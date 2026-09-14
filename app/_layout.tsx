@@ -5,7 +5,7 @@ import { SessionProvider } from '../src/session/context';
 export default function RootLayout() {
   return (
     <SessionProvider>
-      <Stack />
+      <Stack screenOptions={{ headerShown: false }} />
     </SessionProvider>
   );
 }

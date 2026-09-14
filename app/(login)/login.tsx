@@ -22,8 +22,7 @@ type FormData = {
 };
 
 // TODO: reemplaza esta URI por tu propia imagen (por ejemplo con require('../../assets/hero-login.jpg'))
-const HERO_IMAGE_URI =
-  'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800&q=80';
+const HERO_IMAGE_URI = require('../../assets/headerIniciarsesion.jpg');
 
 export default function Login() {
   const { signIn } = useSession();
@@ -67,15 +66,17 @@ export default function Login() {
       >
         {/* hero-accent-block */}
         <ImageBackground
-          source={{ uri: HERO_IMAGE_URI }}
-          className="h-[220px] w-full justify-end overflow-hidden"
+          source={HERO_IMAGE_URI}
+          resizeMode="cover"
+          imageStyle={{ transform: [{ translateY: -40 }] }}
+          className="h-[280px] w-full justify-end overflow-hidden"
         >
           {/* overlay oscuro (equivalente al linear-gradient plano del diseño) */}
           <View className="absolute inset-0 bg-black/15" />
 
           {/* image-overlay-quote */}
           <Text className="px-5 pb-5 font-['Lora'] text-2xl italic leading-7 text-white">
-            Diseñado para tu día a día.
+            Diversidad e inspiración
           </Text>
         </ImageBackground>
 
@@ -84,11 +85,11 @@ export default function Login() {
           {/* brand-logo */}
           <View className="items-center gap-0.5">
             {/* TODO: reemplaza por el nombre real de tu marca */}
-            <Text className="font-['Lora'] text-[32px] italic leading-[41px] text-[#1A1A1A]">
-              Tu Marca
+            <Text className="font-['Lora'] text-[32px] italic leading-[41px] text-[#A81245]">
+              Hibirio
             </Text>
-            <Text className="text-[10px] font-semibold uppercase tracking-wide text-[#B89F8D]">
-              Boutique
+            <Text className="text-[10px] font-semibold uppercase tracking-wide text-[#A81245]-0.2">
+              Tu estilo, tu esencia
             </Text>
           </View>
 
@@ -102,7 +103,7 @@ export default function Login() {
               placeholder="nombre@correo.com"
               labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
               inputWrapperClassName="h-12 flex-row items-center rounded-lg border border-[#EAE6E1] bg-white px-4"
-              inputClassName="flex-1 text-sm text-[#1A1A1A]"
+              inputClassName="flex-1 text-sm text-[#292724]"
             />
 
             <Field
@@ -113,10 +114,10 @@ export default function Login() {
               placeholder="••••••••"
               labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
               inputWrapperClassName="h-12 flex-row items-center rounded-lg border border-[#EAE6E1] bg-white px-4"
-              inputClassName="flex-1 text-sm text-[#1A1A1A]"
+              inputClassName="flex-1 text-sm text-[#292724]"
               rightElement={
                 <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
-                  <Text className="text-xs font-medium text-[#A39E9A]">
+                  <Text className="text-xs font-medium text-[#A81245]">
                     {showPassword ? 'Ocultar' : 'Mostrar'}
                   </Text>
                 </Pressable>
@@ -126,7 +127,7 @@ export default function Login() {
             {/* forgot-password */}
             {/* TODO: sin lógica de recuperación de contraseña todavía — conectar cuando exista el flujo */}
             <Pressable>
-              <Text className="text-right text-xs font-medium text-[#B89F8D]">
+              <Text className="text-right text-xs font-medium text-[#292724]">
                 ¿Olvidaste tu contraseña?
               </Text>
             </Pressable>
@@ -135,7 +136,7 @@ export default function Login() {
             {/* MENSAJE DE ERROR */}
             {error && (
               <View className="mb-6 rounded-xl bg-red-50 p-4">
-                <Text className="text-center text-sm font-medium text-red-700">
+                <Text className="text-center text-sm font-medium text-pink-700">
                   {error}
                 </Text>
               </View>
@@ -143,7 +144,7 @@ export default function Login() {
 
             {/* MENSAJE DE ÉXITO */}
             {success && (
-              <View className="mb-6 rounded-xl bg-green-50 p-4">
+              <View className="mb-6 rounded-xl bg-black-50 p-4">
                 <Text className="text-center text-sm font-medium text-green-700">
                   ¡Has ingresado correctamente!
                 </Text>
@@ -155,7 +156,7 @@ export default function Login() {
             text={loading ? 'Ingresando...' : 'Iniciar sesión'}
             onPress={handleSubmit(onSubmit)}
             disabled={loading}
-            className="h-12 rounded-full bg-[#1A1A1A]"
+            className="h-12 items-center justify-center rounded-full bg-[#DCC7A8]"
             textClassName="text-sm font-semibold text-white"
           />
 
@@ -168,7 +169,7 @@ export default function Login() {
           {/* divider-block */}
           <View className="flex-row items-center gap-3">
             <View className="h-px flex-1 bg-[#EAE6E1]" />
-            <Text className="text-[11px] font-medium uppercase text-[#A39E9A]">O</Text>
+            <Text className="text-[11px] font-medium uppercase text-[#292724]">O</Text>
             <View className="h-px flex-1 bg-[#EAE6E1]" />
           </View>
 
@@ -176,13 +177,13 @@ export default function Login() {
           {/* TODO: sin lógica de auth social todavía — solo visual, conectar cuando exista el flujo */}
           <View className="gap-2">
             <Pressable className="h-12 flex-row items-center justify-center gap-3 rounded-full border border-[#EAE6E1] bg-white">
-              <Text className="text-[13px] font-medium text-[#1A1A1A]">
+              <Text className="text-[13px] font-medium text-[#292724]">
                 Continuar con Google
               </Text>
             </Pressable>
 
             <Pressable className="h-12 flex-row items-center justify-center gap-3 rounded-full border border-[#EAE6E1] bg-white">
-              <Text className="text-[13px] font-medium text-[#1A1A1A]">
+              <Text className="text-[13px] font-medium text-[#292724]">
                 Continuar con Apple
               </Text>
             </Pressable>
@@ -195,7 +196,7 @@ export default function Login() {
             <Pressable>
               <Text className="text-[13px] text-[#6E6B68]">
                 ¿No tienes una cuenta?{' '}
-                <Text className="font-semibold text-[#1A1A1A]">Crear cuenta</Text>
+                <Text className="font-semibold text-[#DCC7A8]">Crear cuenta</Text>
               </Text>
             </Pressable>
           </Link>

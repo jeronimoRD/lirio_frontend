@@ -28,27 +28,20 @@ export default function Button({
       ? 'border border-neutral-300 bg-white'
       : 'bg-green-500';
 
-  return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-
-      className={`w-full items-center justify-center rounded-xl px-4 py-4 active:opacity-80 disabled:opacity-50 ${
-        secondary
-          ? 'border border-neutral-300 bg-white'
-          : danger
-            ? 'bg-red-600'
-            : 'bg-green-500'
-      } ${className ?? ''}`}
-    >
-      <Text
-        className={
-          textClassName ??
-          `text-base font-semibold ${secondary ? 'text-neutral-700' : 'text-white'}`
-        }
+    return (
+      <Pressable
+        onPress={onPress}
+        disabled={disabled}
+        className={`w-full items-center justify-center rounded-xl px-4 py-4 active:opacity-80 disabled:opacity-50 ${colorClasses} ${className ?? ''}`}
       >
-        {text}
-      </Text>
-    </Pressable>
-  );
+        <Text
+          className={
+            textClassName ??
+            `text-base font-semibold ${secondary ? 'text-neutral-700' : 'text-white'}`
+          }
+        >
+          {text}
+        </Text>
+      </Pressable>
+    );
 }

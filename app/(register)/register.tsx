@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   ActivityIndicator,
+  GestureResponderEvent,
   Pressable,
   ScrollView,
   Text,
@@ -72,6 +73,14 @@ export default function Register() {
     }
   };
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(login)/login');
+    }
+  };
+
   return (
     <View className="flex-1 bg-[#FCFAF8]">
       <ScrollView
@@ -81,11 +90,11 @@ export default function Register() {
       >
         {/* header */}
         <View className="flex-row items-center justify-between px-6 py-4">
-          <Pressable onPress={() => router.back()} hitSlop={8}>
-            <Text className="text-xl text-[#1A1A1A]">←</Text>
+          <Pressable onPress={handleBack} hitSlop={8}>
+            <Text className="text-xl text-[#DCC7A8]">←</Text>
           </Pressable>
 
-          <Text className="text-base font-semibold uppercase text-[#1A1A1A]">
+          <Text className="text-base font-semibold uppercase text-[#DCC7A8]">
             Crear cuenta
           </Text>
 
@@ -206,7 +215,7 @@ export default function Register() {
             text={loading ? 'Registrando...' : 'Crear cuenta'}
             onPress={handleSubmit(onSubmit)}
             disabled={loading}
-            className="h-12 rounded-full bg-[#1A1A1A]"
+            className="h-12 rounded-full bg-[#DCC7A8]"
             textClassName="text-sm font-semibold text-white"
           />
 
