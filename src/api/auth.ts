@@ -1,16 +1,17 @@
-import type { User } from '../types';
+import type { Role, User } from '../types';
 import { request, setToken } from './client';
 
 interface UserResponse {
   id: string;
   email: string;
   user_name: string;
+  role?: Role;
 }
 
 interface AuthResponse {
   message: string;
   user: UserResponse;
-  token?: string;
+  access_token?: string;
 }
 
 function toUser(data: UserResponse): User {
@@ -18,8 +19,7 @@ function toUser(data: UserResponse): User {
     id: data.id,
     name: data.user_name,
     email: data.email,
-    role: 'SOLICITANTE',
-    active: true,
+    role: data.role ?? 'USER',
   };
 }
 
@@ -35,8 +35,8 @@ export async function login(
     },
   );
 
-  if (response.token) {
-    setToken(response.token);
+  if (response.access_token) {
+    setToken(response.access_token);
   }
 
   return toUser(response.user);
@@ -56,8 +56,8 @@ export async function register(
     },
   );
 
-  if (response.token) {
-    setToken(response.token);
+  if (response.access_token) {
+    setToken(response.access_token);
   }
 
   return toUser(response.user);

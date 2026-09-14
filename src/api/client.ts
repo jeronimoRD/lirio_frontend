@@ -10,12 +10,14 @@ export function setToken(value: string | null): void {
 export async function request<T>(
   path: string,
   body?: unknown,
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE' =
+    body === undefined ? 'GET' : 'POST',
 ): Promise<T> {
   let response: Response;
 
   try {
     response = await fetch(`${API_URL}${path}`, {
-      method: body === undefined ? 'GET' : 'POST',
+      method,
 
       headers: {
         'Content-Type': 'application/json',
