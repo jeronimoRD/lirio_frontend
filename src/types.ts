@@ -9,8 +9,8 @@
  * no son nombres de código, son los datos que el servidor guarda y devuelve.
  */
 
-/** Roles del sistema. El backend asigna SOLICITANTE por defecto al registrarse. */
-export const ROLES = ['SOLICITANTE', 'AGENTE', 'COORDINADOR', 'ADMINISTRADOR'] as const;
+/** Roles del sistema. El backend asigna USER por defecto al registrarse. */
+export const ROLES = ['USER', 'ADMIN'] as const;
 export type Role = (typeof ROLES)[number];
 
 /** Usuario de la sesión. Nunca incluye la contraseña ni su hash. */
@@ -19,7 +19,16 @@ export interface User {
   name: string;
   email: string;
   role: Role;
-  active: boolean;
+}
+
+/** Una publicación creada por un usuario. */
+export interface Post {
+  id: string;
+  title: string;
+  image: string;
+  description: string;
+  userId: string;
+  createdAt: string;
 }
 
 // --- Tickets ---------------------------------------------------------------

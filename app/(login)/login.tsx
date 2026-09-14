@@ -1,4 +1,4 @@
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -27,6 +27,7 @@ const HERO_IMAGE_URI =
 
 export default function Login() {
   const { signIn } = useSession();
+  const router = useRouter();
 
   const { control, handleSubmit } = useForm<FormData>({
     defaultValues: {
@@ -36,18 +37,17 @@ export default function Login() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data: FormData) => {
     setError(null);
-    setSuccess(false);
     setLoading(true);
 
     try {
       await signIn(data.email, data.password);
-      setSuccess(true);
+      router.replace('/profile');
     } catch (err: any) {
       setError(err?.message ?? 'Error desconocido');
     } finally {
@@ -132,21 +132,23 @@ export default function Login() {
             </Pressable>
           </View>
 
-          {/* MENSAJE DE ERROR */}
-          {error && (
-            <View className="rounded-xl bg-red-50 p-4">
-              <Text className="text-center text-sm font-medium text-red-700">{error}</Text>
-            </View>
-          )}
+            {/* MENSAJE DE ERROR */}
+            {error && (
+              <View className="mb-6 rounded-xl bg-red-50 p-4">
+                <Text className="text-center text-sm font-medium text-red-700">
+                  {error}
+                </Text>
+              </View>
+            )}
 
-          {/* MENSAJE DE ÉXITO */}
-          {success && (
-            <View className="rounded-xl bg-green-50 p-4">
-              <Text className="text-center text-sm font-medium text-green-700">
-                ¡Has ingresado correctamente!
-              </Text>
-            </View>
-          )}
+            {/* MENSAJE DE ÉXITO */}
+            {success && (
+              <View className="mb-6 rounded-xl bg-green-50 p-4">
+                <Text className="text-center text-sm font-medium text-green-700">
+                  ¡Has ingresado correctamente!
+                </Text>
+              </View>
+            )}
 
           {/* login-action: btn-primary */}
           <Button

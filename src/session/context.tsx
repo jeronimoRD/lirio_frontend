@@ -8,6 +8,7 @@
 
 import { createContext, use, useState, type PropsWithChildren } from 'react';
 import * as api from '../api/auth';
+import { getMe } from '../api/users';
 import { setToken } from '../api/client';
 import type { User } from '../types';
 
@@ -17,6 +18,8 @@ interface Session {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (name: string, email: string, password: string) => Promise<void>;
   signOut: () => void;
+  /** Vuelve a pedir el usuario al servidor (tras editar el perfil, por ejemplo). */
+  refreshUser: () => Promise<void>;
 }
 
 const SessionContext = createContext<Session | null>(null);
@@ -38,7 +41,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
    */
   const signIn = async (email: string, password: string) => {
     const user = await api.login(email.trim().toLowerCase(), password);
-    // El backend no devuelve token en esta API; guardamos solo el usuario.
+    // El token queda guardado en `api/client` para las próximas peticiones.
     setUser(user);
   };
 
@@ -62,6 +65,10 @@ export function SessionProvider({ children }: PropsWithChildren) {
         signOut: () => {
           setToken(null);
           setUser(null);
+        },
+        refreshUser: async () => {
+          const user = await getMe();
+          setUser(user);
         },
       }}>
       {children}

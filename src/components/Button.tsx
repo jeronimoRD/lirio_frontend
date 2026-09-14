@@ -5,6 +5,7 @@ interface Props {
   onPress: () => void;
   disabled?: boolean;
   secondary?: boolean;
+  danger?: boolean;
   className?: string;
   textClassName?: string;
 }
@@ -14,6 +15,7 @@ export default function Button({
   onPress,
   disabled,
   secondary,
+  danger,
   className,
   textClassName,
 }: Props) {
@@ -30,7 +32,14 @@ export default function Button({
     <Pressable
       onPress={onPress}
       disabled={disabled}
-      className={`w-full items-center justify-center rounded-xl px-4 py-4 active:opacity-80 disabled:opacity-50 ${colorClasses} ${className ?? ''}`}
+
+      className={`w-full items-center justify-center rounded-xl px-4 py-4 active:opacity-80 disabled:opacity-50 ${
+        secondary
+          ? 'border border-neutral-300 bg-white'
+          : danger
+            ? 'bg-red-600'
+            : 'bg-green-500'
+      } ${className ?? ''}`}
     >
       <Text
         className={
