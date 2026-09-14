@@ -1,4 +1,5 @@
 import { Link, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -22,7 +23,7 @@ type FormData = {
 };
 
 // TODO: reemplaza esta URI por tu propia imagen (por ejemplo con require('../../assets/hero-login.jpg'))
-const HERO_IMAGE_URI = require('../../assets/headerIniciarsesion.jpg');
+const HERO_IMAGE_URI = require('../../assets/pexels-karen-f-1376469-8883181.jpg');
 
 export default function Login() {
   const { signIn } = useSession();
@@ -68,16 +69,11 @@ export default function Login() {
         <ImageBackground
           source={HERO_IMAGE_URI}
           resizeMode="cover"
-          imageStyle={{ transform: [{ translateY: -40 }] }}
+          imageStyle={{ transform: [{ translateY: -1 }] }}
           className="h-[280px] w-full justify-end overflow-hidden"
         >
           {/* overlay oscuro (equivalente al linear-gradient plano del diseño) */}
           <View className="absolute inset-0 bg-black/15" />
-
-          {/* image-overlay-quote */}
-          <Text className="px-5 pb-5 font-['Lora'] text-2xl italic leading-7 text-white">
-            Diversidad e inspiración
-          </Text>
         </ImageBackground>
 
         {/* login-panel */}
@@ -117,7 +113,7 @@ export default function Login() {
               inputClassName="flex-1 text-sm text-[#292724]"
               rightElement={
                 <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
-                  <Text className="text-xs font-medium text-[#A81245]">
+                  <Text className="text-xs font-medium text-[#292724]">
                     {showPassword ? 'Ocultar' : 'Mostrar'}
                   </Text>
                 </Pressable>
@@ -127,7 +123,7 @@ export default function Login() {
             {/* forgot-password */}
             {/* TODO: sin lógica de recuperación de contraseña todavía — conectar cuando exista el flujo */}
             <Pressable>
-              <Text className="text-right text-xs font-medium text-[#292724]">
+              <Text className="text-right text-xs font-medium text-[#A81245]">
                 ¿Olvidaste tu contraseña?
               </Text>
             </Pressable>
@@ -144,7 +140,7 @@ export default function Login() {
 
             {/* MENSAJE DE ÉXITO */}
             {success && (
-              <View className="mb-6 rounded-xl bg-black-50 p-4">
+              <View className="mb-6 rounded-xl bg-green-50 p-4">
                 <Text className="text-center text-sm font-medium text-green-700">
                   ¡Has ingresado correctamente!
                 </Text>
@@ -156,7 +152,7 @@ export default function Login() {
             text={loading ? 'Ingresando...' : 'Iniciar sesión'}
             onPress={handleSubmit(onSubmit)}
             disabled={loading}
-            className="h-12 items-center justify-center rounded-full bg-[#DCC7A8]"
+            className="h-12 flex-row items-center justify-center gap-3 rounded-full border border-[#EAE6E1] bg-[#A81245]"
             textClassName="text-sm font-semibold text-white"
           />
 
@@ -177,12 +173,16 @@ export default function Login() {
           {/* TODO: sin lógica de auth social todavía — solo visual, conectar cuando exista el flujo */}
           <View className="gap-2">
             <Pressable className="h-12 flex-row items-center justify-center gap-3 rounded-full border border-[#EAE6E1] bg-white">
+              <Ionicons name="logo-google" size={18} color="#292724" />
+
               <Text className="text-[13px] font-medium text-[#292724]">
                 Continuar con Google
               </Text>
             </Pressable>
 
             <Pressable className="h-12 flex-row items-center justify-center gap-3 rounded-full border border-[#EAE6E1] bg-white">
+              <Ionicons name="logo-apple" size={18} color="#292724" />
+
               <Text className="text-[13px] font-medium text-[#292724]">
                 Continuar con Apple
               </Text>
@@ -196,7 +196,7 @@ export default function Login() {
             <Pressable>
               <Text className="text-[13px] text-[#6E6B68]">
                 ¿No tienes una cuenta?{' '}
-                <Text className="font-semibold text-[#DCC7A8]">Crear cuenta</Text>
+                <Text className="font-semibold text-[#A81245]">Crear cuenta</Text>
               </Text>
             </Pressable>
           </Link>

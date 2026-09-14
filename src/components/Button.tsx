@@ -32,7 +32,7 @@ export default function Button({
       <Pressable
         onPress={onPress}
         disabled={disabled}
-        className={`w-full items-center justify-center rounded-xl px-4 py-4 active:opacity-80 disabled:opacity-50 ${colorClasses} ${className ?? ''}`}
+        className={`w-full h-12 flex-row items-center justify-center gap-3 rounded-full active:opacity-80 disabled:opacity-50 ${colorClasses} ${className ?? ''}`}
       >
         <Text
           className={
