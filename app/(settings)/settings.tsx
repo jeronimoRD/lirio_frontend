@@ -8,7 +8,6 @@ import {
   ChevronRight,
   Lock,
   Mail,
-  MessageCircle,
   TriangleAlert,
   UserRound,
 } from 'lucide-react-native';
@@ -18,7 +17,6 @@ import {
   updatePassword,
   updateProfile,
 } from '../../src/api/users';
-import Button from '../../src/components/Button';
 import Field from '../../src/components/Field';
 import { useSession } from '../../src/session/context';
 
@@ -36,8 +34,6 @@ function messageOf(err: unknown): string {
   return err instanceof Error ? err.message : 'Ocurrió un error inesperado';
 }
 
-// --- Piezas visuales reutilizables de la lista de settings ---
-
 function IconWell({ children }: { children: ReactNode }) {
   return (
     <View className="h-8 w-8 items-center justify-center rounded-full bg-[#F4EEE7]">
@@ -54,9 +50,6 @@ function SectionLabel({ text }: { text: string }) {
   );
 }
 
-// Fila de encabezado de sección: ícono + texto, sin acción de navegación
-// (las secciones aquí despliegan su formulario debajo, en vez de llevar a
-// otra pantalla, para no tener que crear rutas nuevas).
 function SectionHeaderRow({ icon, label }: { icon: ReactNode; label: string }) {
   return (
     <View className="h-[52px] flex-row items-center gap-3">
@@ -66,7 +59,6 @@ function SectionHeaderRow({ icon, label }: { icon: ReactNode; label: string }) {
   );
 }
 
-// Fila simple tipo toggle (solo visual por ahora, ver TODOs abajo).
 function ToggleRow({
   icon,
   label,
@@ -85,7 +77,7 @@ function ToggleRow({
       <Switch
         value={value}
         onValueChange={onChange}
-        trackColor={{ false: '#EAE6E1', true: '#DCC7A8' }}
+        trackColor={{ false: '#EAE6E1', true: '#A81245' }}
         thumbColor="#FFFFFF"
       />
     </View>
@@ -125,8 +117,6 @@ export default function Settings() {
     text: string;
   } | null>(null);
 
-  // TODO: solo visual — no hay endpoint de preferencias de notificaciones
-  // todavía, así que estos dos toggles no persisten nada por ahora.
   const [pushEnabled, setPushEnabled] = useState(true);
   const [emailEnabled, setEmailEnabled] = useState(false);
 
@@ -171,7 +161,6 @@ export default function Settings() {
     try {
       await deleteAccount();
       signOut();
-      // signOut deja user en null: el Redirect de arriba lo lleva al login.
     } catch (err) {
       setMessage({ kind: 'error', text: messageOf(err) });
     } finally {
@@ -200,7 +189,7 @@ export default function Settings() {
             hitSlop={8}
             className="h-11 w-11 items-center justify-center"
           >
-            <ArrowLeft size={22} color="#DCC7A8" strokeWidth={2} />
+            <ArrowLeft size={22} color="#A81245" strokeWidth={2} />
           </Pressable>
 
           <Text className="flex-1 text-center text-xl font-bold text-[#292724]">
@@ -247,7 +236,6 @@ export default function Settings() {
               }}
             />
 
-            {/* Bio: solo visual por ahora, sin endpoint todavía */}
             <View className="gap-1">
               <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
                 Bibliografía
@@ -266,7 +254,7 @@ export default function Settings() {
             <Pressable
               onPress={profileForm.handleSubmit(saveProfile)}
               disabled={savingProfile}
-              className="h-11 items-center justify-center rounded-full bg-[#DCC7A8] disabled:opacity-50"
+              className="h-11 items-center justify-center rounded-full bg-[#A81245] disabled:opacity-50"
             >
               <Text className="text-sm font-semibold text-white">
                 {savingProfile ? 'Guardando...' : 'Guardar cambios'}
@@ -314,7 +302,7 @@ export default function Settings() {
             <Pressable
               onPress={passwordForm.handleSubmit(savePassword)}
               disabled={savingPassword}
-              className="h-11 items-center justify-center rounded-full bg-[#DCC7A8] disabled:opacity-50"
+              className="h-11 items-center justify-center rounded-full bg-[#A81245] disabled:opacity-50"
             >
               <Text className="text-sm font-semibold text-white">
                 {savingPassword ? 'Actualizando...' : 'Cambiar contraseña'}

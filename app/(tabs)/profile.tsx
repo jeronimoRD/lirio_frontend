@@ -13,9 +13,6 @@ import { getPosts } from '../../src/api/posts';
 import { useSession } from '../../src/session/context';
 import type { Post, Role } from '../../src/types';
 
-// Etiqueta legible por rol. Se usa como "bio" bajo el nombre en vez de un
-// badge aparte, para acercarse al layout del diseño (nombre + línea de texto
-// debajo), sin perder el dato de rol que ya mostraba la versión anterior.
 const ROLE_LABEL: Record<Role, string> = {
   USER: 'Usuario',
   ADMIN: 'Administrador',
@@ -31,13 +28,8 @@ function initialsOf(name: string): string {
     .toUpperCase();
 }
 
-// TODO: solo visual por ahora — "Guardado" no tiene datos propios todavía
-// (los posts guardados no existen en el backend), así que el tab cambia el
-// estado local pero no filtra nada real hasta que exista esa API.
 type GalleryTab = 'outfits' | 'saved';
 
-// Alturas alternadas para que la galería de dos columnas se vea tipo
-// masonry sin tener que medir cada imagen real.
 const COLUMN_HEIGHTS = [174, 112, 164, 102];
 
 export default function Profile() {
@@ -84,7 +76,6 @@ export default function Profile() {
     return <Redirect href="/(login)/login" />;
   }
 
-  // Dos columnas para el efecto masonry, alternando por índice.
   const leftColumn = posts.filter((_, i) => i % 2 === 0);
   const rightColumn = posts.filter((_, i) => i % 2 === 1);
 
@@ -97,7 +88,7 @@ export default function Profile() {
         {/* Profile photo */}
         <View className="items-center">
           <View
-            className="h-[88px] w-[88px] items-center justify-center rounded-full border-[3px] border-white bg-[#DCC7A8]"
+            className="h-[88px] w-[88px] items-center justify-center rounded-full border-[3px] border-white bg-[#A81245]"
             style={{
               shadowColor: 'rgba(92, 75, 54, 0.12)',
               shadowOffset: { width: 0, height: 7 },
@@ -122,8 +113,6 @@ export default function Profile() {
         </View>
 
         {/* Profile stats */}
-        {/* TODO: Followers/Following no existen en el backend todavía — solo
-            se muestra "Outfits", que sí viene de datos reales (posts.length). */}
         <View className="flex-row items-start gap-2">
           <View className="flex-1 items-center gap-[3px]">
             <Text className="text-base font-bold leading-[19px] text-[#292724]">
@@ -138,9 +127,8 @@ export default function Profile() {
         {/* Profile actions */}
         <View className="flex-row gap-2.5">
           <Pressable
-            // TODO: crear ruta /edit-profile — todavía no existe la pantalla.
             onPress={() => router.push('/edit-profile' as any)}
-            className="h-[42px] flex-1 items-center justify-center rounded-full bg-[#DCC7A8]"
+            className="h-[42px] flex-1 items-center justify-center rounded-full bg-[#A81245]"
           >
             <Text className="text-[13px] font-semibold text-white">
               Editar perfil
@@ -173,7 +161,7 @@ export default function Profile() {
               Mis outfits
             </Text>
             {activeTab === 'outfits' && (
-              <View className="h-[2px] w-[74px] bg-[#DCC7A8]" />
+              <View className="h-[2px] w-[74px] bg-[#A81245]" />
             )}
           </Pressable>
 
@@ -191,7 +179,7 @@ export default function Profile() {
               Guardado
             </Text>
             {activeTab === 'saved' && (
-              <View className="h-[2px] w-[74px] bg-[#DCC7A8]" />
+              <View className="h-[2px] w-[74px] bg-[#A81245]" />
             )}
           </Pressable>
         </View>

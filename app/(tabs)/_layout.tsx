@@ -12,9 +12,14 @@ function UploadButton() {
             height: 56,
             width: 56,
             borderRadius: 28,
-            backgroundColor: '#DCC7A8',
+            backgroundColor: '#A81245',
             alignItems: 'center',
             justifyContent: 'center',
+            shadowColor: '#A81245',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 4,
         }}
         >
         <Plus size={22} color="#FFFFFF" />
@@ -27,8 +32,8 @@ function UploadButton() {
         <Tabs
         screenOptions={{
             headerShown: false,
-            tabBarActiveTintColor: '#DCC7A8',
-            tabBarInactiveTintColor: '#3D6B52',
+            tabBarActiveTintColor: '#A81245',
+            tabBarInactiveTintColor: '#A09B95',
             tabBarStyle: {
             backgroundColor: '#FCFAF8',
             borderTopColor: '#EAE6E1',
