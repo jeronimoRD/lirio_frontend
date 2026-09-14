@@ -170,6 +170,13 @@ export default function Profile() {
           ))}
 
         <View className="mt-4 gap-3">
+          {user.role === 'ADMIN' && (
+            <Button
+              text="Panel de administración"
+              secondary
+              onPress={() => router.push('/admin')}
+            />
+          )}
           <Button
             text="Configuración del perfil"
             secondary
