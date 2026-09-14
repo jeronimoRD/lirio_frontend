@@ -14,7 +14,14 @@ export default function AdminLayout() {
   }
 
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerStyle: { backgroundColor: '#FCFAF8' },
+        headerTintColor: '#A81245',
+        headerTitleStyle: { fontWeight: '600', color: '#292724' },
+        headerShadowVisible: false,
+      }}
+    >
       <Stack.Screen
         name="index"
         options={{ title: 'Panel de administración' }}
