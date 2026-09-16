@@ -27,8 +27,16 @@ type CreateForm = {
 };
 
 const ROLE_STYLE: Record<Role, { label: string; className: string }> = {
-  USER: { label: 'Usuario', className: 'bg-blue-100 text-blue-700' },
-  ADMIN: { label: 'Admin', className: 'bg-amber-100 text-amber-800' },
+  USER: { label: 'Usuario', className: 'bg-[#F4EEE7] text-[#6E6B68]' },
+  ADMIN: { label: 'Admin', className: 'bg-[#4A3728]/10 text-[#4A3728]' },
+};
+
+const cardShadow = {
+  shadowColor: 'rgba(92, 75, 54, 0.10)',
+  shadowOffset: { width: 0, height: 4 },
+  shadowRadius: 12,
+  shadowOpacity: 1,
+  elevation: 2,
 };
 
 function initialsOf(name: string): string {
@@ -159,16 +167,23 @@ export default function AdminUsers() {
 
   return (
     <ScrollView
-      className="flex-1 bg-neutral-50"
-      contentContainerClassName="px-6 py-8"
+      className="flex-1 bg-[#FCFAF8]"
+      contentContainerClassName="px-5 py-8"
     >
       <View className="mx-auto w-full max-w-md">
-        <Text className="mb-6 text-3xl font-bold text-neutral-900">
-          Usuarios
-        </Text>
+        <View className="mb-6 flex-row items-center gap-2">
+          <Text className="text-[22px] font-bold uppercase tracking-wide text-[#292724]">
+            Usuarios
+          </Text>
+          <View className="rounded-full bg-[#4A3728] px-2 py-0.5">
+            <Text className="text-[10px] font-bold uppercase tracking-wider text-white">
+              Admin
+            </Text>
+          </View>
+        </View>
 
         {error && (
-          <View className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
+          <View className="mb-4 rounded-2xl bg-red-50 p-4">
             <Text className="text-center text-sm font-medium text-red-700">
               {error}
             </Text>
@@ -182,13 +197,16 @@ export default function AdminUsers() {
         />
 
         {showCreate && (
-          <View className="mt-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <View className="mt-4 rounded-2xl bg-white p-5" style={cardShadow}>
             <View className="gap-4">
               <Field
                 control={control}
                 name="name"
                 label="Nombre de usuario"
                 placeholder="lirio_secret"
+                labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
+                inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
+                inputClassName="flex-1 text-sm text-[#292724]"
                 rules={{ required: 'Escribe un nombre' }}
               />
               <Field
@@ -197,6 +215,9 @@ export default function AdminUsers() {
                 label="Correo electrónico"
                 keyboardType="email-address"
                 placeholder="nombre@correo.com"
+                labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
+                inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
+                inputClassName="flex-1 text-sm text-[#292724]"
                 rules={{ required: 'Escribe un correo' }}
               />
               <Field
@@ -205,11 +226,16 @@ export default function AdminUsers() {
                 label="Contraseña"
                 secureTextEntry
                 placeholder="••••••••"
+                labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
+                inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
+                inputClassName="flex-1 text-sm text-[#292724]"
                 rules={{ required: 'Escribe una contraseña' }}
               />
 
               <View className="gap-2">
-                <Text className="font-semibold">Rol</Text>
+                <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
+                  Rol
+                </Text>
                 <View className="flex-row gap-2">
                   {ROLES.map((role) => {
                     const selected = role === newRole;
@@ -219,13 +245,13 @@ export default function AdminUsers() {
                         onPress={() => setNewRole(role)}
                         className={`flex-1 items-center rounded-xl border px-3 py-3 active:opacity-80 ${
                           selected
-                            ? 'border-green-500 bg-green-500'
-                            : 'border-neutral-300 bg-white'
+                            ? 'border-[#4A3728] bg-[#4A3728]'
+                            : 'border-[#EAE6E1] bg-white'
                         }`}
                       >
                         <Text
                           className={`text-sm font-semibold ${
-                            selected ? 'text-white' : 'text-neutral-700'
+                            selected ? 'text-white' : 'text-[#6E6B68]'
                           }`}
                         >
                           {ROLE_STYLE[role].label}
@@ -240,6 +266,7 @@ export default function AdminUsers() {
                 text={submitting ? 'Creando...' : 'Crear usuario'}
                 onPress={handleSubmit(onCreate)}
                 disabled={submitting}
+                className="bg-[#4A3728]"
               />
             </View>
           </View>
@@ -247,13 +274,13 @@ export default function AdminUsers() {
 
         {loading && (
           <View className="items-center py-10">
-            <ActivityIndicator />
+            <ActivityIndicator color="#4A3728" />
           </View>
         )}
 
         {!loading && !error && users.length === 0 && (
-          <View className="mt-4 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <Text className="text-center text-sm text-neutral-500">
+          <View className="mt-4 rounded-2xl bg-white p-6" style={cardShadow}>
+            <Text className="text-center text-sm text-[#6E6B68]">
               No hay usuarios registrados.
             </Text>
           </View>
@@ -267,10 +294,11 @@ export default function AdminUsers() {
             return (
               <View
                 key={user.id}
-                className="mt-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm"
+                className="mt-4 rounded-2xl bg-white p-5"
+                style={cardShadow}
               >
                 <View className="flex-row items-center gap-3">
-                  <View className="h-11 w-11 items-center justify-center rounded-full bg-green-500">
+                  <View className="h-11 w-11 items-center justify-center rounded-full bg-[#4A3728]">
                     <Text className="text-sm font-bold text-white">
                       {initialsOf(user.name)}
                     </Text>
@@ -278,14 +306,14 @@ export default function AdminUsers() {
 
                   <View className="flex-1">
                     <View className="flex-row items-center gap-2">
-                      <Text className="text-base font-semibold text-neutral-900">
+                      <Text className="text-base font-semibold text-[#292724]">
                         {user.name}
                       </Text>
                       {isMe && (
-                        <Text className="text-xs text-neutral-400">(tú)</Text>
+                        <Text className="text-xs text-[#A09B95]">(tú)</Text>
                       )}
                     </View>
-                    <Text className="mt-0.5 text-sm text-neutral-500">
+                    <Text className="mt-0.5 text-sm text-[#6E6B68]">
                       {user.email}
                     </Text>
                   </View>

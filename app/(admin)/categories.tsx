@@ -17,6 +17,14 @@ import {
 import Button from '../../src/components/Button';
 import type { Category } from '../../src/types';
 
+const cardShadow = {
+  shadowColor: 'rgba(92, 75, 54, 0.10)',
+  shadowOffset: { width: 0, height: 4 },
+  shadowRadius: 12,
+  shadowOpacity: 1,
+  elevation: 2,
+};
+
 export default function AdminCategories() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,9 +108,7 @@ export default function AdminCategories() {
       setEditingId(null);
       setEditName('');
       setCategories((current) =>
-        current.map((c) =>
-          c.id === editingId ? { ...c, name } : c,
-        ),
+        current.map((c) => (c.id === editingId ? { ...c, name } : c)),
       );
     } catch (err) {
       setError(
@@ -127,9 +133,7 @@ export default function AdminCategories() {
 
     try {
       await deleteCategory(category.id);
-      setCategories((current) =>
-        current.filter((c) => c.id !== category.id),
-      );
+      setCategories((current) => current.filter((c) => c.id !== category.id));
     } catch (err) {
       setError(
         err instanceof Error
@@ -143,16 +147,23 @@ export default function AdminCategories() {
 
   return (
     <ScrollView
-      className="flex-1 bg-neutral-50"
-      contentContainerClassName="px-6 py-8"
+      className="flex-1 bg-[#FCFAF8]"
+      contentContainerClassName="px-5 py-8"
     >
       <View className="mx-auto w-full max-w-md">
-        <Text className="mb-6 text-3xl font-bold text-neutral-900">
-          Categorías
-        </Text>
+        <View className="mb-6 flex-row items-center gap-2">
+          <Text className="text-[22px] font-bold uppercase tracking-wide text-[#292724]">
+            Categorías
+          </Text>
+          <View className="rounded-full bg-[#4A3728] px-2 py-0.5">
+            <Text className="text-[10px] font-bold uppercase tracking-wider text-white">
+              Admin
+            </Text>
+          </View>
+        </View>
 
         {error && (
-          <View className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
+          <View className="mb-4 rounded-2xl bg-red-50 p-4">
             <Text className="text-center text-sm font-medium text-red-700">
               {error}
             </Text>
@@ -161,10 +172,11 @@ export default function AdminCategories() {
 
         <View className="flex-row gap-2">
           <TextInput
-            className="flex-1 rounded-xl border border-neutral-300 bg-white px-4 py-4"
+            className="h-12 flex-1 rounded-xl border border-[#EAE6E1] bg-white px-4 text-sm text-[#292724]"
             value={newName}
             onChangeText={setNewName}
             placeholder="Nueva categoría"
+            placeholderTextColor="#A09B95"
             autoCapitalize="words"
             onSubmitEditing={onCreate}
           />
@@ -173,19 +185,20 @@ export default function AdminCategories() {
               text={creating ? '...' : 'Agregar'}
               onPress={onCreate}
               disabled={creating || newName.trim() === ''}
+              className="h-12 rounded-xl bg-[#4A3728] px-4 py-0"
             />
           </View>
         </View>
 
         {loading && (
           <View className="items-center py-10">
-            <ActivityIndicator />
+            <ActivityIndicator color="#4A3728" />
           </View>
         )}
 
         {!loading && !error && categories.length === 0 && (
-          <View className="mt-4 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <Text className="text-center text-sm text-neutral-500">
+          <View className="mt-4 rounded-2xl bg-white p-6" style={cardShadow}>
+            <Text className="text-center text-sm text-[#6E6B68]">
               Aún no hay categorías. Crea la primera arriba.
             </Text>
           </View>
@@ -198,15 +211,17 @@ export default function AdminCategories() {
             return (
               <View
                 key={category.id}
-                className="mt-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm"
+                className="mt-4 rounded-2xl bg-white p-5"
+                style={cardShadow}
               >
                 {isEditing ? (
                   <>
                     <TextInput
-                      className="rounded-xl border border-neutral-300 bg-white px-4 py-3"
+                      className="h-12 rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4 text-sm text-[#292724]"
                       value={editName}
                       onChangeText={setEditName}
                       placeholder="Nombre de la categoría"
+                      placeholderTextColor="#A09B95"
                       autoCapitalize="words"
                       onSubmitEditing={onSaveEdit}
                     />
@@ -216,6 +231,7 @@ export default function AdminCategories() {
                           text={busyId === category.id ? 'Guardando...' : 'Guardar'}
                           onPress={onSaveEdit}
                           disabled={busyId !== null || editName.trim() === ''}
+                          className="rounded-xl bg-[#4A3728]"
                         />
                       </View>
                       <View className="flex-1">
@@ -234,11 +250,11 @@ export default function AdminCategories() {
                 ) : (
                   <>
                     <View className="flex-row items-center justify-between gap-3">
-                      <Text className="flex-1 text-base font-semibold text-neutral-900">
+                      <Text className="flex-1 text-base font-semibold text-[#292724]">
                         {category.name}
                       </Text>
                       <Pressable onPress={() => onStartEdit(category)}>
-                        <Text className="text-sm font-semibold text-green-600">
+                        <Text className="text-sm font-semibold text-[#4A3728]">
                           Renombrar
                         </Text>
                       </Pressable>
@@ -253,7 +269,8 @@ export default function AdminCategories() {
                               ? 'Eliminando...'
                               : 'Eliminar'
                         }
-                        secondary
+                        danger={confirmDeleteId === category.id}
+                        secondary={confirmDeleteId !== category.id}
                         onPress={() => onDeletePress(category)}
                         disabled={busyId !== null}
                       />

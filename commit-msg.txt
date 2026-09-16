@@ -1,0 +1,11 @@
+feat(posts): completa CRUD de Posts + mejoras de UI compartida
+
+Agrega updatePost, deletePost, getPost a src/api/posts.ts
+Nueva pantalla app/edit-post/[id].tsx con formulario precargado (solo envía los campos modificados)
+Profile.tsx: tap para editar, long-press + confirmación para eliminar outfits
+Extrae ScreenHeader como componente compartido (Home/Explore/Saved)
+Corrige Button.tsx: la variante "danger" no se aplicaba
+Alinea valores por defecto de Field.tsx a la paleta de marca
+Carga Lora-Italic y variantes vía expo-font en el layout raíz"
+Alinea valores por defecto de Field.tsx a la paleta de marca
+Carga Lora-Italic y variantes vía expo-font en el layout raíz
