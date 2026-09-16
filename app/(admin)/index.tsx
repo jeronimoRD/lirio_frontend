@@ -121,14 +121,14 @@ export default function AdminIndex() {
               icon={<Users size={20} color="#4A3728" />}
               title="Usuarios"
               subtitle={`${userCount} cuenta${userCount === 1 ? '' : 's'} registrada${userCount === 1 ? '' : 's'}`}
-              onPress={() => router.push('/admin/users')}
+              onPress={() => router.push('/(admin)/users')}
             />
 
             <OptionCard
               icon={<Tag size={20} color="#4A3728" />}
               title="Categorías"
               subtitle={`${categoryCount} categoría${categoryCount === 1 ? '' : 's'}`}
-              onPress={() => router.push('/admin/categories')}
+              onPress={() => router.push('/(admin)/categories')}
             />
           </>
         )}
