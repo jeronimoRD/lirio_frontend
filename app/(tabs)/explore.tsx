@@ -11,13 +11,13 @@ import {
 import { Search, X } from 'lucide-react-native';
 
 import { getPosts } from '../../src/api/posts';
-import type { Post } from '../../src/types';
+import { getCategories } from '../../src/api/categories';
+import type { Post, Category } from '../../src/types';
 import ScreenHeader from '@/components/ScreenHeader';
-
-const FILTERS = ['Streetwear', 'Classy', 'Vintage', 'Minimal', 'Boho'];
 
 export default function Explore() {
     const [posts, setPosts] = useState<Post[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [query, setQuery] = useState('');
@@ -25,6 +25,12 @@ export default function Explore() {
 
     useEffect(() => {
         let active = true;
+
+        getCategories()
+        .then((all) => {
+            if (active) setCategories(all);
+        })
+        .catch(() => {});
 
         getPosts()
         .then((all) => {
@@ -62,6 +68,8 @@ export default function Explore() {
         return haystack.includes(q);
         });
     }, [posts, query]);
+
+    const filters = categories.map((category) => category.name);
 
     const leftColumn = results.filter((_, i) => i % 2 === 0);
     const rightColumn = results.filter((_, i) => i % 2 === 1);
@@ -104,7 +112,7 @@ export default function Explore() {
             showsHorizontalScrollIndicator={false}
             contentContainerClassName="gap-2 px-4 py-4"
             >
-            {FILTERS.map((filter) => {
+            {filters.map((filter) => {
                 const active = activeFilters.includes(filter);
                 return (
                 <Pressable

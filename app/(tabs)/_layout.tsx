@@ -1,5 +1,6 @@
 import { Tabs, useRouter } from 'expo-router';
 import { Pressable, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Heart, House, Plus, Search, UserRound } from 'lucide-react-native';
 
 function UploadButton() {
@@ -28,6 +29,8 @@ function UploadButton() {
     }
 
     export default function TabsLayout() {
+    const insets = useSafeAreaInsets();
+
     return (
         <Tabs
         screenOptions={{
@@ -37,8 +40,9 @@ function UploadButton() {
             tabBarStyle: {
             backgroundColor: '#FCFAF8',
             borderTopColor: '#EAE6E1',
-            height: 64,
+            height: 64 + insets.bottom,
             paddingTop: 8,
+            paddingBottom: insets.bottom,
             },
         }}
         >

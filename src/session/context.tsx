@@ -15,7 +15,7 @@ import type { User } from '../types';
 interface Session {
   /** null = nadie ha entrado. El layout raíz usa esto para decidir qué mostrar. */
   user: User | null;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<User>;
   signUp: (name: string, email: string, password: string) => Promise<void>;
   signOut: () => void;
   /** Vuelve a pedir el usuario al servidor (tras editar el perfil, por ejemplo). */
@@ -43,6 +43,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
     const user = await api.login(email.trim().toLowerCase(), password);
     // El token queda guardado en `api/client` para las próximas peticiones.
     setUser(user);
+    return user;
   };
 
   return (

@@ -10,22 +10,28 @@ import {
 import { Heart } from 'lucide-react-native';
 
 import { getPosts } from '../../src/api/posts';
+import { getCategories } from '../../src/api/categories';
 import { useFavorites } from '../../src/favorites/context';
-import type { Post } from '../../src/types';
+import type { Post, Category } from '../../src/types';
 import ScreenHeader from '@/components/ScreenHeader';
-
-const FILTERS = ['For You', 'Streetwear', 'Classy', 'Vintage', 'Minimal'];
 
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#292724', '#6E6B68', '#EAE6E1', '#A09B95'];
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState('For You');
 
   useEffect(() => {
     let active = true;
+
+    getCategories()
+      .then((all) => {
+        if (active) setCategories(all);
+      })
+      .catch(() => {});
 
     getPosts()
       .then((all) => {
@@ -44,6 +50,8 @@ export default function Home() {
       active = false;
     };
   }, []);
+
+  const filters = ['For You', ...categories.map((category) => category.name)];
 
   const leftColumn = posts.filter((_, i) => i % 2 === 0);
   const rightColumn = posts.filter((_, i) => i % 2 === 1);
@@ -64,7 +72,7 @@ export default function Home() {
           showsHorizontalScrollIndicator={false}
           contentContainerClassName="gap-2 px-4 pb-3 pt-4"
         >
-          {FILTERS.map((filter) => {
+          {filters.map((filter) => {
             const active = filter === activeFilter;
             return (
               <Pressable
@@ -180,7 +188,7 @@ function EditorialSpread({ post }: { post: Post }) {
       <Image source={{ uri: post.image }} className="w-full" style={{ height: 260 }} resizeMode="cover" />
       <View className="absolute inset-0 justify-end p-5" style={{ backgroundColor: 'rgba(0,0,0,0.35)' }}>
         <Text className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#DCC7A8]">
-          Editor's choice
+          {"Editor's choice"}
         </Text>
         <Text className="mb-2 font-['Lora-Italic'] text-xl leading-6 text-white">
           {post.description || 'Un look que vale la pena destacar.'}

@@ -11,6 +11,7 @@ import { ChevronRight, Tag, Users } from 'lucide-react-native';
 
 import { getAdminUsers } from '../../src/api/admin';
 import { getCategories } from '../../src/api/categories';
+import { useSession } from '../../src/session/context';
 
 const cardShadow = {
   shadowColor: 'rgba(92, 75, 54, 0.10)',
@@ -53,6 +54,7 @@ function OptionCard({
 
 export default function AdminIndex() {
   const router = useRouter();
+  const { signOut } = useSession();
 
   const [userCount, setUserCount] = useState<number | null>(null);
   const [categoryCount, setCategoryCount] = useState<number | null>(null);
@@ -132,6 +134,15 @@ export default function AdminIndex() {
             />
           </>
         )}
+
+        <Pressable
+          onPress={signOut}
+          className="mt-4 h-12 w-full items-center justify-center rounded-2xl border border-red-200 bg-white"
+        >
+          <Text className="text-sm font-semibold text-red-600">
+            Cerrar sesión
+          </Text>
+        </Pressable>
       </View>
     </ScrollView>
   );

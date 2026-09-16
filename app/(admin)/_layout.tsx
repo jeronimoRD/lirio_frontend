@@ -5,12 +5,8 @@ import { useSession } from '../../src/session/context';
 export default function AdminLayout() {
   const { user } = useSession();
 
-  if (user === null) {
+  if (user === null || user.role !== 'ADMIN') {
     return <Redirect href="/(login)/login" />;
-  }
-
-  if (user.role !== 'ADMIN') {
-    return <Redirect href="/profile" />;
   }
 
   return (

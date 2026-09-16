@@ -46,8 +46,8 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await signIn(data.email, data.password);
-      router.replace('/profile');
+      const user = await signIn(data.email, data.password);
+      router.replace(user.role === 'ADMIN' ? '/(admin)' : '/home');
     } catch (err: any) {
       setError(err?.message ?? 'Error desconocido');
     } finally {

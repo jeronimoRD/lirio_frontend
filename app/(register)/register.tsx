@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   ActivityIndicator,
@@ -13,6 +13,7 @@ import {
 import Field from '../../src/components/Field';
 import Button from '../../src/components/Button';
 import { useSession } from '../../src/session/context';
+import { getCategories } from '../../src/api/categories';
 import ScreenHeader from '@/components/ScreenHeader';
 
 type FormData = {
@@ -20,15 +21,6 @@ type FormData = {
   email: string;
   password: string;
 };
-
-const STYLE_OPTIONS = [
-  'Minimalist',
-  'Old Money',
-  'Boho Chic',
-  'Streetwear',
-  'Tailored Masculine',
-  'Romantic Luxe',
-];
 
 // TODO: reemplaza esta URI por tu propia imagen de register
 const HERO_IMAGE_URI = require('../../assets/pexels-karen-f-1376469-8883181.jpg');
@@ -46,6 +38,23 @@ export default function Register() {
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
+  const [styleOptions, setStyleOptions] = useState<string[]>([]);
+
+  useEffect(() => {
+    let active = true;
+
+    getCategories()
+      .then((categories) => {
+        if (active) setStyleOptions(categories.map((category) => category.name));
+      })
+      .catch(() => {
+        if (active) setStyleOptions([]);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const toggleStyle = (style: string) => {
     setSelectedStyles((prev) =>
@@ -169,7 +178,7 @@ export default function Register() {
             </View>
 
             <View className="flex-row flex-wrap gap-2">
-              {STYLE_OPTIONS.map((style) => {
+              {styleOptions.map((style) => {
                 const selected = selectedStyles.includes(style);
                 return (
                   <Pressable
