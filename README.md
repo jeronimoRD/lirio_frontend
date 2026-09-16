@@ -69,7 +69,7 @@ Creá un archivo `.env` dentro de esta carpeta con:
 EXPO_PUBLIC_API_URL=http://TU_IP_LOCAL:3000
 ```
 
-### ⚠️ Cómo obtener `TU_IP_LOCAL` (importante, esto rompe muy seguido)
+### Cómo obtener `TU_IP_LOCAL` (importante, esto rompe muy seguido)
 
 El valor correcto de `EXPO_PUBLIC_API_URL` **depende de dónde estés probando la app**:
 
