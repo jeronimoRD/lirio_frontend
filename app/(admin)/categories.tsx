@@ -151,9 +151,16 @@ export default function AdminCategories() {
       contentContainerClassName="px-5 py-8"
     >
       <View className="mx-auto w-full max-w-md">
-        <Text className="mb-6 font-['Lora'] text-[26px] italic leading-8 text-[#A81245]">
-          Categorías
-        </Text>
+        <View className="mb-6 flex-row items-center gap-2">
+          <Text className="text-[22px] font-bold uppercase tracking-wide text-[#292724]">
+            Categorías
+          </Text>
+          <View className="rounded-full bg-[#4A3728] px-2 py-0.5">
+            <Text className="text-[10px] font-bold uppercase tracking-wider text-white">
+              Admin
+            </Text>
+          </View>
+        </View>
 
         {error && (
           <View className="mb-4 rounded-2xl bg-red-50 p-4">
@@ -178,14 +185,14 @@ export default function AdminCategories() {
               text={creating ? '...' : 'Agregar'}
               onPress={onCreate}
               disabled={creating || newName.trim() === ''}
-              className="h-12 rounded-xl bg-[#A81245] px-4 py-0"
+              className="h-12 rounded-xl bg-[#4A3728] px-4 py-0"
             />
           </View>
         </View>
 
         {loading && (
           <View className="items-center py-10">
-            <ActivityIndicator color="#A81245" />
+            <ActivityIndicator color="#4A3728" />
           </View>
         )}
 
@@ -224,6 +231,7 @@ export default function AdminCategories() {
                           text={busyId === category.id ? 'Guardando...' : 'Guardar'}
                           onPress={onSaveEdit}
                           disabled={busyId !== null || editName.trim() === ''}
+                          className="rounded-xl bg-[#4A3728]"
                         />
                       </View>
                       <View className="flex-1">
@@ -246,7 +254,7 @@ export default function AdminCategories() {
                         {category.name}
                       </Text>
                       <Pressable onPress={() => onStartEdit(category)}>
-                        <Text className="text-sm font-semibold text-[#A81245]">
+                        <Text className="text-sm font-semibold text-[#4A3728]">
                           Renombrar
                         </Text>
                       </Pressable>

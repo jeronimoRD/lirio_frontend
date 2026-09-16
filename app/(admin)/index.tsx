@@ -89,9 +89,16 @@ export default function AdminIndex() {
       contentContainerClassName="px-5 py-8"
     >
       <View className="mx-auto w-full max-w-md">
-        <Text className="mb-1 font-['Lora'] text-[26px] italic leading-8 text-[#A81245]">
-          Panel de administración
-        </Text>
+        <View className="mb-1 flex-row items-center gap-2">
+          <Text className="text-[22px] font-bold uppercase tracking-wide text-[#292724]">
+            Panel de administración
+          </Text>
+          <View className="rounded-full bg-[#4A3728] px-2 py-0.5">
+            <Text className="text-[10px] font-bold uppercase tracking-wider text-white">
+              Admin
+            </Text>
+          </View>
+        </View>
         <Text className="mb-6 text-xs font-medium uppercase tracking-wide text-[#6E6B68]">
           Gestión de usuarios y categorías
         </Text>
@@ -106,19 +113,19 @@ export default function AdminIndex() {
 
         {userCount === null || categoryCount === null ? (
           <View className="items-center py-10">
-            <ActivityIndicator color="#A81245" />
+            <ActivityIndicator color="#4A3728" />
           </View>
         ) : (
           <>
             <OptionCard
-              icon={<Users size={20} color="#A81245" />}
+              icon={<Users size={20} color="#4A3728" />}
               title="Usuarios"
               subtitle={`${userCount} cuenta${userCount === 1 ? '' : 's'} registrada${userCount === 1 ? '' : 's'}`}
               onPress={() => router.push('/admin/users')}
             />
 
             <OptionCard
-              icon={<Tag size={20} color="#A81245" />}
+              icon={<Tag size={20} color="#4A3728" />}
               title="Categorías"
               subtitle={`${categoryCount} categoría${categoryCount === 1 ? '' : 's'}`}
               onPress={() => router.push('/admin/categories')}

@@ -28,7 +28,7 @@ type CreateForm = {
 
 const ROLE_STYLE: Record<Role, { label: string; className: string }> = {
   USER: { label: 'Usuario', className: 'bg-[#F4EEE7] text-[#6E6B68]' },
-  ADMIN: { label: 'Admin', className: 'bg-[#A81245]/10 text-[#A81245]' },
+  ADMIN: { label: 'Admin', className: 'bg-[#4A3728]/10 text-[#4A3728]' },
 };
 
 const cardShadow = {
@@ -171,9 +171,16 @@ export default function AdminUsers() {
       contentContainerClassName="px-5 py-8"
     >
       <View className="mx-auto w-full max-w-md">
-        <Text className="mb-6 font-['Lora'] text-[26px] italic leading-8 text-[#A81245]">
-          Usuarios
-        </Text>
+        <View className="mb-6 flex-row items-center gap-2">
+          <Text className="text-[22px] font-bold uppercase tracking-wide text-[#292724]">
+            Usuarios
+          </Text>
+          <View className="rounded-full bg-[#4A3728] px-2 py-0.5">
+            <Text className="text-[10px] font-bold uppercase tracking-wider text-white">
+              Admin
+            </Text>
+          </View>
+        </View>
 
         {error && (
           <View className="mb-4 rounded-2xl bg-red-50 p-4">
@@ -238,7 +245,7 @@ export default function AdminUsers() {
                         onPress={() => setNewRole(role)}
                         className={`flex-1 items-center rounded-xl border px-3 py-3 active:opacity-80 ${
                           selected
-                            ? 'border-[#A81245] bg-[#A81245]'
+                            ? 'border-[#4A3728] bg-[#4A3728]'
                             : 'border-[#EAE6E1] bg-white'
                         }`}
                       >
@@ -259,6 +266,7 @@ export default function AdminUsers() {
                 text={submitting ? 'Creando...' : 'Crear usuario'}
                 onPress={handleSubmit(onCreate)}
                 disabled={submitting}
+                className="bg-[#4A3728]"
               />
             </View>
           </View>
@@ -266,7 +274,7 @@ export default function AdminUsers() {
 
         {loading && (
           <View className="items-center py-10">
-            <ActivityIndicator color="#A81245" />
+            <ActivityIndicator color="#4A3728" />
           </View>
         )}
 
@@ -290,7 +298,7 @@ export default function AdminUsers() {
                 style={cardShadow}
               >
                 <View className="flex-row items-center gap-3">
-                  <View className="h-11 w-11 items-center justify-center rounded-full bg-[#A81245]">
+                  <View className="h-11 w-11 items-center justify-center rounded-full bg-[#4A3728]">
                     <Text className="text-sm font-bold text-white">
                       {initialsOf(user.name)}
                     </Text>

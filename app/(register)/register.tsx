@@ -13,6 +13,7 @@ import {
 import Field from '../../src/components/Field';
 import Button from '../../src/components/Button';
 import { useSession } from '../../src/session/context';
+import ScreenHeader from '@/components/ScreenHeader';
 
 type FormData = {
   user_name: string;
@@ -99,7 +100,7 @@ export default function Register() {
             <Text className="text-lg text-white">←</Text>
           </Pressable>
 
-          <Text className="px-5 pb-5 font-['Lora'] text-xl italic leading-7 text-white">
+          <Text className="px-5 pb-5 font-['Lora-Italic'] text-xl leading-7 text-white">
             Empieza tu historia con nosotros
           </Text>
         </ImageBackground>
@@ -108,9 +109,7 @@ export default function Register() {
         <View className="gap-6 px-6 pb-6 pt-6">
           {/* title-block */}
           <View className="items-center gap-0.5">
-            <Text className="font-['Lora'] text-[28px] italic leading-9 text-[#A81245]">
-              Crear cuenta
-            </Text>
+                <ScreenHeader title="Crear cuenta" />
             <Text className="text-[10px] font-semibold uppercase tracking-wide text-[#6E6B68]">
               Sumate a nuestra comunidad
             </Text>

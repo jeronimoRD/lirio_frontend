@@ -114,9 +114,9 @@ export default function Profile() {
 
         {/* Identity */}
         <View className="mt-3 items-center gap-1">
-          <Text className="font-['Lora'] text-[26px] leading-[33px] text-[#292724]">
-            {user.name}
-          </Text>
+            <Text className="font-['Lora-Regular'] text-[26px] leading-[33px] text-[#292724]">
+              {user.name}
+            </Text>
           <Text className="text-center text-xs leading-[145%] text-[#6E6B68]">
             {ROLE_LABEL[user.role]} · {user.email}
           </Text>

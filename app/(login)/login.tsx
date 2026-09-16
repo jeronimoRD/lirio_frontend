@@ -81,9 +81,9 @@ export default function Login() {
           {/* brand-logo */}
           <View className="items-center gap-0.5">
             {/* TODO: reemplaza por el nombre real de tu marca */}
-            <Text className="font-['Lora'] text-[32px] italic leading-[41px] text-[#A81245]">
-              Hibirio
-            </Text>
+              <Text className="font-['Lora-Italic'] text-[32px] leading-[41px] text-[#A81245]">
+                Hibirio
+              </Text>
             <Text className="text-[10px] font-semibold uppercase tracking-wide text-[#A81245]-0.2">
               Tu estilo, tu esencia
             </Text>
