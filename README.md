@@ -35,7 +35,7 @@ Creá un archivo `.env` dentro de esta carpeta con:
 
 ```dotenv
 MONGODB_URI=mongodb://usuario:contraseña@localhost:27017/nombre-de-tu-basededatos
-JWT_SECRET=una-clave-larga-y-dificil-de-adivinar
+JWT_SECRET=una clave
 ```
 
 | Variable | Qué es | Cómo conseguirla |
@@ -77,7 +77,7 @@ El valor correcto de `EXPO_PUBLIC_API_URL` **depende de dónde estés probando l
 |---|---|
 | **Navegador Web** (`npm run web`) | `http://localhost:3000` |
 | **Celular físico** con Expo Go (misma red WiFi que tu PC) | `http://TU_IP_LOCAL:3000` |
-| **Emulador de Android** | `http://10.0.2.2:3000` (IP especial que Android usa para referirse a tu PC) |
+| **Emulador de Android** | `http://10.2233.2323.2234:3000` (IP especial que Android usa para referirse a tu PC) |
 
 Para conseguir tu IP local (necesaria para celular físico):
 
