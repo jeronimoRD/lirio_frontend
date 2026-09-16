@@ -10,15 +10,22 @@ export function setToken(value: string | null): void {
 export async function request<T>(
   path: string,
   body?: unknown,
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE' =
+    body === undefined ? 'GET' : 'POST',
 ): Promise<T> {
   let response: Response;
 
   try {
+    const isFormData = body instanceof FormData;
     response = await fetch(`${API_URL}${path}`, {
-      method: body === undefined ? 'GET' : 'POST',
+      method,
 
       headers: {
-        'Content-Type': 'application/json',
+          ...(isFormData
+          ? {}
+          : {
+              'Content-Type': 'application/json',
+            }),
 
         ...(token
           ? {
@@ -30,9 +37,12 @@ export async function request<T>(
       body:
         body === undefined
           ? undefined
-          : JSON.stringify(body),
+          : isFormData
+            ? (body as FormData)
+            : JSON.stringify(body),
     });
-  } catch {
+  } catch (error) {
+    console.log('ERROR REAL DEL FETCH:', error);
     throw new Error(
       `No se pudo conectar con ${API_URL}. Verifica que el backend esté encendido.`,
     );
