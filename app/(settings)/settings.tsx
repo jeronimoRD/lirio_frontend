@@ -3,6 +3,7 @@ import { useState, type ReactNode } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { Pressable, ScrollView, Switch, Text, View } from 'react-native';
 import { ArrowLeft, Bell, ChevronRight, Lock, Mail, TriangleAlert } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { deleteAccount, updatePassword, updateProfile } from '../../src/api/users';
 import Field from '../../src/components/Field';
@@ -112,6 +113,7 @@ function ToggleRow({
 export default function Settings() {
   const { user, signOut, refreshUser } = useSession();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const profileForm = useForm<ProfileForm>({
     defaultValues: {
@@ -210,7 +212,8 @@ export default function Settings() {
   return (
     <ScrollView
       className="flex-1 bg-[#FCFAF8]"
-      contentContainerClassName="items-center px-5 pt-6 pb-10">
+      contentContainerClassName="items-center px-5"
+      contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: insets.bottom + 40 }}>
       <View className="w-full max-w-[390px] gap-6">
         {/* Settings header */}
         <View className="flex-row items-center">

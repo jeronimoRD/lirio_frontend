@@ -3,6 +3,7 @@ import { useState, type ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
 import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { ArrowLeft, UserRound } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { updateProfile } from '../../src/api/users';
 import Field from '../../src/components/Field';
@@ -60,6 +61,7 @@ function SectionHeaderRow({ icon, label }: { icon: ReactNode; label: string }) {
 export default function EditProfile() {
   const { user, refreshUser } = useSession();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const profileForm = useForm<ProfileForm>({
     defaultValues: {
@@ -104,7 +106,8 @@ export default function EditProfile() {
   return (
     <ScrollView
       className="flex-1 bg-[#FCFAF8]"
-      contentContainerClassName="items-center px-5 pt-6 pb-10">
+      contentContainerClassName="items-center px-5"
+      contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: insets.bottom + 40 }}>
       <View className="w-full max-w-[390px] gap-6">
         {/* Edit-profile header */}
         <View className="flex-row items-center">
