@@ -175,6 +175,7 @@ export default function AdminCategories() {
             className="h-12 flex-1 rounded-xl border border-[#EAE6E1] bg-white px-4 text-sm text-[#292724]"
             value={newName}
             onChangeText={setNewName}
+            maxLength={50}
             placeholder="Nueva categoría"
             placeholderTextColor="#A09B95"
             autoCapitalize="words"
@@ -220,6 +221,7 @@ export default function AdminCategories() {
                       className="h-12 rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4 text-sm text-[#292724]"
                       value={editName}
                       onChangeText={setEditName}
+                      maxLength={50}
                       placeholder="Nombre de la categoría"
                       placeholderTextColor="#A09B95"
                       autoCapitalize="words"

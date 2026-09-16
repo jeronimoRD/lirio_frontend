@@ -138,11 +138,14 @@ export default function EditProfile() {
                 labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
                 inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
                 inputClassName="flex-1 text-sm text-[#292724]"
+                maxLength={50}
                 rules={{
+                  required: 'El nombre es obligatorio',
                   minLength: {
                     value: 3,
                     message: 'El nombre debe tener al menos 3 caracteres',
                   },
+                  maxLength: { value: 50, message: 'Máximo 50 caracteres' },
                 }}
               />
 
@@ -154,6 +157,7 @@ export default function EditProfile() {
                   placeholderTextColor="#A09B95"
                   value={bio}
                   onChangeText={setBio}
+                  maxLength={200}
                   multiline
                   textAlignVertical="top"
                 />
@@ -167,24 +171,25 @@ export default function EditProfile() {
                   {saving ? 'Guardando...' : 'Guardar cambios'}
                 </Text>
               </Pressable>
+
+              {message && (
+                <View
+                  className={`rounded-2xl border p-4 ${
+                    message.kind === 'ok'
+                      ? 'border-green-200 bg-green-50'
+                      : 'border-red-200 bg-red-50'
+                  }`}>
+                  <Text
+                    className={`text-center text-sm font-medium ${
+                      message.kind === 'ok' ? 'text-green-700' : 'text-red-700'
+                    }`}>
+                    {message.text}
+                  </Text>
+                </View>
+              )}
             </View>
           </SectionCard>
         </View>
-
-        {/* Mensajes de resultado */}
-        {message && (
-          <View
-            className={`rounded-2xl border p-4 ${
-              message.kind === 'ok' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
-            }`}>
-            <Text
-              className={`text-center text-sm font-medium ${
-                message.kind === 'ok' ? 'text-green-700' : 'text-red-700'
-              }`}>
-              {message.text}
-            </Text>
-          </View>
-        )}
       </View>
     </ScrollView>
   );

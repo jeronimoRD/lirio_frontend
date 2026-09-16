@@ -47,9 +47,7 @@ export default function Field<T extends FieldValues>({
           <View
             className={
               inputWrapperClassName ??
-              `h-12 flex-row items-center rounded-xl border bg-white px-4 ${
-                error ? 'border-red-600' : 'border-[#EAE6E1]'
-              }`
+              'h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-white px-4'
             }
           >
             <TextInput

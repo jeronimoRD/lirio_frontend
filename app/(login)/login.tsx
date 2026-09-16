@@ -12,6 +12,7 @@ import {
   View,
 } from 'react-native';
 import { useForm } from 'react-hook-form';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Field from '../../src/components/Field';
 import Button from '../../src/components/Button';
@@ -28,6 +29,7 @@ const HERO_IMAGE_URI = require('../../assets/pexels-karen-f-1376469-8883181.jpg'
 export default function Login() {
   const { signIn } = useSession();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const { control, handleSubmit } = useForm<FormData>({
     defaultValues: {
@@ -63,6 +65,7 @@ export default function Login() {
       <ScrollView
         className="flex-1"
         contentContainerClassName="flex-grow"
+        contentContainerStyle={{ paddingBottom: insets.bottom }}
         keyboardShouldPersistTaps="handled"
       >
         {/* hero-accent-block */}
@@ -100,6 +103,12 @@ export default function Login() {
               labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
               inputWrapperClassName="h-12 flex-row items-center rounded-lg border border-[#EAE6E1] bg-white px-4"
               inputClassName="flex-1 text-sm text-[#292724]"
+              maxLength={100}
+              rules={{
+                required: 'El correo es obligatorio',
+                pattern: { value: /^\S+@\S+\.\S+$/, message: 'Correo inválido' },
+                maxLength: { value: 100, message: 'Máximo 100 caracteres' },
+              }}
             />
 
             <Field
@@ -111,6 +120,8 @@ export default function Login() {
               labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
               inputWrapperClassName="h-12 flex-row items-center rounded-lg border border-[#EAE6E1] bg-white px-4"
               inputClassName="flex-1 text-sm text-[#292724]"
+              maxLength={128}
+              rules={{ required: 'La contraseña es obligatoria' }}
               rightElement={
                 <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
                   <Text className="text-xs font-medium text-[#292724]">

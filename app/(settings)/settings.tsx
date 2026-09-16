@@ -62,6 +62,28 @@ function SectionHeaderRow({ icon, label }: { icon: ReactNode; label: string }) {
   );
 }
 
+function ResultBanner({
+  message,
+}: {
+  message: { kind: 'ok' | 'error'; text: string } | null;
+}) {
+  if (!message) return null;
+
+  return (
+    <View
+      className={`rounded-2xl border p-4 ${
+        message.kind === 'ok' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
+      }`}>
+      <Text
+        className={`text-center text-sm font-medium ${
+          message.kind === 'ok' ? 'text-green-700' : 'text-red-700'
+        }`}>
+        {message.text}
+      </Text>
+    </View>
+  );
+}
+
 function ToggleRow({
   icon,
   label,
@@ -113,7 +135,15 @@ export default function Settings() {
   const [savingPassword, setSavingPassword] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
-  const [message, setMessage] = useState<{
+  const [profileMessage, setProfileMessage] = useState<{
+    kind: 'ok' | 'error';
+    text: string;
+  } | null>(null);
+  const [passwordMessage, setPasswordMessage] = useState<{
+    kind: 'ok' | 'error';
+    text: string;
+  } | null>(null);
+  const [deleteMessage, setDeleteMessage] = useState<{
     kind: 'ok' | 'error';
     text: string;
   } | null>(null);
@@ -126,44 +156,44 @@ export default function Settings() {
   }
 
   const saveProfile = async (data: ProfileForm) => {
-    setMessage(null);
+    setProfileMessage(null);
     setSavingProfile(true);
 
     try {
       await updateProfile(user.name, data.email.trim().toLowerCase(), user.bio);
       await refreshUser();
-      setMessage({ kind: 'ok', text: 'Datos actualizados correctamente' });
+      setProfileMessage({ kind: 'ok', text: 'Datos actualizados correctamente' });
     } catch (err) {
-      setMessage({ kind: 'error', text: messageOf(err) });
+      setProfileMessage({ kind: 'error', text: messageOf(err) });
     } finally {
       setSavingProfile(false);
     }
   };
 
   const savePassword = async (data: PasswordForm) => {
-    setMessage(null);
+    setPasswordMessage(null);
     setSavingPassword(true);
 
     try {
       await updatePassword(data.password);
       passwordForm.reset();
-      setMessage({ kind: 'ok', text: 'Contraseña actualizada correctamente' });
+      setPasswordMessage({ kind: 'ok', text: 'Contraseña actualizada correctamente' });
     } catch (err) {
-      setMessage({ kind: 'error', text: messageOf(err) });
+      setPasswordMessage({ kind: 'error', text: messageOf(err) });
     } finally {
       setSavingPassword(false);
     }
   };
 
   const removeAccount = async () => {
-    setMessage(null);
+    setDeleteMessage(null);
     setDeleting(true);
 
     try {
       await deleteAccount();
       signOut();
     } catch (err) {
-      setMessage({ kind: 'error', text: messageOf(err) });
+      setDeleteMessage({ kind: 'error', text: messageOf(err) });
     } finally {
       setDeleting(false);
     }
@@ -215,11 +245,14 @@ export default function Settings() {
                 labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
                 inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
                 inputClassName="flex-1 text-sm text-[#292724]"
+                maxLength={100}
                 rules={{
+                  required: 'El correo es obligatorio',
                   pattern: {
                     value: /^\S+@\S+\.\S+$/,
                     message: 'Ingresa un correo válido',
                   },
+                  maxLength: { value: 100, message: 'Máximo 100 caracteres' },
                 }}
               />
 
@@ -231,6 +264,8 @@ export default function Settings() {
                   {savingProfile ? 'Guardando...' : 'Guardar cambios'}
                 </Text>
               </Pressable>
+
+              <ResultBanner message={profileMessage} />
             </View>
           </SectionCard>
         </View>
@@ -250,11 +285,14 @@ export default function Settings() {
                 labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
                 inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
                 inputClassName="flex-1 text-sm text-[#292724]"
+                maxLength={128}
                 rules={{
+                  required: 'La contraseña es obligatoria',
                   minLength: {
                     value: 6,
                     message: 'La contraseña debe tener al menos 6 caracteres',
                   },
+                  maxLength: { value: 128, message: 'Máximo 128 caracteres' },
                 }}
               />
 
@@ -266,7 +304,9 @@ export default function Settings() {
                 labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
                 inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
                 inputClassName="flex-1 text-sm text-[#292724]"
+                maxLength={128}
                 rules={{
+                  required: 'Confirma la contraseña',
                   validate: (value) => value === newPassword || 'Las contraseñas no coinciden',
                 }}
               />
@@ -279,6 +319,8 @@ export default function Settings() {
                   {savingPassword ? 'Actualizando...' : 'Cambiar contraseña'}
                 </Text>
               </Pressable>
+
+              <ResultBanner message={passwordMessage} />
             </View>
           </SectionCard>
         </View>
@@ -344,23 +386,10 @@ export default function Settings() {
                 <Text className="text-sm font-semibold text-red-600">Eliminar cuenta</Text>
               </Pressable>
             )}
+
+            <ResultBanner message={deleteMessage} />
           </SectionCard>
         </View>
-
-        {/* Mensajes de resultado */}
-        {message && (
-          <View
-            className={`rounded-2xl border p-4 ${
-              message.kind === 'ok' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
-            }`}>
-            <Text
-              className={`text-center text-sm font-medium ${
-                message.kind === 'ok' ? 'text-green-700' : 'text-red-700'
-              }`}>
-              {message.text}
-            </Text>
-          </View>
-        )}
       </View>
     </ScrollView>
   );

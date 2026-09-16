@@ -9,6 +9,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Field from '../../src/components/Field';
 import Button from '../../src/components/Button';
@@ -29,6 +30,7 @@ const HERO_IMAGE_URI = require('../../assets/pexels-karen-f-1376469-8883181.jpg'
 export default function Register() {
   const router = useRouter();
   const { signUp } = useSession();
+  const insets = useSafeAreaInsets();
 
   const { control, handleSubmit } = useForm<FormData>({
     defaultValues: { user_name: '', email: '', password: '' },
@@ -93,6 +95,7 @@ export default function Register() {
       <ScrollView
         className="flex-1"
         contentContainerClassName="flex-grow"
+        contentContainerStyle={{ paddingBottom: insets.bottom }}
         keyboardShouldPersistTaps="handled"
       >
         {/* hero-accent-block */}
@@ -137,6 +140,12 @@ export default function Register() {
               labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
               inputWrapperClassName="h-12 flex-row items-center rounded-lg border border-[#EAE6E1] bg-white px-4"
               inputClassName="flex-1 text-sm text-[#292724]"
+              maxLength={50}
+              rules={{
+                required: 'El nombre es obligatorio',
+                minLength: { value: 3, message: 'Mínimo 3 caracteres' },
+                maxLength: { value: 50, message: 'Máximo 50 caracteres' },
+              }}
             />
 
             <Field
@@ -148,6 +157,12 @@ export default function Register() {
               labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
               inputWrapperClassName="h-12 flex-row items-center rounded-lg border border-[#EAE6E1] bg-white px-4"
               inputClassName="flex-1 text-sm text-[#292724]"
+              maxLength={100}
+              rules={{
+                required: 'El correo es obligatorio',
+                pattern: { value: /^\S+@\S+\.\S+$/, message: 'Correo inválido' },
+                maxLength: { value: 100, message: 'Máximo 100 caracteres' },
+              }}
             />
 
             <Field
@@ -159,6 +174,12 @@ export default function Register() {
               labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
               inputWrapperClassName="h-12 flex-row items-center rounded-lg border border-[#EAE6E1] bg-white px-4"
               inputClassName="flex-1 text-sm text-[#292724]"
+              maxLength={128}
+              rules={{
+                required: 'La contraseña es obligatoria',
+                minLength: { value: 6, message: 'Mínimo 6 caracteres' },
+                maxLength: { value: 128, message: 'Máximo 128 caracteres' },
+              }}
               rightElement={
                 <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
                   <Text className="text-xs font-medium text-[#A81245]">

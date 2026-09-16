@@ -113,6 +113,7 @@ export default function CreatePost() {
             <TextInput
               value={title}
               onChangeText={setTitle}
+              maxLength={100}
               placeholder="Ej. Look de otoño"
               placeholderTextColor="#A09B95"
               className="h-12 rounded-lg border border-[#EAE6E1] bg-white px-4 text-sm text-[#292724]"
@@ -126,6 +127,7 @@ export default function CreatePost() {
             <TextInput
               value={description}
               onChangeText={setDescription}
+              maxLength={500}
               placeholder="Cuéntanos sobre este outfit..."
               placeholderTextColor="#A09B95"
               multiline
