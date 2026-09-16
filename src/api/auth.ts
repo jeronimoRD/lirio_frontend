@@ -6,6 +6,8 @@ interface UserResponse {
   email: string;
   user_name: string;
   role?: Role;
+  bio?: string;
+  preferred_categories?: string[];
 }
 
 interface AuthResponse {
@@ -20,6 +22,8 @@ function toUser(data: UserResponse): User {
     name: data.user_name,
     email: data.email,
     role: data.role ?? 'USER',
+    bio: data.bio ?? '',
+    preferredCategories: data.preferred_categories ?? [],
   };
 }
 
@@ -46,6 +50,7 @@ export async function register(
   name: string,
   email: string,
   password: string,
+  preferredCategories: string[] = [],
 ): Promise<User> {
   const response = await request<AuthResponse>(
     '/users/register',
@@ -53,6 +58,7 @@ export async function register(
       email,
       user_name: name,
       password,
+      preferred_categories: preferredCategories,
     },
   );
 

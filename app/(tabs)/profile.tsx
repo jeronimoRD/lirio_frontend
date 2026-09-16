@@ -120,6 +120,11 @@ export default function Profile() {
           <Text className="text-center text-xs leading-[145%] text-[#6E6B68]">
             {ROLE_LABEL[user.role]} · {user.email}
           </Text>
+          {!!user.bio && (
+            <Text className="mt-1 text-center text-[13px] leading-[18px] text-[#6E6B68]">
+              {user.bio}
+            </Text>
+          )}
         </View>
 
         <View className="mt-5 w-full max-w-[390px] gap-4">

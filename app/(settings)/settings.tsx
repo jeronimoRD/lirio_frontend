@@ -1,27 +1,14 @@
 import { Redirect, useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { Pressable, ScrollView, Switch, Text, TextInput, View } from 'react-native';
-import {
-  ArrowLeft,
-  Bell,
-  ChevronRight,
-  Lock,
-  Mail,
-  TriangleAlert,
-  UserRound,
-} from 'lucide-react-native';
+import { Pressable, ScrollView, Switch, Text, View } from 'react-native';
+import { ArrowLeft, Bell, ChevronRight, Lock, Mail, TriangleAlert } from 'lucide-react-native';
 
-import {
-  deleteAccount,
-  updatePassword,
-  updateProfile,
-} from '../../src/api/users';
+import { deleteAccount, updatePassword, updateProfile } from '../../src/api/users';
 import Field from '../../src/components/Field';
 import { useSession } from '../../src/session/context';
 
 type ProfileForm = {
-  name: string;
   email: string;
 };
 
@@ -106,7 +93,6 @@ export default function Settings() {
 
   const profileForm = useForm<ProfileForm>({
     defaultValues: {
-      name: user?.name ?? '',
       email: user?.email ?? '',
     },
   });
@@ -123,7 +109,6 @@ export default function Settings() {
     name: 'password',
   });
 
-  const [bio, setBio] = useState('');
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -145,7 +130,7 @@ export default function Settings() {
     setSavingProfile(true);
 
     try {
-      await updateProfile(data.name.trim(), data.email.trim().toLowerCase());
+      await updateProfile(user.name, data.email.trim().toLowerCase(), user.bio);
       await refreshUser();
       setMessage({ kind: 'ok', text: 'Datos actualizados correctamente' });
     } catch (err) {
@@ -195,8 +180,7 @@ export default function Settings() {
   return (
     <ScrollView
       className="flex-1 bg-[#FCFAF8]"
-      contentContainerClassName="items-center px-5 pt-6 pb-10"
-    >
+      contentContainerClassName="items-center px-5 pt-6 pb-10">
       <View className="w-full max-w-[390px] gap-6">
         {/* Settings header */}
         <View className="flex-row items-center">
@@ -204,14 +188,11 @@ export default function Settings() {
             onPress={handleBack}
             hitSlop={8}
             className="h-11 w-11 items-center justify-center rounded-full bg-white"
-            style={cardShadow}
-          >
+            style={cardShadow}>
             <ArrowLeft size={20} color="#A81245" strokeWidth={2} />
           </Pressable>
 
-          <Text className="flex-1 text-center text-xl font-bold text-[#292724]">
-            Configuración
-          </Text>
+          <Text className="flex-1 text-center text-xl font-bold text-[#292724]">Configuración</Text>
 
           <View className="h-11 w-11" />
         </View>
@@ -220,24 +201,12 @@ export default function Settings() {
         <View className="gap-2.5">
           <SectionLabel text="CUENTA" />
           <SectionCard>
-            <SectionHeaderRow icon={<UserRound size={18} color="#A81245" />} label="Nombre y correo" />
+            <SectionHeaderRow
+              icon={<Mail size={18} color="#A81245" />}
+              label="Correo electrónico"
+            />
 
             <View className="gap-4">
-              <Field
-                control={profileForm.control}
-                name="name"
-                label="Nombre"
-                labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
-                inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
-                inputClassName="flex-1 text-sm text-[#292724]"
-                rules={{
-                  minLength: {
-                    value: 3,
-                    message: 'El nombre debe tener al menos 3 caracteres',
-                  },
-                }}
-              />
-
               <Field
                 control={profileForm.control}
                 name="email"
@@ -254,26 +223,10 @@ export default function Settings() {
                 }}
               />
 
-              <View className="gap-1">
-                <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
-                  Bibliografía
-                </Text>
-                <TextInput
-                  className="min-h-24 rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] p-3 text-sm text-[#292724]"
-                  placeholder="Cuéntanos algo sobre ti..."
-                  placeholderTextColor="#A09B95"
-                  value={bio}
-                  onChangeText={setBio}
-                  multiline
-                  textAlignVertical="top"
-                />
-              </View>
-
               <Pressable
                 onPress={profileForm.handleSubmit(saveProfile)}
                 disabled={savingProfile}
-                className="h-11 items-center justify-center rounded-xl bg-[#A81245] disabled:opacity-50"
-              >
+                className="h-11 items-center justify-center rounded-xl bg-[#A81245] disabled:opacity-50">
                 <Text className="text-sm font-semibold text-white">
                   {savingProfile ? 'Guardando...' : 'Guardar cambios'}
                 </Text>
@@ -314,16 +267,14 @@ export default function Settings() {
                 inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
                 inputClassName="flex-1 text-sm text-[#292724]"
                 rules={{
-                  validate: (value) =>
-                    value === newPassword || 'Las contraseñas no coinciden',
+                  validate: (value) => value === newPassword || 'Las contraseñas no coinciden',
                 }}
               />
 
               <Pressable
                 onPress={passwordForm.handleSubmit(savePassword)}
                 disabled={savingPassword}
-                className="h-11 items-center justify-center rounded-xl bg-[#A81245] disabled:opacity-50"
-              >
+                className="h-11 items-center justify-center rounded-xl bg-[#A81245] disabled:opacity-50">
                 <Text className="text-sm font-semibold text-white">
                   {savingPassword ? 'Actualizando...' : 'Cambiar contraseña'}
                 </Text>
@@ -360,15 +311,13 @@ export default function Settings() {
               <View className="h-10 w-10 items-center justify-center rounded-full bg-red-100">
                 <TriangleAlert size={18} color="#DC2626" />
               </View>
-              <Text className="flex-1 text-sm font-semibold text-red-700">
-                Eliminar cuenta
-              </Text>
+              <Text className="flex-1 text-sm font-semibold text-red-700">Eliminar cuenta</Text>
               {!confirmingDelete && <ChevronRight size={16} color="#A09B95" />}
             </View>
 
             <Text className="text-xs leading-[18px] text-[#6E6B68]">
-              Al eliminar tu cuenta se borrarán también tus publicaciones. Esta
-              acción no se puede deshacer.
+              Al eliminar tu cuenta se borrarán también tus publicaciones. Esta acción no se puede
+              deshacer.
             </Text>
 
             {confirmingDelete ? (
@@ -376,8 +325,7 @@ export default function Settings() {
                 <Pressable
                   onPress={removeAccount}
                   disabled={deleting}
-                  className="h-11 items-center justify-center rounded-xl bg-red-600 disabled:opacity-50"
-                >
+                  className="h-11 items-center justify-center rounded-xl bg-red-600 disabled:opacity-50">
                   <Text className="text-sm font-semibold text-white">
                     {deleting ? 'Eliminando...' : 'Sí, eliminar mi cuenta'}
                   </Text>
@@ -385,21 +333,15 @@ export default function Settings() {
                 <Pressable
                   onPress={() => setConfirmingDelete(false)}
                   disabled={deleting}
-                  className="h-11 items-center justify-center rounded-xl border border-[#EAE6E1]"
-                >
-                  <Text className="text-sm font-semibold text-[#292724]">
-                    Cancelar
-                  </Text>
+                  className="h-11 items-center justify-center rounded-xl border border-[#EAE6E1]">
+                  <Text className="text-sm font-semibold text-[#292724]">Cancelar</Text>
                 </Pressable>
               </View>
             ) : (
               <Pressable
                 onPress={() => setConfirmingDelete(true)}
-                className="h-11 items-center justify-center rounded-xl border border-red-200"
-              >
-                <Text className="text-sm font-semibold text-red-600">
-                  Eliminar cuenta
-                </Text>
+                className="h-11 items-center justify-center rounded-xl border border-red-200">
+                <Text className="text-sm font-semibold text-red-600">Eliminar cuenta</Text>
               </Pressable>
             )}
           </SectionCard>
@@ -409,16 +351,12 @@ export default function Settings() {
         {message && (
           <View
             className={`rounded-2xl border p-4 ${
-              message.kind === 'ok'
-                ? 'border-green-200 bg-green-50'
-                : 'border-red-200 bg-red-50'
-            }`}
-          >
+              message.kind === 'ok' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
+            }`}>
             <Text
               className={`text-center text-sm font-medium ${
                 message.kind === 'ok' ? 'text-green-700' : 'text-red-700'
-              }`}
-            >
+              }`}>
               {message.text}
             </Text>
           </View>

@@ -14,6 +14,7 @@ import Field from '../../src/components/Field';
 import Button from '../../src/components/Button';
 import { useSession } from '../../src/session/context';
 import { getCategories } from '../../src/api/categories';
+import type { Category } from '../../src/types';
 import ScreenHeader from '@/components/ScreenHeader';
 
 type FormData = {
@@ -38,14 +39,14 @@ export default function Register() {
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
-  const [styleOptions, setStyleOptions] = useState<string[]>([]);
+  const [styleOptions, setStyleOptions] = useState<Category[]>([]);
 
   useEffect(() => {
     let active = true;
 
     getCategories()
       .then((categories) => {
-        if (active) setStyleOptions(categories.map((category) => category.name));
+        if (active) setStyleOptions(categories);
       })
       .catch(() => {
         if (active) setStyleOptions([]);
@@ -56,9 +57,11 @@ export default function Register() {
     };
   }, []);
 
-  const toggleStyle = (style: string) => {
+  const toggleStyle = (categoryId: string) => {
     setSelectedStyles((prev) =>
-      prev.includes(style) ? prev.filter((s) => s !== style) : [...prev, style]
+      prev.includes(categoryId)
+        ? prev.filter((s) => s !== categoryId)
+        : [...prev, categoryId]
     );
   };
 
@@ -67,7 +70,7 @@ export default function Register() {
     setSuccess(false);
     setLoading(true);
     try {
-      await signUp(data.user_name, data.email, data.password);
+      await signUp(data.user_name, data.email, data.password, selectedStyles);
       setSuccess(true);
     } catch (err: any) {
       setError(err?.message ?? 'Error desconocido');
@@ -166,7 +169,7 @@ export default function Register() {
             />
           </View>
 
-          {/* preferences-block (solo visual) */}
+          {/* preferences-block */}
           <View className="gap-3">
             <View className="gap-1">
               <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
@@ -178,12 +181,12 @@ export default function Register() {
             </View>
 
             <View className="flex-row flex-wrap gap-2">
-              {styleOptions.map((style) => {
-                const selected = selectedStyles.includes(style);
+              {styleOptions.map((category) => {
+                const selected = selectedStyles.includes(category.id);
                 return (
                   <Pressable
-                    key={style}
-                    onPress={() => toggleStyle(style)}
+                    key={category.id}
+                    onPress={() => toggleStyle(category.id)}
                     className={`h-9 items-center justify-center rounded-full border px-4 ${
                       selected ? 'border-[#A81245] bg-[#A81245]/10' : 'border-[#EAE6E1] bg-white'
                     }`}
@@ -193,7 +196,7 @@ export default function Register() {
                         selected ? 'text-[#A81245]' : 'text-[#6E6B68]'
                       }`}
                     >
-                      {style}
+                      {category.name}
                     </Text>
                   </Pressable>
                 );

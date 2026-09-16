@@ -6,6 +6,8 @@ interface UserResponse {
   email: string;
   user_name: string;
   role: Role;
+  bio?: string;
+  preferred_categories?: string[];
 }
 
 interface MessageResponse {
@@ -18,6 +20,8 @@ function toUser(data: UserResponse): User {
     name: data.user_name,
     email: data.email,
     role: data.role,
+    bio: data.bio ?? '',
+    preferredCategories: data.preferred_categories ?? [],
   };
 }
 

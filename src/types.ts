@@ -19,6 +19,9 @@ export interface User {
   name: string;
   email: string;
   role: Role;
+  bio: string;
+  /** IDs de las categorías de estilos que el usuario eligió al registrarse. */
+  preferredCategories: string[];
 }
 
 /** Una publicación creada por un usuario. */
