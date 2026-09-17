@@ -1,18 +1,7 @@
-import { Redirect, useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useState } from 'react';
-import {
-  ActivityIndicator,
-  Image,
-  Pressable,
-  ScrollView,
-  Alert,
-  Text,
-  View,
-} from 'react-native';
-import {
-  Settings as SettingsIcon,
-  MoreVertical,
-} from 'lucide-react-native';
+import { Redirect, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Image, Pressable, ScrollView, Alert, Text, View } from 'react-native';
+import { Settings as SettingsIcon, MoreVertical } from 'lucide-react-native';
 
 import { getPosts, deletePost } from '../../src/api/posts';
 import { useSession } from '../../src/session/context';
@@ -45,7 +34,7 @@ const cardShadow = {
   elevation: 3,
 };
 
-export default function Profile() {
+export default function Profile({ active = true }: { active?: boolean }) {
   const { user, signOut } = useSession();
   const router = useRouter();
 
@@ -54,49 +43,43 @@ export default function Profile() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<GalleryTab>('outfits');
   const [openMenu, setOpenMenu] = useState<string | null>(null);
-  
-useFocusEffect(
-  useCallback(() => {
-    if (!user) return;
 
-    let active = true;
+  useEffect(() => {
+    if (!active || !user) return;
 
-    setLoading(true);
-    setError(null);
+    let cancelled = false;
 
-    getPosts()
-      .then((all) => {
-        if (active) {
-          setPosts(all.filter((post) => post.userId === user.id));
-        }
-      })
-      .catch((err) => {
-        if (active) {
-          setError(
-            err instanceof Error
-              ? err.message
-              : 'No se pudieron cargar tus publicaciones',
-          );
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false);
-        }
-      });
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const all = await getPosts();
+        if (cancelled) return;
+        setPosts(all.filter((post) => post.userId === user.id));
+      } catch (err) {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : 'No se pudieron cargar tus publicaciones');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    load();
 
     return () => {
-      active = false;
+      cancelled = true;
     };
-  }, [user]),
-);
+  }, [active, user]);
 
   if (!user) {
-    return <Redirect href="/(login)/login" />;
+    return active ? <Redirect href="/(login)/login" /> : null;
   }
 
   const leftColumn = posts.filter((_, i) => i % 2 === 0);
   const rightColumn = posts.filter((_, i) => i % 2 === 1);
+
+  const showSpinner = loading && posts.length === 0;
 
   return (
     <ScrollView className="flex-1 bg-[#FCFAF8]" contentContainerClassName="pb-10">
@@ -105,8 +88,7 @@ useFocusEffect(
         <Pressable
           onPress={() => router.push('/settings')}
           hitSlop={8}
-          className="absolute right-5 top-6 h-10 w-10 items-center justify-center rounded-full bg-white/20"
-        >
+          className="absolute right-5 top-6 h-10 w-10 items-center justify-center rounded-full bg-white/20">
           <SettingsIcon size={20} color="#FFFFFF" />
         </Pressable>
       </View>
@@ -115,18 +97,15 @@ useFocusEffect(
         {/* avatar flotando sobre el banner */}
         <View
           className="-mt-12 h-24 w-24 items-center justify-center rounded-full border-[4px] border-[#FCFAF8] bg-[#DCC7A8]"
-          style={cardShadow}
-        >
-          <Text className="text-[26px] font-bold text-white">
-            {initialsOf(user.name)}
-          </Text>
+          style={cardShadow}>
+          <Text className="text-[26px] font-bold text-white">{initialsOf(user.name)}</Text>
         </View>
 
         {/* Identity */}
         <View className="mt-3 items-center gap-1">
-            <Text className="font-['Lora-Regular'] text-[26px] leading-[33px] text-[#292724]">
-              {user.name}
-            </Text>
+          <Text className="font-['Lora-Regular'] text-[26px] leading-[33px] text-[#292724]">
+            {user.name}
+          </Text>
           <Text className="text-center text-xs leading-[145%] text-[#6E6B68]">
             {ROLE_LABEL[user.role]} · {user.email}
           </Text>
@@ -141,8 +120,7 @@ useFocusEffect(
           {/* stats-card */}
           <View
             className="flex-row items-center justify-center rounded-2xl bg-white py-4"
-            style={cardShadow}
-          >
+            style={cardShadow}>
             <View className="items-center gap-[3px]">
               <Text className="text-lg font-bold leading-[22px] text-[#292724]">
                 {posts.length}
@@ -158,39 +136,28 @@ useFocusEffect(
             <Pressable
               onPress={() => router.push('/edit-profile' as any)}
               className="h-12 flex-1 items-center justify-center rounded-2xl bg-[#A81245]"
-              style={cardShadow}
-            >
-              <Text className="text-[13px] font-semibold text-white">
-                Editar perfil
-              </Text>
+              style={cardShadow}>
+              <Text className="text-[13px] font-semibold text-white">Editar perfil</Text>
             </Pressable>
 
             <Pressable
               onPress={() => router.push('/settings')}
-              className="h-12 flex-1 items-center justify-center rounded-2xl border border-[#EAE6E1] bg-white"
-            >
-              <Text className="text-[13px] font-semibold text-[#292724]">
-                Configuración
-              </Text>
+              className="h-12 flex-1 items-center justify-center rounded-2xl border border-[#EAE6E1] bg-white">
+              <Text className="text-[13px] font-semibold text-[#292724]">Configuración</Text>
             </Pressable>
           </View>
 
           {/* Outfit tabs */}
-          <View
-            className="flex-row rounded-2xl bg-white p-1.5"
-            style={cardShadow}
-          >
+          <View className="flex-row rounded-2xl bg-white p-1.5" style={cardShadow}>
             <Pressable
               onPress={() => setActiveTab('outfits')}
               className={`flex-1 items-center justify-center rounded-xl py-2.5 ${
                 activeTab === 'outfits' ? 'bg-[#A81245]' : ''
-              }`}
-            >
+              }`}>
               <Text
                 className={`text-[13px] font-semibold ${
                   activeTab === 'outfits' ? 'text-white' : 'text-[#6E6B68]'
-                }`}
-              >
+                }`}>
                 Mis outfits
               </Text>
             </Pressable>
@@ -199,13 +166,11 @@ useFocusEffect(
               onPress={() => setActiveTab('saved')}
               className={`flex-1 items-center justify-center rounded-xl py-2.5 ${
                 activeTab === 'saved' ? 'bg-[#A81245]' : ''
-              }`}
-            >
+              }`}>
               <Text
                 className={`text-[13px] font-semibold ${
                   activeTab === 'saved' ? 'text-white' : 'text-[#6E6B68]'
-                }`}
-              >
+                }`}>
                 Guardado
               </Text>
             </Pressable>
@@ -214,25 +179,21 @@ useFocusEffect(
           {/* MENSAJE DE ERROR */}
           {error && (
             <View className="rounded-2xl bg-red-50 p-4">
-              <Text className="text-center text-sm font-medium text-red-700">
-                {error}
-              </Text>
+              <Text className="text-center text-sm font-medium text-red-700">{error}</Text>
             </View>
           )}
 
-          {loading && (
+          {showSpinner && (
             <View className="items-center py-10">
               <ActivityIndicator />
             </View>
           )}
 
           {/* Outfit gallery */}
-          {!loading && !error && activeTab === 'outfits' && (
-            posts.length === 0 ? (
-              <View
-                className="rounded-2xl bg-white p-6"
-                style={cardShadow}
-              >
+          {!error &&
+            activeTab === 'outfits' &&
+            (posts.length === 0 ? (
+              <View className="rounded-2xl bg-white p-6" style={cardShadow}>
                 <Text className="text-center text-sm text-[#6E6B68]">
                   Aún no tienes outfits publicados.
                 </Text>
@@ -246,12 +207,8 @@ useFocusEffect(
                         key={post.id}
                         className="relative"
                         style={{
-                          height:
-                            COLUMN_HEIGHTS[
-                              (colIndex + i * 2) % COLUMN_HEIGHTS.length
-                            ],
-                        }}
-                      >
+                          height: COLUMN_HEIGHTS[(colIndex + i * 2) % COLUMN_HEIGHTS.length],
+                        }}>
                         <Image
                           source={{ uri: post.image }}
                           className="h-full w-full"
@@ -262,25 +219,16 @@ useFocusEffect(
                         />
 
                         <Pressable
-                          onPress={() =>
-                            setOpenMenu(
-                              openMenu === post.id ? null : post.id,
-                            )
-                          }
+                          onPress={() => setOpenMenu(openMenu === post.id ? null : post.id)}
                           hitSlop={8}
-                          className="absolute right-2 top-2 h-8 w-8 items-center justify-center rounded-full bg-black/35"
-                        >
-                          <MoreVertical
-                            size={18}
-                            color="#FFFFFF"
-                          />
+                          className="absolute right-2 top-2 h-8 w-8 items-center justify-center rounded-full bg-black/35">
+                          <MoreVertical size={18} color="#FFFFFF" />
                         </Pressable>
 
                         {openMenu === post.id && (
                           <View className="absolute right-2 top-11 w-28 overflow-hidden rounded-xl border border-[#EAE6E1] bg-white">
                             <Pressable
                               onPress={() => {
-
                                 setOpenMenu(null);
 
                                 router.push({
@@ -290,8 +238,7 @@ useFocusEffect(
                                   },
                                 } as any);
                               }}
-                              className="px-4 py-3"
-                            >
+                              className="px-4 py-3">
                               <Text className="text-sm text-[#292724]">Editar</Text>
                             </Pressable>
                             <Pressable
@@ -315,24 +262,23 @@ useFocusEffect(
 
                                           setPosts((currentPosts) =>
                                             currentPosts.filter(
-                                              (currentPost) => currentPost.id !== post.id,
-                                            ),
+                                              (currentPost) => currentPost.id !== post.id
+                                            )
                                           );
                                         } catch (error) {
                                           Alert.alert(
                                             'Error',
                                             error instanceof Error
                                               ? error.message
-                                              : 'No se pudo eliminar la publicación.',
+                                              : 'No se pudo eliminar la publicación.'
                                           );
                                         }
                                       },
                                     },
-                                  ],
+                                  ]
                                 );
                               }}
-                              className="border-t border-[#EAE6E1] px-4 py-3"
-                            >
+                              className="border-t border-[#EAE6E1] px-4 py-3">
                               <Text className="text-sm text-red-600">Eliminar</Text>
                             </Pressable>
                           </View>
@@ -342,10 +288,9 @@ useFocusEffect(
                   </View>
                 ))}
               </View>
-            )
-          )}
+            ))}
 
-          {!loading && !error && activeTab === 'saved' && (
+          {!error && activeTab === 'saved' && (
             <View className="rounded-2xl bg-white p-6" style={cardShadow}>
               <Text className="text-center text-sm text-[#6E6B68]">
                 Próximamente: outfits guardados.
@@ -356,11 +301,8 @@ useFocusEffect(
           {/* Cerrar sesión */}
           <Pressable
             onPress={signOut}
-            className="mt-2 h-12 w-full items-center justify-center rounded-2xl border border-red-200 bg-white"
-          >
-            <Text className="text-sm font-semibold text-red-600">
-              Cerrar sesión
-            </Text>
+            className="mt-2 h-12 w-full items-center justify-center rounded-2xl border border-red-200 bg-white">
+            <Text className="text-sm font-semibold text-red-600">Cerrar sesión</Text>
           </Pressable>
         </View>
       </View>

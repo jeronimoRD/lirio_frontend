@@ -1,12 +1,5 @@
-import { useCallback, useState } from 'react';
-import {
-  ActivityIndicator,
-  Image,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { Heart } from 'lucide-react-native';
 
 import { getFeedPosts } from '../../src/api/posts';
@@ -14,74 +7,73 @@ import { getCategories } from '../../src/api/categories';
 import { useFavorites } from '../../src/favorites/context';
 import type { Post, Category } from '../../src/types';
 import ScreenHeader from '@/components/ScreenHeader';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#292724', '#6E6B68', '#EAE6E1', '#A09B95'];
 
-export default function Home() {
+export default function Home({ active = true }: { active?: boolean }) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState('For You');
 
-  useFocusEffect(
-    useCallback(() => {
-      let active = true;
+  useEffect(() => {
+    if (!active) return;
 
+    let cancelled = false;
+
+    const load = async () => {
       setLoading(true);
       setError(null);
 
       getCategories()
-        .then((all) => {
-          if (active) setCategories(all);
+        .then((allCategories) => {
+          if (cancelled) return;
+          setCategories(allCategories);
         })
         .catch(() => {});
 
-      getFeedPosts()
-        .then((all) => {
-          if (active) setPosts(all);
-        })
-        .catch((err) => {
-          if (active) {
-            setError(
-              err instanceof Error
-                ? err.message
-                : 'No se pudo cargar el feed',
-            );
-          }
-        })
-        .finally(() => {
-          if (active) setLoading(false);
-        });
+      try {
+        const allPosts = await getFeedPosts();
+        if (cancelled) return;
+        setPosts(allPosts);
+      } catch (err) {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : 'No se pudo cargar el feed');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
 
-      return () => {
-        active = false;
-      };
-    }, []),
-  );
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [active]);
 
   const filters = ['For You', ...categories.map((category) => category.name)];
 
   const leftColumn = posts.filter((_, i) => i % 2 === 0);
   const rightColumn = posts.filter((_, i) => i % 2 === 1);
 
+  const showSpinner = loading && posts.length === 0;
+
   return (
     <View className="flex-1 bg-[#FCFAF8]">
       <View className="items-center border-b border-[#EAE6E1] px-5 pb-3 pt-14">
-          <ScreenHeader title="Hibirio" />
+        <ScreenHeader title="Hibirio" />
       </View>
 
       <ScrollView
         className="flex-1"
         contentContainerClassName="pb-24"
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerClassName="gap-2 px-4 pb-3 pt-4"
-        >
+          contentContainerClassName="gap-2 px-4 pb-3 pt-4">
           {filters.map((filter) => {
             const active = filter === activeFilter;
             return (
@@ -90,13 +82,11 @@ export default function Home() {
                 onPress={() => setActiveFilter(filter)}
                 className={`items-center justify-center rounded-full px-4 py-2 ${
                   active ? 'bg-[#DCC7A8]' : 'border border-[#EAE6E1]'
-                }`}
-              >
+                }`}>
                 <Text
                   className={`text-[13px] font-semibold ${
                     active ? 'text-[#292724]' : 'text-[#6E6B68]'
-                  }`}
-                >
+                  }`}>
                   {filter}
                 </Text>
               </Pressable>
@@ -110,7 +100,7 @@ export default function Home() {
           </View>
         )}
 
-        {loading && (
+        {showSpinner && (
           <View className="items-center py-16">
             <ActivityIndicator color="#A81245" />
           </View>
@@ -124,7 +114,7 @@ export default function Home() {
           </View>
         )}
 
-        {!loading && !error && posts.length > 0 && (
+        {!error && posts.length > 0 && (
           <View className="gap-4 px-4 pt-1">
             <View className="flex-row gap-3">
               {[leftColumn, rightColumn].map((column, colIndex) => (
@@ -132,9 +122,7 @@ export default function Home() {
                   {column.map((post, i) => {
                     const globalIndex = colIndex + i * 2;
                     const swatch = SWATCH_COLORS[globalIndex % SWATCH_COLORS.length];
-                    return (
-                      <FeedCard key={post.id} post={post} swatchColor={swatch} />
-                    );
+                    return <FeedCard key={post.id} post={post} swatchColor={swatch} />;
                   })}
                 </View>
               ))}
@@ -160,8 +148,7 @@ function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
           pathname: '/(upload)/[id]',
           params: { id: post.id },
         })
-      }
-    >
+      }>
       <Image
         source={{ uri: post.image }}
         className="w-full rounded-[14px]"
@@ -171,12 +158,8 @@ function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
 
       <View
         className="absolute bottom-2 left-2 right-2 flex-row items-center justify-between rounded-full px-2 py-1.5"
-        style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}
-      >
-        <Text
-          numberOfLines={1}
-          className="flex-1 text-[11px] font-semibold text-white"
-        >
+        style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}>
+        <Text numberOfLines={1} className="flex-1 text-[11px] font-semibold text-white">
           {post.title}
         </Text>
 
@@ -185,13 +168,8 @@ function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
             event.stopPropagation();
             toggleFavorite(post.id);
           }}
-          hitSlop={8}
-        >
-          <Heart
-            size={14}
-            color="#FFFFFF"
-            fill={favorited ? '#FFFFFF' : 'none'}
-          />
+          hitSlop={8}>
+          <Heart size={14} color="#FFFFFF" fill={favorited ? '#FFFFFF' : 'none'} />
         </Pressable>
       </View>
 
@@ -215,8 +193,15 @@ function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
 function EditorialSpread({ post }: { post: Post }) {
   return (
     <View className="overflow-hidden rounded-2xl">
-      <Image source={{ uri: post.image }} className="w-full" style={{ height: 260 }} resizeMode="cover" />
-      <View className="absolute inset-0 justify-end p-5" style={{ backgroundColor: 'rgba(0,0,0,0.35)' }}>
+      <Image
+        source={{ uri: post.image }}
+        className="w-full"
+        style={{ height: 260 }}
+        resizeMode="cover"
+      />
+      <View
+        className="absolute inset-0 justify-end p-5"
+        style={{ backgroundColor: 'rgba(0,0,0,0.35)' }}>
         <Text className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#DCC7A8]">
           {"Editor's choice"}
         </Text>
