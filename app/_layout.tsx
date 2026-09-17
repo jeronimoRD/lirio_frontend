@@ -11,7 +11,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
     const [fontsLoaded, fontError] = useFonts({
       'Lora-Italic': require('../assets/fonts/Lora-Italic.ttf'),
-      'Lora-Regular': require('../assets/fonts/Lora-Regular.ttf'),  // 👈 agregar esta línea
+      'Lora-Regular': require('../assets/fonts/Lora-Regular.ttf'), 
       'Lora-Medium': require('../assets/fonts/Lora-Medium.ttf'),
       'Lora-MediumItalic': require('../assets/fonts/Lora-MediumItalic.ttf'),
     });

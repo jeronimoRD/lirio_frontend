@@ -78,6 +78,11 @@ export default function CreatePost() {
       return;
     }
 
+    if (!category) {
+      Alert.alert('Falta información', 'Selecciona una categoría.');
+      return;
+    }
+
     if (!image) {
       Alert.alert('Falta información', 'Selecciona una imagen.');
       return;
@@ -85,12 +90,13 @@ export default function CreatePost() {
 
     try {
       setLoading(true);
-      await createPost(title, description, image);
+      await createPost(title, description, image, category.id);
 
       Alert.alert('Post creado', 'Tu publicación se creó correctamente.');
 
       setTitle('');
       setDescription('');
+      setCategory(null);
       setImage(null);
     } catch (error) {
       Alert.alert(
@@ -154,6 +160,7 @@ export default function CreatePost() {
               className="min-h-[120px] rounded-lg border border-[#EAE6E1] bg-white p-4 text-sm text-[#292724]"
             />
           </View>
+
           <View className="gap-1.5">
             <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
               Categoría
@@ -191,6 +198,7 @@ export default function CreatePost() {
               </View>
             )}
           </View>
+
           <View className="gap-1.5">
             <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
               Foto del outfit

@@ -61,15 +61,26 @@ export default function Home() {
     }, []),
   );
 
-  const filters = ['For You', ...categories.map((category) => category.name)];
+  const filters = ['Ver todos', ...categories.map((category) => category.name)];
 
-  const leftColumn = posts.filter((_, i) => i % 2 === 0);
-  const rightColumn = posts.filter((_, i) => i % 2 === 1);
+  // "For You" muestra el feed completo (ya viene priorizado por preferencias
+  // desde el backend). Elegir una categoría puntual filtra por su id.
+  const activeCategoryId =
+    activeFilter === 'Ver todos'
+      ? null
+      : categories.find((c) => c.name === activeFilter)?.id ?? null;
+
+  const displayedPosts = activeCategoryId
+    ? posts.filter((post) => post.categoryId === activeCategoryId)
+    : posts;
+
+  const leftColumn = displayedPosts.filter((_, i) => i % 2 === 0);
+  const rightColumn = displayedPosts.filter((_, i) => i % 2 === 1);
 
   return (
     <View className="flex-1 bg-[#FCFAF8]">
       <View className="items-center border-b border-[#EAE6E1] px-5 pb-3 pt-14">
-          <ScreenHeader title="Hibirio" />
+        <ScreenHeader title="Hibirio" />
       </View>
 
       <ScrollView
@@ -89,12 +100,12 @@ export default function Home() {
                 key={filter}
                 onPress={() => setActiveFilter(filter)}
                 className={`items-center justify-center rounded-full px-4 py-2 ${
-                  active ? 'bg-[#DCC7A8]' : 'border border-[#EAE6E1]'
+                  active ? 'bg-[#A81245]' : 'border border-[#EAE6E1]'
                 }`}
               >
                 <Text
                   className={`text-[13px] font-semibold ${
-                    active ? 'text-[#292724]' : 'text-[#6E6B68]'
+                    active ? 'text-white' : 'text-[#6E6B68]'
                   }`}
                 >
                   {filter}
@@ -116,15 +127,17 @@ export default function Home() {
           </View>
         )}
 
-        {!loading && !error && posts.length === 0 && (
+        {!loading && !error && displayedPosts.length === 0 && (
           <View className="mx-4 rounded-2xl border border-[#EAE6E1] bg-white p-6">
             <Text className="text-center text-sm text-[#6E6B68]">
-              Aún no hay outfits publicados.
+              {activeCategoryId
+                ? `Sin outfits en "${activeFilter}" todavía.`
+                : 'Aún no hay outfits publicados.'}
             </Text>
           </View>
         )}
 
-        {!loading && !error && posts.length > 0 && (
+        {!loading && !error && displayedPosts.length > 0 && (
           <View className="gap-4 px-4 pt-1">
             <View className="flex-row gap-3">
               {[leftColumn, rightColumn].map((column, colIndex) => (
@@ -140,7 +153,7 @@ export default function Home() {
               ))}
             </View>
 
-            {posts[0] && <EditorialSpread post={posts[0]} />}
+            {displayedPosts[0] && <EditorialSpread post={displayedPosts[0]} />}
           </View>
         )}
       </ScrollView>

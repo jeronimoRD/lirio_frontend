@@ -48,11 +48,11 @@ function UploadButton() {
         >
         <Tabs.Screen
             name="home"
-            options={{ title: 'Home', tabBarIcon: ({ color }) => <House size={22} color={color} /> }}
+            options={{ title: 'Inicio', tabBarIcon: ({ color }) => <House size={22} color={color} /> }}
         />
         <Tabs.Screen
             name="explore"
-            options={{ title: 'Explore', tabBarIcon: ({ color }) => <Search size={22} color={color} /> }}
+            options={{ title: 'Busqueda', tabBarIcon: ({ color }) => <Search size={22} color={color} /> }}
         />
         <Tabs.Screen
             name="upload-placeholder"
@@ -68,11 +68,11 @@ function UploadButton() {
         />
         <Tabs.Screen
             name="saved"
-            options={{ title: 'Saved', tabBarIcon: ({ color }) => <Heart size={22} color={color} /> }}
+            options={{ title: 'Guardados', tabBarIcon: ({ color }) => <Heart size={22} color={color} /> }}
         />
         <Tabs.Screen
             name="profile"
-            options={{ title: 'Profile', tabBarIcon: ({ color }) => <UserRound size={22} color={color} /> }}
+            options={{ title: 'Perfil', tabBarIcon: ({ color }) => <UserRound size={22} color={color} /> }}
         />
         </Tabs>
     );

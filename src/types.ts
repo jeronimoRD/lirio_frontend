@@ -32,6 +32,8 @@ export interface Post {
   description: string;
   userId: string;
   createdAt: string;
+  /** ID de la categoría del outfit (opcional hasta que todos los posts la tengan). */
+  categoryId?: string;
 }
 
 /** Categoría de los posts (outfits). La gestiona el admin. */
