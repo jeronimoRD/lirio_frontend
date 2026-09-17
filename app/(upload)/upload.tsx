@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -14,13 +14,31 @@ import { useRouter } from 'expo-router';
 import { ArrowLeft, ImagePlus } from 'lucide-react-native';
 
 import { createPost } from '../../src/api/posts';
+import { getCategories } from '../../src/api/categories';
+import type { Category } from '../../src/types';
 
 export default function CreatePost() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [category, setCategory] = useState<Category | null>(null);
+  const [showCategories, setShowCategories] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const data = await getCategories();
+        setCategories(data);
+      } catch (error) {
+        console.log('Error cargando categorías:', error);
+      }
+    }
+
+    loadCategories();
+  }, []);
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -136,7 +154,43 @@ export default function CreatePost() {
               className="min-h-[120px] rounded-lg border border-[#EAE6E1] bg-white p-4 text-sm text-[#292724]"
             />
           </View>
+          <View className="gap-1.5">
+            <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
+              Categoría
+            </Text>
 
+            <Pressable
+              onPress={() => setShowCategories(!showCategories)}
+              className="h-12 flex-row items-center justify-between rounded-lg border border-[#EAE6E1] bg-white px-4"
+            >
+              <Text className="text-sm text-[#292724]">
+                {category ? category.name : 'Selecciona una categoría'}
+              </Text>
+
+              <Text className="text-[#6E6B68]">
+                {showCategories ? '▲' : '▼'}
+              </Text>
+            </Pressable>
+
+            {showCategories && (
+              <View className="overflow-hidden rounded-lg border border-[#EAE6E1] bg-white">
+                {categories.map((item) => (
+                  <Pressable
+                    key={item.id}
+                    onPress={() => {
+                      setCategory(item);
+                      setShowCategories(false);
+                    }}
+                    className="border-b border-[#EAE6E1] px-4 py-3 last:border-b-0"
+                  >
+                    <Text className="text-sm text-[#292724]">
+                      {item.name}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            )}
+          </View>
           <View className="gap-1.5">
             <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
               Foto del outfit

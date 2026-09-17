@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -14,6 +14,7 @@ import { getCategories } from '../../src/api/categories';
 import { useFavorites } from '../../src/favorites/context';
 import type { Post, Category } from '../../src/types';
 import ScreenHeader from '@/components/ScreenHeader';
+import { useFocusEffect, useRouter } from 'expo-router';
 
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#292724', '#6E6B68', '#EAE6E1', '#A09B95'];
 
@@ -24,32 +25,41 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState('For You');
 
-  useEffect(() => {
-    let active = true;
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
 
-    getCategories()
-      .then((all) => {
-        if (active) setCategories(all);
-      })
-      .catch(() => {});
+      setLoading(true);
+      setError(null);
 
-    getPosts()
-      .then((all) => {
-        if (active) setPosts(all);
-      })
-      .catch((err) => {
-        if (active) {
-          setError(err instanceof Error ? err.message : 'No se pudo cargar el feed');
-        }
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
+      getCategories()
+        .then((all) => {
+          if (active) setCategories(all);
+        })
+        .catch(() => {});
 
-    return () => {
-      active = false;
-    };
-  }, []);
+      getPosts()
+        .then((all) => {
+          if (active) setPosts(all);
+        })
+        .catch((err) => {
+          if (active) {
+            setError(
+              err instanceof Error
+                ? err.message
+                : 'No se pudo cargar el feed',
+            );
+          }
+        })
+        .finally(() => {
+          if (active) setLoading(false);
+        });
+
+      return () => {
+        active = false;
+      };
+    }, []),
+  );
 
   const filters = ['For You', ...categories.map((category) => category.name)];
 
@@ -141,23 +151,42 @@ export default function Home() {
 function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorited = isFavorite(post.id);
+  const router = useRouter();
 
   return (
-    <View>
+    <Pressable
+      onPress={() =>
+        router.push({
+          pathname: '/(upload)/[id]',
+          params: { id: post.id },
+        })
+      }
+    >
       <Image
         source={{ uri: post.image }}
         className="w-full rounded-[14px]"
         style={{ height: 220 }}
         resizeMode="cover"
       />
+
       <View
         className="absolute bottom-2 left-2 right-2 flex-row items-center justify-between rounded-full px-2 py-1.5"
         style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}
       >
-        <Text numberOfLines={1} className="flex-1 text-[11px] font-semibold text-white">
+        <Text
+          numberOfLines={1}
+          className="flex-1 text-[11px] font-semibold text-white"
+        >
           {post.title}
         </Text>
-        <Pressable onPress={() => toggleFavorite(post.id)} hitSlop={8}>
+
+        <Pressable
+          onPress={(event) => {
+            event.stopPropagation();
+            toggleFavorite(post.id);
+          }}
+          hitSlop={8}
+        >
           <Heart
             size={14}
             color="#FFFFFF"
@@ -165,6 +194,7 @@ function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
           />
         </Pressable>
       </View>
+
       <View
         className="absolute -left-1 rounded-full border-2 border-white"
         style={{
@@ -178,7 +208,7 @@ function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
           shadowRadius: 4,
         }}
       />
-    </View>
+    </Pressable>
   );
 }
 
