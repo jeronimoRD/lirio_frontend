@@ -15,6 +15,7 @@ import { getCategories } from '../../src/api/categories';
 import { searchUsers, suggestUsers } from '../../src/api/users';
 import type { Post, Category, User } from '../../src/types';
 import ScreenHeader from '@/components/ScreenHeader';
+import FeedCard from '@/components/FeedCard';
 
 type SearchTab = 'outfits' | 'cuentas';
 
@@ -275,22 +276,7 @@ export default function Explore() {
                 {[leftColumn, rightColumn].map((column, colIndex) => (
                   <View key={colIndex} className="flex-1 gap-3">
                     {column.map((post) => (
-                      <View key={post.id} className="overflow-hidden rounded-[14px]">
-                        <Image
-                          source={{ uri: post.image }}
-                          className="w-full"
-                          style={{ height: 200 }}
-                          resizeMode="cover"
-                        />
-                        <View className="absolute bottom-0 left-0 right-0 bg-black/30 px-2 py-1.5">
-                          <Text
-                            numberOfLines={1}
-                            className="text-[11px] font-semibold text-white"
-                          >
-                            {post.title}
-                          </Text>
-                        </View>
-                      </View>
+                      <FeedCard key={post.id} post={post} />
                     ))}
                   </View>
                 ))}
@@ -313,22 +299,7 @@ export default function Explore() {
                 {[leftColumn, rightColumn].map((column, colIndex) => (
                   <View key={colIndex} className="flex-1 gap-3">
                     {column.map((post) => (
-                      <View key={post.id} className="overflow-hidden rounded-[14px]">
-                        <Image
-                          source={{ uri: post.image }}
-                          className="w-full"
-                          style={{ height: 200 }}
-                          resizeMode="cover"
-                        />
-                        <View className="absolute bottom-0 left-0 right-0 bg-black/30 px-2 py-1.5">
-                          <Text
-                            numberOfLines={1}
-                            className="text-[11px] font-semibold text-white"
-                          >
-                            {post.title}
-                          </Text>
-                        </View>
-                      </View>
+                      <FeedCard key={post.id} post={post} />
                     ))}
                   </View>
                 ))}
