@@ -47,9 +47,15 @@ export async function suggestUsers(limit = 3): Promise<User[]> {
   const data = await request<UserResponse[]>(
     `/users/suggestions?limit=${limit}`,
   );
+  
 
   return data.map(toUser);
 }
+
+/** Un usuario puntual por su id (para mostrar quién publicó un post). */
+export async function getUserById(id: string): Promise<User> {
+    return toUser(await request<UserResponse>(`/users/${id}/profile`));
+  }
 
 export async function updateProfile(
   name: string,

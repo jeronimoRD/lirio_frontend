@@ -8,6 +8,7 @@ interface PostResponse {
   image: string;
   description: string;
   user_id: string;
+  category_id?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -19,6 +20,7 @@ function toPost(data: PostResponse): Post {
     image: data.image,
     description: data.description,
     userId: data.user_id,
+    categoryId: data.category_id,
     createdAt: data.createdAt,
   };
 }
@@ -29,28 +31,32 @@ export async function getPosts(): Promise<Post[]> {
   return data.map(toPost);
 }
 
+/**
+ * Alias de getPosts para el feed de Home. Hoy trae exactamente lo mismo;
+ * si en algún momento el backend agrega un endpoint de feed personalizado
+ * (ej. /posts/feed), este es el único lugar que hay que cambiar.
+ */
+export async function getFeedPosts(): Promise<Post[]> {
+  return getPosts();
+}
+
 export async function getPost(id: string): Promise<Post> {
   const data = await request<PostResponse>(`/posts/${id}`);
 
   return toPost(data);
 }
 
-/** Feed personalizado: mezcla posts de tus categorías preferidas y aleatorios. */
-export async function getFeedPosts(limit = 20): Promise<Post[]> {
-  const data = await request<PostResponse[]>(`/posts/feed?limit=${limit}`);
-
-  return data.map(toPost);
-}
-
 export async function createPost(
   title: string,
   description: string,
   imageUri: string,
+  categoryId: string,
 ) {
   const formData = new FormData();
 
   formData.append('title', title);
   formData.append('description', description);
+  formData.append('category_id', categoryId);
 
   const file = new File(imageUri);
 
@@ -77,6 +83,7 @@ export async function updatePost(
 
   return toPost(data.post);
 }
+
 export async function deletePost(id: string): Promise<void> {
   try {
     await request(`/posts/${id}`, undefined, 'DELETE');

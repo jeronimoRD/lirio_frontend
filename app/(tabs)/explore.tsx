@@ -119,22 +119,47 @@ export default function Explore() {
     };
   }, [query]);
 
-  const toggleFilter = (filter: string) => {
-    setActiveFilters((prev) =>
-      prev.includes(filter) ? prev.filter((f) => f !== filter) : [...prev, filter],
-    );
-  };
+const toggleFilter = (filter: string) => {
+  setActiveFilters((prev) =>
+    prev.includes(filter) ? prev.filter((f) => f !== filter) : [...prev, filter],
+  );
+};
 
-  // Filtra por título o descripción del post.
+// IDs de las categorías seleccionadas (los chips guardan el nombre, no el id).
+const activeCategoryIds = useMemo(
+  () =>
+    categories
+      .filter((c) => activeFilters.includes(c.name))
+      .map((c) => c.id),
+  [categories, activeFilters],
+);
+
+  // Mapa rápido para resolver el nombre de la categoría de un post.
+  const categoryNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const category of categories) {
+      map.set(category.id, category.name);
+    }
+    return map;
+  }, [categories]);
+
+  // Filtra por texto (título/descripción/categoría) Y por categorías seleccionadas.
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return posts;
 
     return posts.filter((post) => {
-      const haystack = `${post.title} ${post.description ?? ''}`.toLowerCase();
-      return haystack.includes(q);
+      const categoryName = post.categoryId ? categoryNameById.get(post.categoryId) ?? '' : '';
+      const haystack = `${post.title} ${post.description ?? ''} ${categoryName}`.toLowerCase();
+
+      const matchesQuery = !q || haystack.includes(q);
+
+      const matchesCategory =
+        activeCategoryIds.length === 0 ||
+        (post.categoryId !== undefined && activeCategoryIds.includes(post.categoryId));
+
+      return matchesQuery && matchesCategory;
     });
-  }, [posts, query]);
+  }, [posts, query, activeCategoryIds, categoryNameById]);
 
   const hasQuery = query.trim().length > 0;
   const searchActive = focused || hasQuery;
@@ -219,12 +244,12 @@ export default function Explore() {
                   key={filter}
                   onPress={() => toggleFilter(filter)}
                   className={`items-center justify-center rounded-full px-4 py-2 ${
-                    active ? 'bg-[#DCC7A8]' : 'border border-[#EAE6E1]'
+                    active ? 'bg-[#A81245]' : 'border border-[#EAE6E1]'
                   }`}
                 >
                   <Text
                     className={`text-[13px] font-semibold ${
-                      active ? 'text-[#292724]' : 'text-[#6E6B68]'
+                      active ? 'text-white' : 'text-[#6E6B68]'
                     }`}
                   >
                     {filter}
@@ -284,7 +309,9 @@ export default function Explore() {
             ) : (
               <View className="mx-4 rounded-2xl border border-[#EAE6E1] bg-white p-6">
                 <Text className="text-center text-sm text-[#6E6B68]">
-                  Aún no hay outfits publicados.
+                  {activeCategoryIds.length > 0
+                    ? 'Sin outfits en esas categorías todavía.'
+                    : 'Aún no hay outfits publicados.'}
                 </Text>
               </View>
             )}
@@ -304,10 +331,12 @@ export default function Explore() {
                   </View>
                 ))}
               </View>
-            ) : hasQuery ? (
+            ) : hasQuery || activeCategoryIds.length > 0 ? (
               <View className="mx-4 rounded-2xl border border-[#EAE6E1] bg-white p-6">
                 <Text className="text-center text-sm text-[#6E6B68]">
-                  {`Sin resultados para "${query}"`}
+                  {hasQuery
+                    ? `Sin resultados para "${query}"`
+                    : 'Sin outfits en esas categorías todavía.'}
                 </Text>
               </View>
             ) : (
@@ -403,59 +432,106 @@ function TabButton({
   );
 }
 
-function SuggestionCard({
-  user,
-  outfitCount,
-}: {
-  user: User;
-  outfitCount: number;
-}) {
+const cardShadow = {
+  shadowColor: 'rgba(92, 75, 54, 0.12)',
+  shadowOffset: { width: 0, height: 6 },
+  shadowRadius: 16,
+  shadowOpacity: 1,
+  elevation: 3,
+};
+
+function AvatarRing({ initials, size = 64 }: { initials: string; size?: number }) {
+  const ringSize = size + 8;
   return (
-    <View className="w-[150px] items-center gap-2 rounded-2xl border border-[#EAE6E1] bg-white p-4">
-      <View className="h-16 w-16 items-center justify-center rounded-full bg-[#DCC7A8]">
-        <Text className="text-lg font-bold text-white">
-          {initialsOf(user.name)}
+    <View
+      className="items-center justify-center rounded-full"
+      style={{
+        width: ringSize,
+        height: ringSize,
+        borderWidth: 2,
+        borderColor: '#DCC7A8',
+      }}
+    >
+      <View
+        className="items-center justify-center rounded-full bg-[#A81245]"
+        style={{ width: size, height: size }}
+      >
+        <Text className="font-bold text-white" style={{ fontSize: size * 0.32 }}>
+          {initials}
         </Text>
       </View>
-      <Text
-        numberOfLines={1}
-        className="w-full text-center font-['Lora-Regular'] text-sm text-[#292724]"
-      >
-        {user.name}
-      </Text>
-      <Text className="text-[11px] font-semibold text-[#6E6B68]">
-        {outfitCount} {outfitCount === 1 ? 'outfit' : 'outfits'}
-      </Text>
     </View>
   );
 }
 
-function UserRow({ user, outfitCount }: { user: User; outfitCount: number }) {
-  return (
-    <View className="mx-4 mb-2 flex-row items-center gap-3 rounded-2xl border border-[#EAE6E1] bg-white p-3">
-      <View className="h-12 w-12 items-center justify-center rounded-full bg-[#DCC7A8]">
-        <Text className="text-sm font-bold text-white">
-          {initialsOf(user.name)}
-        </Text>
-      </View>
-      <View className="flex-1 gap-[3px]">
-        <Text
-          numberOfLines={1}
-          className="font-['Lora-Regular'] text-base text-[#292724]"
-        >
-          {user.name}
-        </Text>
-        {!!user.bio && (
-          <Text numberOfLines={1} className="text-xs text-[#6E6B68]">
-            {user.bio}
+  function SuggestionCard({
+    user,
+    outfitCount,
+  }: {
+    user: User;
+    outfitCount: number;
+  }) {
+    return (
+      <View
+        className="w-[160px] items-center gap-3 rounded-[20px] bg-white px-4 pb-4 pt-5"
+        style={cardShadow}
+      >
+        <AvatarRing initials={initialsOf(user.name)} />
+
+        <View className="items-center gap-1">
+          <Text
+            numberOfLines={1}
+            className="w-full text-center font-['Lora-Italic'] text-base text-[#292724]"
+          >
+            {user.name}
           </Text>
-        )}
+          {!!user.bio && (
+            <Text
+              numberOfLines={1}
+              className="w-full text-center text-[11px] text-[#A09B95]"
+            >
+              {user.bio}
+            </Text>
+          )}
+        </View>
+
+        <View className="rounded-full bg-[#F4EEE7] px-3 py-1">
+          <Text className="text-[11px] font-semibold text-[#6E6B68]">
+            {outfitCount} {outfitCount === 1 ? 'outfit' : 'outfits'}
+          </Text>
+        </View>
       </View>
-      <View className="rounded-full bg-[#F4EEE7] px-3 py-1">
-        <Text className="text-[11px] font-semibold text-[#6E6B68]">
-          {outfitCount} {outfitCount === 1 ? 'outfit' : 'outfits'}
-        </Text>
+    );
+  }
+
+  function UserRow({ user, outfitCount }: { user: User; outfitCount: number }) {
+    return (
+      <View
+        className="mx-4 mb-3 flex-row items-center gap-3.5 rounded-[20px] bg-white p-4"
+        style={cardShadow}
+      >
+        <AvatarRing initials={initialsOf(user.name)} size={52} />
+
+        <View className="flex-1 gap-[3px]">
+          <Text
+            numberOfLines={1}
+            className="font-['Lora-Italic'] text-base text-[#292724]"
+          >
+            {user.name}
+          </Text>
+          {!!user.bio && (
+            <Text numberOfLines={1} className="text-xs text-[#6E6B68]">
+              {user.bio}
+            </Text>
+          )}
+        </View>
+
+        <View className="items-center rounded-2xl bg-[#F4EEE7] px-3 py-2">
+          <Text className="text-sm font-bold text-[#A81245]">{outfitCount}</Text>
+          <Text className="text-[9px] font-semibold uppercase tracking-wide text-[#6E6B68]">
+            {outfitCount === 1 ? 'outfit' : 'outfits'}
+          </Text>
+        </View>
       </View>
-    </View>
-  );
-}
+    );
+  }
