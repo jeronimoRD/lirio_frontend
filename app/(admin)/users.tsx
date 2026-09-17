@@ -11,6 +11,8 @@ import Field from '../../src/components/Field';
 import { useSession } from '../../src/session/context';
 import type { Role, User } from '../../src/types';
 import { ROLES } from '../../src/types';
+import { cardShadow } from '../../src/constants/theme';
+import { initialsOf } from '../../src/utils/strings';
 
 type CreateForm = {
   name: string;
@@ -22,24 +24,6 @@ const ROLE_STYLE: Record<Role, { label: string; className: string }> = {
   USER: { label: 'Usuario', className: 'bg-[#F4EEE7] text-[#6E6B68]' },
   ADMIN: { label: 'Admin', className: 'bg-[#4A3728]/10 text-[#4A3728]' },
 };
-
-const cardShadow = {
-  shadowColor: 'rgba(92, 75, 54, 0.10)',
-  shadowOffset: { width: 0, height: 4 },
-  shadowRadius: 12,
-  shadowOpacity: 1,
-  elevation: 2,
-};
-
-function initialsOf(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((word) => word[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
-}
 
 export default function AdminUsers() {
   const { user: me } = useSession();

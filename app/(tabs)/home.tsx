@@ -70,9 +70,7 @@ export default function Home() {
 
   return (
     <View className="flex-1 bg-[#FCFAF8]">
-      <View className="items-center border-b border-[#EAE6E1] px-5 pb-3 pt-14">
-        <ScreenHeader title="Hibirio" />
-      </View>
+      <ScreenHeader title="Hibirio" />
 
       <ScrollView
         className="flex-1"

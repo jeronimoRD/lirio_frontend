@@ -6,7 +6,7 @@ Este proyecto está dividido en **dos repositorios separados**:
 
 | Repositorio | Qué contiene |
 |---|---|
-| [`LirioHibisco-Frontend`](https://github.com/jeronimoRD/LirioHibisco-Frontend) *(este repo)* | La app (Expo) |
+| [`lirio-Frontend`](https://github.com/jeronimoRD/lirio_frontend.git) *(este repo)* | La app (Expo) |
 | [`lirio_backend`](https://github.com/isatm/lirio_backend) | La API (Node + MongoDB) |
 
 Para correr el proyecto completo necesitás clonar **ambos** repositorios.
@@ -36,12 +36,18 @@ Creá un archivo `.env` dentro de esta carpeta con:
 ```dotenv
 MONGODB_URI=mongodb://usuario:contraseña@localhost:27017/nombre-de-tu-basededatos
 JWT_SECRET=una clave
+CLOUDINARY_CLOUD_NAME=tu-cloud-name
+CLOUDINARY_API_KEY=tu-api-key
+CLOUDINARY_API_SECRET=tu-api-secret
 ```
 
 | Variable | Qué es | Cómo conseguirla |
 |---|---|---|
 | `MONGODB_URI` | Cadena de conexión a tu base de datos MongoDB | Si usás MongoDB local: `mongodb://localhost:27017/nombre-db`. Si usás Atlas, la URI te la da el panel de Atlas. |
 | `JWT_SECRET` | Clave usada para firmar los tokens de autenticación | Cualquier string largo y aleatorio, o el que te haya pasado el desarrollador del backend. |
+| `CLOUDINARY_CLOUD_NAME` | Nombre de tu cuenta en Cloudinary | El dashboard de Cloudinary (tras crear cuenta gratis) lo muestra como "Cloud name". |
+| `CLOUDINARY_API_KEY` | Llave pública de la API de Cloudinary | Dashboard de Cloudinary → "API Key". |
+| `CLOUDINARY_API_SECRET` | Llave secreta de la API de Cloudinary | Dashboard de Cloudinary → "API Secret". Es secreto: no lo compartas ni lo subas a git. Se necesita para subir las imágenes de los posts. |
 
 Corré el servidor:
 

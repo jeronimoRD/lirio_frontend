@@ -13,6 +13,7 @@ import { ArrowLeft, Heart } from 'lucide-react-native';
 import { getPost } from '../../src/api/posts';
 import { getUserById } from '../../src/api/users';
 import type { Post, User } from '../../src/types';
+import { initialsOf } from '../../src/utils/strings';
 
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#3D6B52'];
 
@@ -31,16 +32,6 @@ const floatingButtonShadow = {
   shadowOpacity: 0.15,
   elevation: 3,
 };
-
-function initialsOf(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((word) => word[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
-}
 
 export default function PostDetail() {
   const router = useRouter();

@@ -12,17 +12,10 @@ import {
 import Button from '../../src/components/Button';
 import ConfirmModal from '../../src/components/ConfirmModal';
 import type { Category } from '../../src/types';
+import { cardShadow } from '../../src/constants/theme';
 
 const CATEGORY_NAME_MIN_LENGTH = 2;
 const CATEGORY_NAME_MAX_LENGTH = 50;
-
-const cardShadow = {
-  shadowColor: 'rgba(92, 75, 54, 0.10)',
-  shadowOffset: { width: 0, height: 4 },
-  shadowRadius: 12,
-  shadowOpacity: 1,
-  elevation: 2,
-};
 
 export default function AdminCategories() {
   const insets = useSafeAreaInsets();

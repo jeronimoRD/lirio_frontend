@@ -6,14 +6,7 @@ import { ChevronRight, ShieldCheck, Tag, Users } from 'lucide-react-native';
 import { getAdminUsers } from '../../src/api/admin';
 import { getCategories } from '../../src/api/categories';
 import { useSession } from '../../src/session/context';
-
-const cardShadow = {
-  shadowColor: 'rgba(92, 75, 54, 0.10)',
-  shadowOffset: { width: 0, height: 4 },
-  shadowRadius: 12,
-  shadowOpacity: 1,
-  elevation: 2,
-};
+import { cardShadow } from '../../src/constants/theme';
 
 function OptionCard({
   icon,

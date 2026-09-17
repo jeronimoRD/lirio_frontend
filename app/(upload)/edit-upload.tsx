@@ -7,18 +7,11 @@ import { ArrowLeft } from 'lucide-react-native';
 
 import { getPost, updatePost } from '../../src/api/posts';
 import Field from '../../src/components/Field';
+import { cardShadow } from '../../src/constants/theme';
 
 type FormData = {
   title: string;
   description: string;
-};
-
-const cardShadow = {
-  shadowColor: 'rgba(92, 75, 54, 0.10)',
-  shadowOffset: { width: 0, height: 4 },
-  shadowRadius: 12,
-  shadowOpacity: 1,
-  elevation: 2,
 };
 
 const imageShadow = {

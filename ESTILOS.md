@@ -112,17 +112,14 @@ import ScreenHeader from '../../src/components/ScreenHeader';
 
 No lo envuelvas en otro `View` con borde: el componente ya trae el suyo.
 
-Header con botón de volver (todavía no es componente, se repite 2 veces):
+Header con botón de volver:
 
 ```tsx
-<View className="flex-row items-center justify-between px-6 pb-4 pt-14">
-  <Pressable onPress={handleBack} hitSlop={8}>
-    <ArrowLeft size={22} color="#A81245" />
-  </Pressable>
-  <Text className="font-['Lora-Italic'] text-xl text-[#A81245]">Título</Text>
-  <View className="w-[22px]" />
-</View>
+<ScreenHeader title="Crear publicación" onBack={handleBack} />
 ```
+
+La variante `onBack` rendersiza la flecha + título + spacer. Se reutiliza
+en upload, settings y edit-profile.
 
 ---
 

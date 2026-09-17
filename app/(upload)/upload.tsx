@@ -3,12 +3,13 @@ import { ActivityIndicator, Alert, Image, Pressable, ScrollView, Text, View } fr
 import { useForm } from 'react-hook-form';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, ImagePlus } from 'lucide-react-native';
+import { ImagePlus } from 'lucide-react-native';
 
 import { createPost } from '../../src/api/posts';
 import { getCategories } from '../../src/api/categories';
 import ConfirmModal from '../../src/components/ConfirmModal';
 import Field from '../../src/components/Field';
+import ScreenHeader from '../../src/components/ScreenHeader';
 import type { Category } from '../../src/types';
 
 type FormData = {
@@ -114,15 +115,7 @@ export default function CreatePost() {
         contentContainerClassName="flex-grow"
         keyboardShouldPersistTaps="handled">
         {/* header */}
-        <View className="flex-row items-center justify-between px-6 pb-4 pt-14">
-          <Pressable onPress={handleBack} hitSlop={8}>
-            <ArrowLeft size={22} color="#A81245" />
-          </Pressable>
-
-          <Text className="font-['Lora-Italic'] text-xl text-[#A81245]">Crear publicación</Text>
-
-          <View className="w-[22px]" />
-        </View>
+        <ScreenHeader title="Crear publicación" onBack={handleBack} className="px-6 pb-4 pt-14" />
 
         {/* body */}
         <View className="gap-5 px-6 pb-6 pt-2">

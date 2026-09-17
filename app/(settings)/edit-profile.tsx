@@ -1,13 +1,21 @@
 import { Redirect, useRouter } from 'expo-router';
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
-import { ArrowLeft, UserRound } from 'lucide-react-native';
+import { UserRound } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { updateProfile } from '../../src/api/users';
 import Field from '../../src/components/Field';
 import { useSession } from '../../src/session/context';
+
+import {
+  IconWell,
+  SectionCard,
+  SectionHeaderRow,
+  SectionLabel,
+} from '../../src/components/SettingsSections';
+import ScreenHeader from '../../src/components/ScreenHeader';
 
 type ProfileForm = {
   name: string;
@@ -15,47 +23,6 @@ type ProfileForm = {
 
 function messageOf(err: unknown): string {
   return err instanceof Error ? err.message : 'Ocurrió un error inesperado';
-}
-
-const cardShadow = {
-  shadowColor: 'rgba(92, 75, 54, 0.10)',
-  shadowOffset: { width: 0, height: 4 },
-  shadowRadius: 12,
-  shadowOpacity: 1,
-  elevation: 2,
-};
-
-function IconWell({ children }: { children: ReactNode }) {
-  return (
-    <View className="h-10 w-10 items-center justify-center rounded-full bg-[#F4EEE7]">
-      {children}
-    </View>
-  );
-}
-
-function SectionLabel({ text }: { text: string }) {
-  return (
-    <Text className="px-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#A09B95]">
-      {text}
-    </Text>
-  );
-}
-
-function SectionCard({ children }: { children: ReactNode }) {
-  return (
-    <View className="gap-4 rounded-2xl bg-white p-4" style={cardShadow}>
-      {children}
-    </View>
-  );
-}
-
-function SectionHeaderRow({ icon, label }: { icon: ReactNode; label: string }) {
-  return (
-    <View className="flex-row items-center gap-3">
-      <IconWell>{icon}</IconWell>
-      <Text className="flex-1 text-sm font-semibold text-[#292724]">{label}</Text>
-    </View>
-  );
 }
 
 export default function EditProfile() {
@@ -110,19 +77,7 @@ export default function EditProfile() {
       contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: insets.bottom + 40 }}>
       <View className="w-full max-w-[390px] gap-6">
         {/* Edit-profile header */}
-        <View className="flex-row items-center">
-          <Pressable
-            onPress={handleBack}
-            hitSlop={8}
-            className="h-11 w-11 items-center justify-center rounded-full bg-white"
-            style={cardShadow}>
-            <ArrowLeft size={20} color="#A81245" strokeWidth={2} />
-          </Pressable>
-
-          <Text className="flex-1 text-center text-xl font-bold text-[#292724]">Editar perfil</Text>
-
-          <View className="h-11 w-11" />
-        </View>
+        <ScreenHeader title="Editar perfil" onBack={handleBack} />
 
         {/* Perfil */}
         <View className="gap-2.5">

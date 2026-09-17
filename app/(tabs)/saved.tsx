@@ -37,9 +37,7 @@ export default function Saved() {
 
   return (
     <View className="flex-1 bg-[#FCFAF8]">
-      <View className="items-center border-b border-[#EAE6E1] px-5 pb-3 pt-14">
-        <ScreenHeader title="Guardados" />
-      </View>
+      <ScreenHeader title="Guardados" />
 
       <ScrollView className="flex-1" contentContainerClassName="px-4 pb-24 pt-4">
         {loading && (

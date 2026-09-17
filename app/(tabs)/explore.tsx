@@ -8,18 +8,10 @@ import { searchUsers, suggestUsers } from '../../src/api/users';
 import type { Post, Category, User } from '../../src/types';
 import ScreenHeader from '@/components/ScreenHeader';
 import FeedCard from '@/components/FeedCard';
+import { cardShadowLg } from '@/constants/theme';
+import { initialsOf } from '@/utils/strings';
 
 type SearchTab = 'outfits' | 'cuentas';
-
-function initialsOf(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((word) => word[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
-}
 
 export default function Explore() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -406,14 +398,6 @@ function TabButton({
   );
 }
 
-const cardShadow = {
-  shadowColor: 'rgba(92, 75, 54, 0.12)',
-  shadowOffset: { width: 0, height: 6 },
-  shadowRadius: 16,
-  shadowOpacity: 1,
-  elevation: 3,
-};
-
 function AvatarRing({ initials, size = 64 }: { initials: string; size?: number }) {
   const ringSize = size + 8;
   return (
@@ -440,7 +424,7 @@ function SuggestionCard({ user, outfitCount }: { user: User; outfitCount: number
   return (
     <View
       className="w-[160px] items-center gap-3 rounded-[20px] bg-white px-4 pb-4 pt-5"
-      style={cardShadow}>
+      style={cardShadowLg}>
       <AvatarRing initials={initialsOf(user.name)} />
 
       <View className="items-center gap-1">
@@ -469,7 +453,7 @@ function UserRow({ user, outfitCount }: { user: User; outfitCount: number }) {
   return (
     <View
       className="mx-4 mb-3 flex-row items-center gap-3.5 rounded-[20px] bg-white p-4"
-      style={cardShadow}>
+      style={cardShadowLg}>
       <AvatarRing initials={initialsOf(user.name)} size={52} />
 
       <View className="flex-1 gap-[3px]">

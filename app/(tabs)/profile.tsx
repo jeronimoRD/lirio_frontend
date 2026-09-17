@@ -8,31 +8,15 @@ import { useSession } from '../../src/session/context';
 import type { Post, Role } from '../../src/types';
 import ConfirmModal from '@/components/ConfirmModal';
 import FeedCard from '@/components/FeedCard';
+import { cardShadowLg } from '@/constants/theme';
+import { initialsOf } from '@/utils/strings';
 
 const ROLE_LABEL: Record<Role, string> = {
   USER: 'Usuario',
   ADMIN: 'Administrador',
 };
 
-function initialsOf(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((word) => word[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
-}
-
 type GalleryTab = 'outfits' | 'saved';
-
-const cardShadow = {
-  shadowColor: 'rgba(92, 75, 54, 0.12)',
-  shadowOffset: { width: 0, height: 6 },
-  shadowRadius: 16,
-  shadowOpacity: 1,
-  elevation: 3,
-};
 
 export default function Profile({ active = true }: { active?: boolean }) {
   const { user, signOut } = useSession();
@@ -120,7 +104,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
           {/* avatar flotando sobre el banner */}
           <View
             className="-mt-12 h-24 w-24 items-center justify-center rounded-full border-[4px] border-[#FCFAF8] bg-[#DCC7A8]"
-            style={cardShadow}>
+            style={cardShadowLg}>
             <Text className="text-[26px] font-bold text-white">{initialsOf(user.name)}</Text>
           </View>
 
@@ -143,7 +127,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
             {/* stats-card */}
             <View
               className="flex-row items-center justify-center rounded-2xl bg-white py-4"
-              style={cardShadow}>
+              style={cardShadowLg}>
               <View className="items-center gap-[3px]">
                 <Text className="text-lg font-bold leading-[22px] text-[#292724]">
                   {posts.length}
@@ -159,7 +143,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
               <Pressable
                 onPress={() => router.push('/edit-profile' as any)}
                 className="h-12 flex-1 items-center justify-center rounded-2xl bg-[#A81245]"
-                style={cardShadow}>
+                style={cardShadowLg}>
                 <Text className="text-[13px] font-semibold text-white">Editar perfil</Text>
               </Pressable>
 
@@ -171,7 +155,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
             </View>
 
             {/* Outfit tabs */}
-            <View className="flex-row rounded-2xl bg-white p-1.5" style={cardShadow}>
+            <View className="flex-row rounded-2xl bg-white p-1.5" style={cardShadowLg}>
               <Pressable
                 onPress={() => setActiveTab('outfits')}
                 className={`flex-1 items-center justify-center rounded-xl py-2.5 ${
@@ -216,7 +200,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
             {!error &&
               activeTab === 'outfits' &&
               (posts.length === 0 ? (
-                <View className="rounded-2xl bg-white p-6" style={cardShadow}>
+                <View className="rounded-2xl bg-white p-6" style={cardShadowLg}>
                   <Text className="text-center text-sm text-[#6E6B68]">
                     Aún no tienes outfits publicados.
                   </Text>
@@ -247,7 +231,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
               ))}
 
             {!error && activeTab === 'saved' && (
-              <View className="rounded-2xl bg-white p-6" style={cardShadow}>
+              <View className="rounded-2xl bg-white p-6" style={cardShadowLg}>
                 <Text className="text-center text-sm text-[#6E6B68]">
                   Próximamente: outfits guardados.
                 </Text>

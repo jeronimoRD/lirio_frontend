@@ -87,7 +87,7 @@ export default function Login() {
               <Text className="font-['Lora-Italic'] text-[32px] leading-[41px] text-[#A81245]">
                 Hibirio
               </Text>
-            <Text className="text-[10px] font-semibold uppercase tracking-wide text-[#A81245]-0.2">
+            <Text className="text-[10px] font-semibold uppercase tracking-wide text-[#A81245]">
               Tu estilo, tu esencia
             </Text>
           </View>
