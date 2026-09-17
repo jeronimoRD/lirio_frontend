@@ -1,4 +1,4 @@
-import { forwardRef, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 export type TabPagerHandle = {
   setPage: (page: number) => void;
@@ -11,9 +11,9 @@ export type TabPagerProps = {
   children: ReactNode[];
 };
 
-const TabPager = forwardRef<TabPagerHandle, TabPagerProps>(({ index, children }) => {
+const TabPager = ({ index, children }: TabPagerProps) => {
   return <>{children[index]}</>;
-});
+};
 
 TabPager.displayName = 'TabPager';
 
