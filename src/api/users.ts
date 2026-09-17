@@ -30,6 +30,24 @@ export async function getMe(): Promise<User> {
   return toUser(await request<UserResponse>('/users/me'));
 }
 
+/** Busca cuentas por nombre de usuario, correo o bio. */
+export async function searchUsers(query: string): Promise<User[]> {
+  const data = await request<UserResponse[]>(
+    `/users/search?q=${encodeURIComponent(query)}`,
+  );
+
+  return data.map(toUser);
+}
+
+/** Cuentas aleatorias para las sugerencias del buscador. */
+export async function suggestUsers(limit = 3): Promise<User[]> {
+  const data = await request<UserResponse[]>(
+    `/users/suggestions?limit=${limit}`,
+  );
+
+  return data.map(toUser);
+}
+
 export async function updateProfile(
   name: string,
   email: string,
