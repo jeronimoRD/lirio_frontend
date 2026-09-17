@@ -91,18 +91,13 @@ export default function AdminIndex() {
       contentContainerClassName="px-5 py-8"
     >
       <View className="mx-auto w-full max-w-md">
-        <View className="mb-1 flex-row items-center gap-2">
+        <View className="mb-1">
           <Text className="text-[22px] font-bold uppercase tracking-wide text-[#292724]">
             Panel de administración
           </Text>
-          <View className="rounded-full bg-[#4A3728] px-2 py-0.5">
-            <Text className="text-[10px] font-bold uppercase tracking-wider text-white">
-              Admin
-            </Text>
-          </View>
         </View>
         <Text className="mb-6 text-xs font-medium uppercase tracking-wide text-[#6E6B68]">
-          Gestión de usuarios y categorías
+          Gestión de usuarios, categorías y posts
         </Text>
 
         {error && (

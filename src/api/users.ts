@@ -31,9 +31,12 @@ export async function getMe(): Promise<User> {
 }
 
 /** Busca cuentas por nombre de usuario, correo o bio. */
-export async function searchUsers(query: string): Promise<User[]> {
+export async function searchUsers(
+  query: string,
+  limit = 10,
+): Promise<User[]> {
   const data = await request<UserResponse[]>(
-    `/users/search?q=${encodeURIComponent(query)}`,
+    `/users/search?q=${encodeURIComponent(query)}&limit=${limit}`,
   );
 
   return data.map(toUser);

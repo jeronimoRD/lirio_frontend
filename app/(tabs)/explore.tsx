@@ -64,7 +64,7 @@ export default function Explore() {
         if (active) setLoading(false);
       });
 
-    suggestUsers(3)
+    suggestUsers(10)
       .then((all) => {
         if (active) setSuggestions(all);
       })
@@ -350,7 +350,7 @@ export default function Explore() {
         )}
 
         {!loading && !error && searchActive && activeTab === 'cuentas' && (
-          <View className="gap-3">
+          <View className="mt-4 gap-3">
             {hasQuery ? (
               <>
                 {usersLoading && (

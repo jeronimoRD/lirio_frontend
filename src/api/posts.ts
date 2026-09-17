@@ -29,6 +29,13 @@ export async function getPosts(): Promise<Post[]> {
   return data.map(toPost);
 }
 
+/** Feed personalizado: mezcla posts de tus categorías preferidas y aleatorios. */
+export async function getFeedPosts(limit = 20): Promise<Post[]> {
+  const data = await request<PostResponse[]>(`/posts/feed?limit=${limit}`);
+
+  return data.map(toPost);
+}
+
 export async function createPost(
   title: string,
   description: string,

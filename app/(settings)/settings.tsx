@@ -6,6 +6,7 @@ import { ArrowLeft, Bell, ChevronRight, Lock, Mail, TriangleAlert } from 'lucide
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { deleteAccount, updatePassword, updateProfile } from '../../src/api/users';
+import ConfirmModal from '../../src/components/ConfirmModal';
 import Field from '../../src/components/Field';
 import { useSession } from '../../src/session/context';
 
@@ -188,6 +189,7 @@ export default function Settings() {
   };
 
   const removeAccount = async () => {
+    setConfirmingDelete(false);
     setDeleteMessage(null);
     setDeleting(true);
 
@@ -365,34 +367,27 @@ export default function Settings() {
               deshacer.
             </Text>
 
-            {confirmingDelete ? (
-              <View className="gap-3">
-                <Pressable
-                  onPress={removeAccount}
-                  disabled={deleting}
-                  className="h-11 items-center justify-center rounded-xl bg-red-600 disabled:opacity-50">
-                  <Text className="text-sm font-semibold text-white">
-                    {deleting ? 'Eliminando...' : 'Sí, eliminar mi cuenta'}
-                  </Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => setConfirmingDelete(false)}
-                  disabled={deleting}
-                  className="h-11 items-center justify-center rounded-xl border border-[#EAE6E1]">
-                  <Text className="text-sm font-semibold text-[#292724]">Cancelar</Text>
-                </Pressable>
-              </View>
-            ) : (
-              <Pressable
-                onPress={() => setConfirmingDelete(true)}
-                className="h-11 items-center justify-center rounded-xl border border-red-200">
-                <Text className="text-sm font-semibold text-red-600">Eliminar cuenta</Text>
-              </Pressable>
-            )}
+            <Pressable
+              onPress={() => setConfirmingDelete(true)}
+              disabled={deleting}
+              className="h-11 items-center justify-center rounded-xl border border-red-200 disabled:opacity-50">
+              <Text className="text-sm font-semibold text-red-600">Eliminar cuenta</Text>
+            </Pressable>
 
             <ResultBanner message={deleteMessage} />
           </SectionCard>
         </View>
+
+        <ConfirmModal
+          visible={confirmingDelete}
+          title="¿Eliminar tu cuenta?"
+          message="Se eliminarán tu cuenta y todas tus publicaciones de forma permanente. Esta acción no se puede deshacer."
+          confirmLabel="Eliminar"
+          danger
+          loading={deleting}
+          onConfirm={removeAccount}
+          onCancel={() => setConfirmingDelete(false)}
+        />
       </View>
     </ScrollView>
   );

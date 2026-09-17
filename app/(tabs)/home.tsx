@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { Heart } from 'lucide-react-native';
 
-import { getPosts } from '../../src/api/posts';
+import { getFeedPosts } from '../../src/api/posts';
 import { getCategories } from '../../src/api/categories';
 import { useFavorites } from '../../src/favorites/context';
 import type { Post, Category } from '../../src/types';
@@ -33,7 +33,7 @@ export default function Home() {
       })
       .catch(() => {});
 
-    getPosts()
+    getFeedPosts()
       .then((all) => {
         if (active) setPosts(all);
       })

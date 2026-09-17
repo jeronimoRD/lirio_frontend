@@ -7,6 +7,8 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Search, X } from 'lucide-react-native';
 
 import {
   createCategory,
@@ -26,10 +28,13 @@ const cardShadow = {
 };
 
 export default function AdminCategories() {
+  const insets = useSafeAreaInsets();
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [searchQuery, setSearchQuery] = useState('');
   const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
 
@@ -38,6 +43,10 @@ export default function AdminCategories() {
 
   const [busyId, setBusyId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  const filteredCategories = categories.filter((category) =>
+    category.name.toLowerCase().includes(searchQuery.trim().toLowerCase()),
+  );
 
   const loadCategories = async () => {
     try {
@@ -149,6 +158,7 @@ export default function AdminCategories() {
     <ScrollView
       className="flex-1 bg-[#FCFAF8]"
       contentContainerClassName="px-5 py-8"
+      contentContainerStyle={{ paddingBottom: 32 + insets.bottom }}
     >
       <View className="mx-auto w-full max-w-md">
         <View className="mb-6 flex-row items-center gap-2">
@@ -191,6 +201,24 @@ export default function AdminCategories() {
           </View>
         </View>
 
+        <View className="mt-4 h-12 flex-row items-center gap-2 rounded-full border border-[#EAE6E1] bg-white px-4">
+          <Search size={18} color="#A09B95" />
+          <TextInput
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Buscar categoría..."
+            placeholderTextColor="#A09B95"
+            className="flex-1 text-sm text-[#292724]"
+            autoCapitalize="none"
+            returnKeyType="search"
+          />
+          {searchQuery.length > 0 && (
+            <Pressable onPress={() => setSearchQuery('')} hitSlop={8}>
+              <X size={16} color="#A09B95" />
+            </Pressable>
+          )}
+        </View>
+
         {loading && (
           <View className="items-center py-10">
             <ActivityIndicator color="#4A3728" />
@@ -206,7 +234,18 @@ export default function AdminCategories() {
         )}
 
         {!loading &&
-          categories.map((category) => {
+          !error &&
+          categories.length > 0 &&
+          filteredCategories.length === 0 && (
+            <View className="mt-4 rounded-2xl bg-white p-6" style={cardShadow}>
+              <Text className="text-center text-sm text-[#6E6B68]">
+                No se encontraron categorías para {`"${searchQuery}"`}.
+              </Text>
+            </View>
+          )}
+
+        {!loading &&
+          filteredCategories.map((category) => {
             const isEditing = editingId === category.id;
 
             return (

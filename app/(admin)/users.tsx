@@ -4,9 +4,12 @@ import {
   Pressable,
   ScrollView,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import { useForm } from 'react-hook-form';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Search, X } from 'lucide-react-native';
 
 import {
   createUser,
@@ -15,6 +18,7 @@ import {
   updateUserRole,
 } from '../../src/api/admin';
 import Button from '../../src/components/Button';
+import ConfirmModal from '../../src/components/ConfirmModal';
 import Field from '../../src/components/Field';
 import { useSession } from '../../src/session/context';
 import type { Role, User } from '../../src/types';
@@ -51,6 +55,7 @@ function initialsOf(name: string): string {
 
 export default function AdminUsers() {
   const { user: me } = useSession();
+  const insets = useSafeAreaInsets();
 
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,7 +66,18 @@ export default function AdminUsers() {
   const [submitting, setSubmitting] = useState(false);
 
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<User | null>(null);
+  const [pendingCreate, setPendingCreate] = useState<CreateForm | null>(null);
+  const [query, setQuery] = useState('');
+
+  const filteredUsers = users.filter((user) => {
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      user.name.toLowerCase().includes(q) ||
+      user.email.toLowerCase().includes(q)
+    );
+  });
 
   const { control, handleSubmit, reset } = useForm<CreateForm>({
     defaultValues: {
@@ -99,7 +115,15 @@ export default function AdminUsers() {
       .finally(() => setLoading(false));
   }, []);
 
-  const onCreate = async (data: CreateForm) => {
+  const requestCreate = () => {
+    handleSubmit((data) => setPendingCreate(data))();
+  };
+
+  const onCreate = async () => {
+    if (!pendingCreate) return;
+
+    const data = pendingCreate;
+    setPendingCreate(null);
     setSubmitting(true);
     setError(null);
 
@@ -119,7 +143,7 @@ export default function AdminUsers() {
   };
 
   const onToggleRole = async (user: User) => {
-    if (busyId || confirmDeleteId || user.id === me?.id) return;
+    if (busyId || user.id === me?.id) return;
 
     const nextRole: Role = user.role === 'ADMIN' ? 'USER' : 'ADMIN';
     setBusyId(user.id);
@@ -141,21 +165,23 @@ export default function AdminUsers() {
     }
   };
 
-  const onDeletePress = async (user: User) => {
-    if (busyId) return;
+  const onRequestDelete = (user: User) => {
+    if (busyId || user.id === me?.id) return;
 
-    if (confirmDeleteId !== user.id) {
-      setConfirmDeleteId(user.id);
-      return;
-    }
+    setPendingDelete(user);
+  };
 
-    setBusyId(user.id);
-    setConfirmDeleteId(null);
+  const onDelete = async () => {
+    if (!pendingDelete || busyId) return;
+
+    const target = pendingDelete;
+    setPendingDelete(null);
+    setBusyId(target.id);
     setError(null);
 
     try {
-      await deleteUser(user.id);
-      setUsers((current) => current.filter((u) => u.id !== user.id));
+      await deleteUser(target.id);
+      setUsers((current) => current.filter((u) => u.id !== target.id));
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'No se pudo eliminar el usuario',
@@ -169,6 +195,7 @@ export default function AdminUsers() {
     <ScrollView
       className="flex-1 bg-[#FCFAF8]"
       contentContainerClassName="px-5 py-8"
+      contentContainerStyle={{ paddingBottom: 32 + insets.bottom }}
     >
       <View className="mx-auto w-full max-w-md">
         <View className="mb-6 flex-row items-center gap-2">
@@ -196,6 +223,26 @@ export default function AdminUsers() {
           onPress={() => setShowCreate((current) => !current)}
         />
 
+        {!showCreate && (
+          <View className="mt-4 h-12 flex-row items-center gap-2 rounded-full border border-[#EAE6E1] bg-white px-4">
+            <Search size={18} color="#A09B95" />
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Buscar usuario por nombre o correo..."
+              placeholderTextColor="#A09B95"
+              className="flex-1 text-sm text-[#292724]"
+              autoCapitalize="none"
+              returnKeyType="search"
+            />
+            {query.length > 0 && (
+              <Pressable onPress={() => setQuery('')} hitSlop={8}>
+                <X size={16} color="#A09B95" />
+              </Pressable>
+            )}
+          </View>
+        )}
+
         {showCreate && (
           <View className="mt-4 rounded-2xl bg-white p-5" style={cardShadow}>
             <View className="gap-4">
@@ -207,7 +254,12 @@ export default function AdminUsers() {
                 labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
                 inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
                 inputClassName="flex-1 text-sm text-[#292724]"
-                rules={{ required: 'Escribe un nombre' }}
+                maxLength={50}
+                rules={{
+                  required: 'Escribe un nombre',
+                  minLength: { value: 3, message: 'Mínimo 3 caracteres' },
+                  maxLength: { value: 50, message: 'Máximo 50 caracteres' },
+                }}
               />
               <Field
                 control={control}
@@ -218,7 +270,12 @@ export default function AdminUsers() {
                 labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
                 inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
                 inputClassName="flex-1 text-sm text-[#292724]"
-                rules={{ required: 'Escribe un correo' }}
+                maxLength={100}
+                rules={{
+                  required: 'Escribe un correo',
+                  pattern: { value: /^\S+@\S+\.\S+$/, message: 'Correo inválido' },
+                  maxLength: { value: 100, message: 'Máximo 100 caracteres' },
+                }}
               />
               <Field
                 control={control}
@@ -229,7 +286,12 @@ export default function AdminUsers() {
                 labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
                 inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
                 inputClassName="flex-1 text-sm text-[#292724]"
-                rules={{ required: 'Escribe una contraseña' }}
+                maxLength={128}
+                rules={{
+                  required: 'Escribe una contraseña',
+                  minLength: { value: 6, message: 'Mínimo 6 caracteres' },
+                  maxLength: { value: 128, message: 'Máximo 128 caracteres' },
+                }}
               />
 
               <View className="gap-2">
@@ -264,7 +326,7 @@ export default function AdminUsers() {
 
               <Button
                 text={submitting ? 'Creando...' : 'Crear usuario'}
-                onPress={handleSubmit(onCreate)}
+                onPress={requestCreate}
                 disabled={submitting}
                 className="bg-[#4A3728]"
               />
@@ -287,7 +349,18 @@ export default function AdminUsers() {
         )}
 
         {!loading &&
-          users.map((user) => {
+          !error &&
+          users.length > 0 &&
+          filteredUsers.length === 0 && (
+            <View className="mt-4 rounded-2xl bg-white p-6" style={cardShadow}>
+              <Text className="text-center text-sm text-[#6E6B68]">
+                No se encontraron usuarios para {`"${query}"`}.
+              </Text>
+            </View>
+          )}
+
+        {!loading &&
+          filteredUsers.map((user) => {
             const role = ROLE_STYLE[user.role];
             const isMe = user.id === me?.id;
 
@@ -343,15 +416,9 @@ export default function AdminUsers() {
 
                   <View className="flex-1">
                     <Button
-                      text={
-                        confirmDeleteId === user.id
-                          ? '¿Confirmar?'
-                          : busyId === user.id
-                            ? 'Eliminando...'
-                            : 'Eliminar'
-                      }
+                      text={busyId === user.id ? 'Eliminando...' : 'Eliminar'}
                       danger
-                      onPress={() => onDeletePress(user)}
+                      onPress={() => onRequestDelete(user)}
                       disabled={busyId !== null || isMe}
                     />
                   </View>
@@ -360,6 +427,29 @@ export default function AdminUsers() {
             );
           })}
       </View>
+
+      <ConfirmModal
+        visible={pendingCreate !== null}
+        title="¿Crear usuario?"
+        message={`Se creará la cuenta "${pendingCreate?.name ?? ''}" con el rol ${
+          newRole === 'ADMIN' ? 'admin' : 'usuario'
+        }.`}
+        confirmLabel="Crear"
+        loading={submitting}
+        onConfirm={onCreate}
+        onCancel={() => setPendingCreate(null)}
+      />
+
+      <ConfirmModal
+        visible={pendingDelete !== null}
+        title="¿Eliminar usuario?"
+        message={`Se eliminará la cuenta "${pendingDelete?.name ?? ''}" de forma permanente.`}
+        confirmLabel="Eliminar"
+        danger
+        loading={busyId !== null}
+        onConfirm={onDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </ScrollView>
   );
 }
