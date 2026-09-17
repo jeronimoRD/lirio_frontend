@@ -1,13 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
-import { ChevronRight, Tag, Users } from 'lucide-react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { ChevronRight, ShieldCheck, Tag, Users } from 'lucide-react-native';
 
 import { getAdminUsers } from '../../src/api/admin';
 import { getCategories } from '../../src/api/categories';
@@ -36,8 +30,7 @@ function OptionCard({
     <Pressable
       onPress={onPress}
       className="mb-4 flex-row items-center gap-4 rounded-2xl bg-white p-5 active:opacity-80"
-      style={cardShadow}
-    >
+      style={cardShadow}>
       <View className="h-12 w-12 items-center justify-center rounded-full bg-[#F4EEE7]">
         {icon}
       </View>
@@ -72,11 +65,7 @@ export default function AdminIndex() {
       })
       .catch((err) => {
         if (active) {
-          setError(
-            err instanceof Error
-              ? err.message
-              : 'No se pudieron cargar los datos',
-          );
+          setError(err instanceof Error ? err.message : 'No se pudieron cargar los datos');
         }
       });
 
@@ -86,12 +75,15 @@ export default function AdminIndex() {
   }, []);
 
   return (
-    <ScrollView
-      className="flex-1 bg-[#FCFAF8]"
-      contentContainerClassName="px-5 py-8"
-    >
+    <ScrollView className="flex-1 bg-[#FCFAF8]" contentContainerClassName="px-5 py-8">
       <View className="mx-auto w-full max-w-md">
         <View className="mb-1">
+          <View className="mb-3 flex-row items-center gap-1.5 self-start rounded-full bg-[#4A3728]/10 px-3 py-1.5">
+            <ShieldCheck size={13} color="#4A3728" />
+            <Text className="text-[10px] font-bold uppercase tracking-widest text-[#4A3728]">
+              Modo admin
+            </Text>
+          </View>
           <Text className="text-[22px] font-bold uppercase tracking-wide text-[#292724]">
             Panel de administración
           </Text>
@@ -102,9 +94,7 @@ export default function AdminIndex() {
 
         {error && (
           <View className="mb-4 rounded-2xl bg-red-50 p-4">
-            <Text className="text-center text-sm font-medium text-red-700">
-              {error}
-            </Text>
+            <Text className="text-center text-sm font-medium text-red-700">{error}</Text>
           </View>
         )}
 
@@ -132,11 +122,8 @@ export default function AdminIndex() {
 
         <Pressable
           onPress={signOut}
-          className="mt-4 h-12 w-full items-center justify-center rounded-2xl border border-red-200 bg-white"
-        >
-          <Text className="text-sm font-semibold text-red-600">
-            Cerrar sesión
-          </Text>
+          className="mt-4 h-12 w-full items-center justify-center rounded-2xl border border-red-200 bg-white">
+          <Text className="text-sm font-semibold text-red-600">Cerrar sesión</Text>
         </Pressable>
       </View>
     </ScrollView>

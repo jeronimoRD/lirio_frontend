@@ -1,22 +1,10 @@
 import { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Search, X } from 'lucide-react-native';
+import { Search, ShieldCheck, X } from 'lucide-react-native';
 
-import {
-  createUser,
-  deleteUser,
-  getAdminUsers,
-  updateUserRole,
-} from '../../src/api/admin';
+import { createUser, deleteUser, getAdminUsers, updateUserRole } from '../../src/api/admin';
 import Button from '../../src/components/Button';
 import ConfirmModal from '../../src/components/ConfirmModal';
 import Field from '../../src/components/Field';
@@ -73,10 +61,7 @@ export default function AdminUsers() {
   const filteredUsers = users.filter((user) => {
     const q = query.trim().toLowerCase();
     if (!q) return true;
-    return (
-      user.name.toLowerCase().includes(q) ||
-      user.email.toLowerCase().includes(q)
-    );
+    return user.name.toLowerCase().includes(q) || user.email.toLowerCase().includes(q);
   });
 
   const { control, handleSubmit, reset } = useForm<CreateForm>({
@@ -93,9 +78,7 @@ export default function AdminUsers() {
       setUsers(data);
       setError(null);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'No se pudieron cargar los usuarios',
-      );
+      setError(err instanceof Error ? err.message : 'No se pudieron cargar los usuarios');
     }
   };
 
@@ -106,11 +89,7 @@ export default function AdminUsers() {
         setError(null);
       })
       .catch((err) =>
-        setError(
-          err instanceof Error
-            ? err.message
-            : 'No se pudieron cargar los usuarios',
-        ),
+        setError(err instanceof Error ? err.message : 'No se pudieron cargar los usuarios')
       )
       .finally(() => setLoading(false));
   }, []);
@@ -134,9 +113,7 @@ export default function AdminUsers() {
       setNewRole('USER');
       await loadUsers();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'No se pudo crear el usuario',
-      );
+      setError(err instanceof Error ? err.message : 'No se pudo crear el usuario');
     } finally {
       setSubmitting(false);
     }
@@ -151,15 +128,9 @@ export default function AdminUsers() {
 
     try {
       await updateUserRole(user.id, nextRole);
-      setUsers((current) =>
-        current.map((u) => (u.id === user.id ? { ...u, role: nextRole } : u)),
-      );
+      setUsers((current) => current.map((u) => (u.id === user.id ? { ...u, role: nextRole } : u)));
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'No se pudo cambiar el rol del usuario',
-      );
+      setError(err instanceof Error ? err.message : 'No se pudo cambiar el rol del usuario');
     } finally {
       setBusyId(null);
     }
@@ -183,9 +154,7 @@ export default function AdminUsers() {
       await deleteUser(target.id);
       setUsers((current) => current.filter((u) => u.id !== target.id));
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'No se pudo eliminar el usuario',
-      );
+      setError(err instanceof Error ? err.message : 'No se pudo eliminar el usuario');
     } finally {
       setBusyId(null);
     }
@@ -195,25 +164,23 @@ export default function AdminUsers() {
     <ScrollView
       className="flex-1 bg-[#FCFAF8]"
       contentContainerClassName="px-5 py-8"
-      contentContainerStyle={{ paddingBottom: 32 + insets.bottom }}
-    >
+      contentContainerStyle={{ paddingBottom: 32 + insets.bottom }}>
       <View className="mx-auto w-full max-w-md">
-        <View className="mb-6 flex-row items-center gap-2">
+        <View className="mb-6">
+          <View className="mb-3 flex-row items-center gap-1.5 self-start rounded-full bg-[#4A3728]/10 px-3 py-1.5">
+            <ShieldCheck size={13} color="#4A3728" />
+            <Text className="text-[10px] font-bold uppercase tracking-widest text-[#4A3728]">
+              Modo admin
+            </Text>
+          </View>
           <Text className="text-[22px] font-bold uppercase tracking-wide text-[#292724]">
             Usuarios
           </Text>
-          <View className="rounded-full bg-[#4A3728] px-2 py-0.5">
-            <Text className="text-[10px] font-bold uppercase tracking-wider text-white">
-              Admin
-            </Text>
-          </View>
         </View>
 
         {error && (
           <View className="mb-4 rounded-2xl bg-red-50 p-4">
-            <Text className="text-center text-sm font-medium text-red-700">
-              {error}
-            </Text>
+            <Text className="text-center text-sm font-medium text-red-700">{error}</Text>
           </View>
         )}
 
@@ -295,9 +262,7 @@ export default function AdminUsers() {
               />
 
               <View className="gap-2">
-                <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
-                  Rol
-                </Text>
+                <Text className="text-xs font-semibold uppercase text-[#6E6B68]">Rol</Text>
                 <View className="flex-row gap-2">
                   {ROLES.map((role) => {
                     const selected = role === newRole;
@@ -306,16 +271,12 @@ export default function AdminUsers() {
                         key={role}
                         onPress={() => setNewRole(role)}
                         className={`flex-1 items-center rounded-xl border px-3 py-3 active:opacity-80 ${
-                          selected
-                            ? 'border-[#4A3728] bg-[#4A3728]'
-                            : 'border-[#EAE6E1] bg-white'
-                        }`}
-                      >
+                          selected ? 'border-[#4A3728] bg-[#4A3728]' : 'border-[#EAE6E1] bg-white'
+                        }`}>
                         <Text
                           className={`text-sm font-semibold ${
                             selected ? 'text-white' : 'text-[#6E6B68]'
-                          }`}
-                        >
+                          }`}>
                           {ROLE_STYLE[role].label}
                         </Text>
                       </Pressable>
@@ -342,22 +303,17 @@ export default function AdminUsers() {
 
         {!loading && !error && users.length === 0 && (
           <View className="mt-4 rounded-2xl bg-white p-6" style={cardShadow}>
-            <Text className="text-center text-sm text-[#6E6B68]">
-              No hay usuarios registrados.
-            </Text>
+            <Text className="text-center text-sm text-[#6E6B68]">No hay usuarios registrados.</Text>
           </View>
         )}
 
-        {!loading &&
-          !error &&
-          users.length > 0 &&
-          filteredUsers.length === 0 && (
-            <View className="mt-4 rounded-2xl bg-white p-6" style={cardShadow}>
-              <Text className="text-center text-sm text-[#6E6B68]">
-                No se encontraron usuarios para {`"${query}"`}.
-              </Text>
-            </View>
-          )}
+        {!loading && !error && users.length > 0 && filteredUsers.length === 0 && (
+          <View className="mt-4 rounded-2xl bg-white p-6" style={cardShadow}>
+            <Text className="text-center text-sm text-[#6E6B68]">
+              No se encontraron usuarios para {`"${query}"`}.
+            </Text>
+          </View>
+        )}
 
         {!loading &&
           filteredUsers.map((user) => {
@@ -365,30 +321,18 @@ export default function AdminUsers() {
             const isMe = user.id === me?.id;
 
             return (
-              <View
-                key={user.id}
-                className="mt-4 rounded-2xl bg-white p-5"
-                style={cardShadow}
-              >
+              <View key={user.id} className="mt-4 rounded-2xl bg-white p-5" style={cardShadow}>
                 <View className="flex-row items-center gap-3">
                   <View className="h-11 w-11 items-center justify-center rounded-full bg-[#4A3728]">
-                    <Text className="text-sm font-bold text-white">
-                      {initialsOf(user.name)}
-                    </Text>
+                    <Text className="text-sm font-bold text-white">{initialsOf(user.name)}</Text>
                   </View>
 
                   <View className="flex-1">
                     <View className="flex-row items-center gap-2">
-                      <Text className="text-base font-semibold text-[#292724]">
-                        {user.name}
-                      </Text>
-                      {isMe && (
-                        <Text className="text-xs text-[#A09B95]">(tú)</Text>
-                      )}
+                      <Text className="text-base font-semibold text-[#292724]">{user.name}</Text>
+                      {isMe && <Text className="text-xs text-[#A09B95]">(tú)</Text>}
                     </View>
-                    <Text className="mt-0.5 text-sm text-[#6E6B68]">
-                      {user.email}
-                    </Text>
+                    <Text className="mt-0.5 text-sm text-[#6E6B68]">{user.email}</Text>
                   </View>
 
                   <View className={`rounded-full px-3 py-1 ${role.className}`}>

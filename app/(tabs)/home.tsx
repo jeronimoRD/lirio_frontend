@@ -10,7 +10,7 @@ import ScreenHeader from '@/components/ScreenHeader';
 import { useRouter } from 'expo-router';
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#292724', '#6E6B68', '#EAE6E1', '#A09B95'];
 
-export default function Home({ active = true }: { active?: boolean }) {
+export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,8 +18,6 @@ export default function Home({ active = true }: { active?: boolean }) {
   const [activeFilter, setActiveFilter] = useState('For You');
 
   useEffect(() => {
-    if (!active) return;
-
     let cancelled = false;
 
     const load = async () => {
@@ -50,7 +48,7 @@ export default function Home({ active = true }: { active?: boolean }) {
     return () => {
       cancelled = true;
     };
-  }, [active]);
+  }, []);
 
   const filters = ['Ver todos', ...categories.map((category) => category.name)];
 
@@ -59,7 +57,7 @@ export default function Home({ active = true }: { active?: boolean }) {
   const activeCategoryId =
     activeFilter === 'Ver todos'
       ? null
-      : categories.find((c) => c.name === activeFilter)?.id ?? null;
+      : (categories.find((c) => c.name === activeFilter)?.id ?? null);
 
   const displayedPosts = activeCategoryId
     ? posts.filter((post) => post.categoryId === activeCategoryId)
@@ -73,7 +71,6 @@ export default function Home({ active = true }: { active?: boolean }) {
   return (
     <View className="flex-1 bg-[#FCFAF8]">
       <View className="items-center border-b border-[#EAE6E1] px-5 pb-3 pt-14">
-        <ScreenHeader title="Hibirio" />
         <ScreenHeader title="Hibirio" />
       </View>
 
@@ -93,13 +90,11 @@ export default function Home({ active = true }: { active?: boolean }) {
                 onPress={() => setActiveFilter(filter)}
                 className={`items-center justify-center rounded-full px-4 py-2 ${
                   active ? 'bg-[#A81245]' : 'border border-[#EAE6E1]'
-                }`}
-              >
+                }`}>
                 <Text
                   className={`text-[13px] font-semibold ${
                     active ? 'text-white' : 'text-[#6E6B68]'
-                  }`}
-                >
+                  }`}>
                   {filter}
                 </Text>
               </Pressable>

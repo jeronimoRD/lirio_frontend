@@ -1,30 +1,34 @@
 import { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Alert, Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { useForm } from 'react-hook-form';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, ImagePlus } from 'lucide-react-native';
 
 import { createPost } from '../../src/api/posts';
 import { getCategories } from '../../src/api/categories';
+import ConfirmModal from '../../src/components/ConfirmModal';
+import Field from '../../src/components/Field';
 import type { Category } from '../../src/types';
 
+type FormData = {
+  title: string;
+  description: string;
+};
+
 export default function CreatePost() {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const { control, handleSubmit, getValues } = useForm<FormData>({
+    defaultValues: { title: '', description: '' },
+  });
+
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
   const [showCategories, setShowCategories] = useState(false);
+  const [confirm, setConfirm] = useState(false);
+  const [categoryError, setCategoryError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -64,119 +68,107 @@ export default function CreatePost() {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
+      setImageError(null);
     }
   }
 
-  async function handleCreatePost() {
-    if (!title.trim()) {
-      Alert.alert('Falta información', 'Escribe un título.');
-      return;
-    }
-
-    if (!description.trim()) {
-      Alert.alert('Falta información', 'Escribe una descripción.');
-      return;
-    }
+  const requestCreate = handleSubmit(() => {
+    setCategoryError(null);
+    setImageError(null);
 
     if (!category) {
-      Alert.alert('Falta información', 'Selecciona una categoría.');
+      setCategoryError('Selecciona una categoría.');
       return;
     }
 
     if (!image) {
-      Alert.alert('Falta información', 'Selecciona una imagen.');
+      setImageError('Selecciona una imagen.');
       return;
     }
 
+    setConfirm(true);
+  });
+
+  const onConfirmCreate = async () => {
+    if (loading || !category || !image) return;
+
+    const { title, description } = getValues();
+
+    setLoading(true);
+
     try {
-      setLoading(true);
       await createPost(title, description, image, category.id);
-
-      Alert.alert('Post creado', 'Tu publicación se creó correctamente.');
-
-      setTitle('');
-      setDescription('');
-      setCategory(null);
-      setImage(null);
+      setConfirm(false);
+      router.replace('/(tabs)/profile');
     } catch (error) {
-      Alert.alert(
-        'Error',
-        error instanceof Error ? error.message : 'No se pudo crear el post.',
-      );
+      Alert.alert('Error', error instanceof Error ? error.message : 'No se pudo crear el post.');
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <View className="flex-1 bg-[#FCFAF8]">
       <ScrollView
         className="flex-1"
         contentContainerClassName="flex-grow"
-        keyboardShouldPersistTaps="handled"
-      >
+        keyboardShouldPersistTaps="handled">
         {/* header */}
         <View className="flex-row items-center justify-between px-6 pb-4 pt-14">
           <Pressable onPress={handleBack} hitSlop={8}>
             <ArrowLeft size={22} color="#A81245" />
           </Pressable>
 
-          <Text className="font-['Lora-Italic'] text-xl text-[#A81245]">
-            Crear publicación
-          </Text>
+          <Text className="font-['Lora-Italic'] text-xl text-[#A81245]">Crear publicación</Text>
 
           <View className="w-[22px]" />
         </View>
 
         {/* body */}
         <View className="gap-5 px-6 pb-6 pt-2">
-          <View className="gap-1.5">
-            <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
-              Título
-            </Text>
-            <TextInput
-              value={title}
-              onChangeText={setTitle}
-              maxLength={100}
-              placeholder="Ej. Look de otoño"
-              placeholderTextColor="#A09B95"
-              className="h-12 rounded-lg border border-[#EAE6E1] bg-white px-4 text-sm text-[#292724]"
-            />
-          </View>
+          <Field
+            control={control}
+            name="title"
+            label="Título"
+            placeholder="Ej. Look de otoño"
+            autoCapitalize="words"
+            maxLength={100}
+            inputWrapperClassName="h-12 flex-row items-center rounded-lg border border-[#EAE6E1] bg-white px-4"
+            inputClassName="flex-1 text-sm text-[#292724]"
+            rules={{
+              required: 'El título es obligatorio',
+              maxLength: { value: 100, message: 'Máximo 100 caracteres' },
+            }}
+          />
+
+          <Field
+            control={control}
+            name="description"
+            label="Descripción"
+            placeholder="Cuéntanos sobre este outfit..."
+            multiline
+            numberOfLines={5}
+            textAlignVertical="top"
+            maxLength={500}
+            inputWrapperClassName="min-h-[120px] flex-row items-start rounded-lg border border-[#EAE6E1] bg-white p-4"
+            inputClassName="flex-1 text-sm text-[#292724]"
+            rules={{
+              required: 'La descripción es obligatoria',
+              maxLength: { value: 500, message: 'Máximo 500 caracteres' },
+            }}
+          />
 
           <View className="gap-1.5">
-            <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
-              Descripción
-            </Text>
-            <TextInput
-              value={description}
-              onChangeText={setDescription}
-              maxLength={500}
-              placeholder="Cuéntanos sobre este outfit..."
-              placeholderTextColor="#A09B95"
-              multiline
-              numberOfLines={5}
-              textAlignVertical="top"
-              className="min-h-[120px] rounded-lg border border-[#EAE6E1] bg-white p-4 text-sm text-[#292724]"
-            />
-          </View>
-
-          <View className="gap-1.5">
-            <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
-              Categoría
-            </Text>
+            <Text className="text-xs font-semibold uppercase text-[#6E6B68]">Categoría</Text>
 
             <Pressable
               onPress={() => setShowCategories(!showCategories)}
-              className="h-12 flex-row items-center justify-between rounded-lg border border-[#EAE6E1] bg-white px-4"
-            >
+              className="h-12 flex-row items-center justify-between rounded-lg border border-[#EAE6E1] bg-white px-4">
               <Text className="text-sm text-[#292724]">
                 {category ? category.name : 'Selecciona una categoría'}
               </Text>
 
-              <Text className="text-[#6E6B68]">
-                {showCategories ? '▲' : '▼'}
-              </Text>
+              <Text className="text-[#6E6B68]">{showCategories ? '▲' : '▼'}</Text>
             </Pressable>
 
             {showCategories && (
@@ -187,22 +179,20 @@ export default function CreatePost() {
                     onPress={() => {
                       setCategory(item);
                       setShowCategories(false);
+                      setCategoryError(null);
                     }}
-                    className="border-b border-[#EAE6E1] px-4 py-3 last:border-b-0"
-                  >
-                    <Text className="text-sm text-[#292724]">
-                      {item.name}
-                    </Text>
+                    className="border-b border-[#EAE6E1] px-4 py-3 last:border-b-0">
+                    <Text className="text-sm text-[#292724]">{item.name}</Text>
                   </Pressable>
                 ))}
               </View>
             )}
+
+            {categoryError && <Text className="text-xs text-red-600">{categoryError}</Text>}
           </View>
 
           <View className="gap-1.5">
-            <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
-              Foto del outfit
-            </Text>
+            <Text className="text-xs font-semibold uppercase text-[#6E6B68]">Foto del outfit</Text>
 
             {image ? (
               <Pressable onPress={selectImage}>
@@ -218,24 +208,22 @@ export default function CreatePost() {
             ) : (
               <Pressable
                 onPress={selectImage}
-                className="h-40 items-center justify-center gap-2 rounded-2xl border border-dashed border-[#DCC7A8] bg-white"
-              >
+                className="h-40 items-center justify-center gap-2 rounded-2xl border border-dashed border-[#DCC7A8] bg-white">
                 <ImagePlus size={26} color="#A81245" />
-                <Text className="text-sm font-semibold text-[#A81245]">
-                  Seleccionar imagen
-                </Text>
+                <Text className="text-sm font-semibold text-[#A81245]">Seleccionar imagen</Text>
               </Pressable>
             )}
+
+            {imageError && <Text className="text-xs text-red-600">{imageError}</Text>}
           </View>
         </View>
 
         {/* footer */}
         <View className="items-center gap-3 px-6 pb-8">
           <Pressable
-            onPress={handleCreatePost}
+            onPress={requestCreate}
             disabled={loading}
-            className="h-12 w-full items-center justify-center rounded-full bg-[#A81245] disabled:opacity-50"
-          >
+            className="h-12 w-full items-center justify-center rounded-full bg-[#A81245] disabled:opacity-50">
             {loading ? (
               <ActivityIndicator color="white" />
             ) : (
@@ -244,6 +232,16 @@ export default function CreatePost() {
           </Pressable>
         </View>
       </ScrollView>
+
+      <ConfirmModal
+        visible={confirm}
+        title="¿Crear publicación?"
+        message={`Se publicará el outfit "${getValues().title}".`}
+        confirmLabel="Publicar"
+        loading={loading}
+        onConfirm={onConfirmCreate}
+        onCancel={() => setConfirm(false)}
+      />
     </View>
   );
 }

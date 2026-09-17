@@ -90,7 +90,7 @@ export default function TabsLayout() {
 
   const home = (
     <View key="home" style={PAGE_STYLE}>
-      <HomeScreen active={index === 0} />
+      <HomeScreen />
     </View>
   );
   const explore = (
@@ -109,49 +109,64 @@ export default function TabsLayout() {
     </View>
   );
 
-    return (
-        <Tabs
-        screenOptions={{
-            headerShown: false,
-            tabBarActiveTintColor: '#A81245',
-            tabBarInactiveTintColor: '#A09B95',
-            tabBarStyle: {
-            backgroundColor: '#FCFAF8',
-            borderTopColor: '#EAE6E1',
-            height: 64 + insets.bottom,
-            paddingTop: 8,
-            paddingBottom: insets.bottom,
-            },
-        }}
-        >
-        <Tabs.Screen
-            name="home"
-            options={{ title: 'Inicio', tabBarIcon: ({ color }) => <House size={22} color={color} /> }}
-        />
-        <Tabs.Screen
-            name="explore"
-            options={{ title: 'Busqueda', tabBarIcon: ({ color }) => <Search size={22} color={color} /> }}
-        />
-        <Tabs.Screen
-            name="upload-placeholder"
-            options={{
-            title: '',
-            tabBarButton: () => (
-                <View style={{ flex: 1, alignItems: 'center' }}>
-                <UploadButton />
-                </View>
-            ),
-            }}
-            listeners={{ tabPress: (e) => e.preventDefault() }}
-        />
-        <Tabs.Screen
-            name="saved"
-            options={{ title: 'Guardados', tabBarIcon: ({ color }) => <Heart size={22} color={color} /> }}
-        />
-        <Tabs.Screen
-            name="profile"
-            options={{ title: 'Perfil', tabBarIcon: ({ color }) => <UserRound size={22} color={color} /> }}
-        />
-        </Tabs>
-    );
+  return (
+    <View style={{ flex: 1, backgroundColor: '#FCFAF8' }}>
+      <TabPager ref={pagerRef} index={index} onPageSelected={onPageSelected}>
+        {home}
+        {explore}
+        {saved}
+        {profile}
+      </TabPager>
+
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          backgroundColor: '#FCFAF8',
+          borderTopColor: '#EAE6E1',
+          borderTopWidth: 1,
+          height: 64 + insets.bottom,
+          paddingTop: 8,
+          paddingBottom: insets.bottom,
+        }}>
+        <TabButton label="Home" icon={House} active={index === 0} onPress={() => goTo(0)} />
+        <TabButton label="Explore" icon={Search} active={index === 1} onPress={() => goTo(1)} />
+        <View style={{ flex: 1, alignItems: 'center' }}>
+          <UploadButton />
+        </View>
+        <TabButton label="Saved" icon={Heart} active={index === 2} onPress={() => goTo(2)} />
+        <TabButton label="Profile" icon={UserRound} active={index === 3} onPress={() => goTo(3)} />
+      </View>
+    </View>
+  );
+}
+
+function TabButton({
+  label,
+  icon: Icon,
+  active,
+  onPress,
+}: {
+  label: string;
+  icon: typeof House;
+  active: boolean;
+  onPress: () => void;
+}) {
+  const color = active ? '#A81245' : '#A09B95';
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="tab"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: active }}
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 3,
+      }}>
+      <Icon size={22} color={color} />
+      <Text style={{ fontSize: 11, fontWeight: '600', color }}>{label}</Text>
+    </Pressable>
+  );
 }
