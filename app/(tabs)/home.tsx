@@ -8,7 +8,6 @@ import { useFavorites } from '../../src/favorites/context';
 import type { Post, Category } from '../../src/types';
 import ScreenHeader from '@/components/ScreenHeader';
 import { useRouter } from 'expo-router';
-import FeedCard from '@/components/FeedCard';
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#292724', '#6E6B68', '#EAE6E1', '#A09B95'];
 
 export default function Home({ active = true }: { active?: boolean }) {
@@ -148,8 +147,7 @@ function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
           pathname: '/(upload)/[id]',
           params: { id: post.id },
         })
-      }
-    >
+      }>
       <Image
         source={{ uri: post.image }}
         className="w-full rounded-[14px]"
@@ -159,12 +157,8 @@ function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
 
       <View
         className="absolute bottom-2 left-2 right-2 flex-row items-center justify-between rounded-full px-2 py-1.5"
-        style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}
-      >
-        <Text
-          numberOfLines={1}
-          className="flex-1 text-[11px] font-semibold text-white"
-        >
+        style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}>
+        <Text numberOfLines={1} className="flex-1 text-[11px] font-semibold text-white">
           {post.title}
         </Text>
 
@@ -173,13 +167,8 @@ function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
             event.stopPropagation();
             toggleFavorite(post.id);
           }}
-          hitSlop={8}
-        >
-          <Heart
-            size={14}
-            color="#FFFFFF"
-            fill={favorited ? '#FFFFFF' : 'none'}
-          />
+          hitSlop={8}>
+          <Heart size={14} color="#FFFFFF" fill={favorited ? '#FFFFFF' : 'none'} />
         </Pressable>
       </View>
 

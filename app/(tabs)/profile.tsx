@@ -1,7 +1,7 @@
 import { Redirect, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Pressable, ScrollView, Alert, Text, View } from 'react-native';
-import { Settings as SettingsIcon, MoreVertical } from 'lucide-react-native';
+import { ActivityIndicator, Pressable, ScrollView, Alert, Text, View } from 'react-native';
+import { Settings as SettingsIcon } from 'lucide-react-native';
 
 import { getPosts, deletePost } from '../../src/api/posts';
 import { useSession } from '../../src/session/context';
@@ -25,8 +25,6 @@ function initialsOf(name: string): string {
 
 type GalleryTab = 'outfits' | 'saved';
 
-const COLUMN_HEIGHTS = [174, 112, 164, 102];
-
 const cardShadow = {
   shadowColor: 'rgba(92, 75, 54, 0.12)',
   shadowOffset: { width: 0, height: 6 },
@@ -43,7 +41,6 @@ export default function Profile({ active = true }: { active?: boolean }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<GalleryTab>('outfits');
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
 
   useEffect(() => {
     if (!active || !user) return;
@@ -201,62 +198,55 @@ export default function Profile({ active = true }: { active?: boolean }) {
               </View>
             ) : (
               <View className="flex-row gap-2.5">
-              {[leftColumn, rightColumn].map((column, colIndex) => (
-                <View key={colIndex} className="flex-1 gap-2.5">
-                  {column.map((post) => (
-                    <FeedCard
-                      key={post.id}
-                      post={post}
-                      showMenu
-                      onEdit={() => {
-                        router.push({
-                          pathname: '/(upload)/edit-upload',
-                          params: {
-                            id: post.id,
-                          },
-                        } as any);
-                      }}
-                      onDelete={() => {
-                        Alert.alert(
-                          'Eliminar publicación',
-                          '¿Estás segura de que quieres eliminar esta publicación?',
-                          [
-                            {
-                              text: 'Cancelar',
-                              style: 'cancel',
+                {[leftColumn, rightColumn].map((column, colIndex) => (
+                  <View key={colIndex} className="flex-1 gap-2.5">
+                    {column.map((post) => (
+                      <FeedCard
+                        key={post.id}
+                        post={post}
+                        showMenu
+                        onEdit={() => {
+                          router.push({
+                            pathname: '/(upload)/edit-upload',
+                            params: {
+                              id: post.id,
                             },
-                            {
-                              text: 'Eliminar',
-                              style: 'destructive',
-                              onPress: async () => {
-                                try {
-                                  await deletePost(post.id);
-
-                                          setPosts((currentPosts) =>
-                                            currentPosts.filter(
-                                              (currentPost) => currentPost.id !== post.id,
-                                            ),
-                                          );
-                                        } catch (error) {
-                                          Alert.alert(
-                                            'Error',
-                                            error instanceof Error
-                                              ? error.message
-                                              : 'No se pudo eliminar la publicación.',
-                                          );
-                                        }
-                                      },
-                                    },
-                                  ],
-                                );
-                              }}
-                              className="border-t border-[#EAE6E1] px-4 py-3"
-                            >
-                              <Text className="text-sm text-red-600">Eliminar</Text>
-                            </Pressable>
-                          </View>
-                        )}
-                      </View>
+                          } as any);
+                        }}
+                        onDelete={() => {
+                          Alert.alert(
+                            'Eliminar publicación',
+                            '¿Estás segura de que quieres eliminar esta publicación?',
+                            [
+                              {
+                                text: 'Cancelar',
+                                style: 'cancel',
+                              },
+                              {
+                                text: 'Eliminar',
+                                style: 'destructive',
+                                onPress: async () => {
+                                  try {
+                                    await deletePost(post.id);
+                                    setPosts((currentPosts) =>
+                                      currentPosts.filter(
+                                        (currentPost) => currentPost.id !== post.id
+                                      )
+                                    );
+                                  } catch (error) {
+                                    Alert.alert(
+                                      'Error',
+                                      error instanceof Error
+                                        ? error.message
+                                        : 'No se pudo eliminar la publicación.'
+                                    );
+                                  }
+                                },
+                              },
+                            ]
+                          );
+                        }}
+                      />
                     ))}
                   </View>
                 ))}

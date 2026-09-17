@@ -41,6 +41,7 @@ function UploadButton() {
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
+  const router = useRouter();
 
   const [index, setIndex] = useState(() => {
     const i = TAB_ROUTES.indexOf(pathname as (typeof TAB_ROUTES)[number]);
@@ -71,12 +72,20 @@ export default function TabsLayout() {
     const i = event.nativeEvent.position;
     pagerIndexRef.current = i;
     setIndex(i);
+    syncUrl(i);
   };
 
   const goTo = (i: number) => {
     pagerIndexRef.current = i;
     setIndex(i);
     pagerRef.current?.setPageWithoutAnimation(i);
+    syncUrl(i);
+  };
+
+  // Keep the URL pointing at the active tab so that push/back restores it.
+  const syncUrl = (i: number) => {
+    const target = TAB_ROUTES[i];
+    if (target !== pathname) router.navigate(target);
   };
 
   const home = (
