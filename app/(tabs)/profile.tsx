@@ -1,16 +1,20 @@
-import { Redirect, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { Redirect, useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
   Pressable,
   ScrollView,
+  Alert,
   Text,
   View,
 } from 'react-native';
-import { Settings as SettingsIcon } from 'lucide-react-native';
+import {
+  Settings as SettingsIcon,
+  MoreVertical,
+} from 'lucide-react-native';
 
-import { getPosts } from '../../src/api/posts';
+import { getPosts, deletePost } from '../../src/api/posts';
 import { useSession } from '../../src/session/context';
 import type { Post, Role } from '../../src/types';
 
@@ -49,11 +53,16 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<GalleryTab>('outfits');
-
-  useEffect(() => {
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  
+useFocusEffect(
+  useCallback(() => {
     if (!user) return;
 
     let active = true;
+
+    setLoading(true);
+    setError(null);
 
     getPosts()
       .then((all) => {
@@ -79,7 +88,8 @@ export default function Profile() {
     return () => {
       active = false;
     };
-  }, [user]);
+  }, [user]),
+);
 
   if (!user) {
     return <Redirect href="/(login)/login" />;
@@ -232,16 +242,102 @@ export default function Profile() {
                 {[leftColumn, rightColumn].map((column, colIndex) => (
                   <View key={colIndex} className="flex-1 gap-2.5">
                     {column.map((post, i) => (
-                      <Image
+                      <View
                         key={post.id}
-                        source={{ uri: post.image }}
+                        className="relative"
                         style={{
-                          width: '100%',
-                          height: COLUMN_HEIGHTS[(colIndex + i * 2) % COLUMN_HEIGHTS.length],
-                          borderRadius: 18,
+                          height:
+                            COLUMN_HEIGHTS[
+                              (colIndex + i * 2) % COLUMN_HEIGHTS.length
+                            ],
                         }}
-                        resizeMode="cover"
-                      />
+                      >
+                        <Image
+                          source={{ uri: post.image }}
+                          className="h-full w-full"
+                          style={{
+                            borderRadius: 18,
+                          }}
+                          resizeMode="cover"
+                        />
+
+                        <Pressable
+                          onPress={() =>
+                            setOpenMenu(
+                              openMenu === post.id ? null : post.id,
+                            )
+                          }
+                          hitSlop={8}
+                          className="absolute right-2 top-2 h-8 w-8 items-center justify-center rounded-full bg-black/35"
+                        >
+                          <MoreVertical
+                            size={18}
+                            color="#FFFFFF"
+                          />
+                        </Pressable>
+
+                        {openMenu === post.id && (
+                          <View className="absolute right-2 top-11 w-28 overflow-hidden rounded-xl border border-[#EAE6E1] bg-white">
+                            <Pressable
+                              onPress={() => {
+
+                                setOpenMenu(null);
+
+                                router.push({
+                                  pathname: '/(upload)/edit-upload',
+                                  params: {
+                                    id: post.id,
+                                  },
+                                } as any);
+                              }}
+                              className="px-4 py-3"
+                            >
+                              <Text className="text-sm text-[#292724]">Editar</Text>
+                            </Pressable>
+                            <Pressable
+                              onPress={() => {
+                                setOpenMenu(null);
+
+                                Alert.alert(
+                                  'Eliminar publicación',
+                                  '¿Estás segura de que quieres eliminar esta publicación?',
+                                  [
+                                    {
+                                      text: 'Cancelar',
+                                      style: 'cancel',
+                                    },
+                                    {
+                                      text: 'Eliminar',
+                                      style: 'destructive',
+                                      onPress: async () => {
+                                        try {
+                                          await deletePost(post.id);
+
+                                          setPosts((currentPosts) =>
+                                            currentPosts.filter(
+                                              (currentPost) => currentPost.id !== post.id,
+                                            ),
+                                          );
+                                        } catch (error) {
+                                          Alert.alert(
+                                            'Error',
+                                            error instanceof Error
+                                              ? error.message
+                                              : 'No se pudo eliminar la publicación.',
+                                          );
+                                        }
+                                      },
+                                    },
+                                  ],
+                                );
+                              }}
+                              className="border-t border-[#EAE6E1] px-4 py-3"
+                            >
+                              <Text className="text-sm text-red-600">Eliminar</Text>
+                            </Pressable>
+                          </View>
+                        )}
+                      </View>
                     ))}
                   </View>
                 ))}

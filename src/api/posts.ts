@@ -29,6 +29,12 @@ export async function getPosts(): Promise<Post[]> {
   return data.map(toPost);
 }
 
+export async function getPost(id: string): Promise<Post> {
+  const data = await request<PostResponse>(`/posts/${id}`);
+
+  return toPost(data);
+}
+
 /** Feed personalizado: mezcla posts de tus categorías preferidas y aleatorios. */
 export async function getFeedPosts(limit = 20): Promise<Post[]> {
   const data = await request<PostResponse[]>(`/posts/feed?limit=${limit}`);
@@ -51,4 +57,30 @@ export async function createPost(
   formData.append('image', file as any);
 
   return request('/posts', formData, 'POST');
+}
+
+export async function updatePost(
+  id: string,
+  title: string,
+  description: string,
+  image?: string,
+): Promise<Post> {
+  const data = await request<{ post: PostResponse }>(
+    `/posts/${id}`,
+    {
+      title,
+      description,
+      ...(image ? { image } : {}),
+    },
+    'PATCH',
+  );
+
+  return toPost(data.post);
+}
+export async function deletePost(id: string): Promise<void> {
+  try {
+    await request(`/posts/${id}`, undefined, 'DELETE');
+  } catch (error) {
+    throw error;
+  }
 }
