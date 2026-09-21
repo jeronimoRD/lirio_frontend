@@ -8,6 +8,8 @@ interface UserResponse {
   role: Role;
   bio?: string;
   preferred_categories?: string[];
+  createdAt?: string;
+  last_login?: string;
 }
 
 interface MessageResponse {
@@ -22,6 +24,8 @@ function toUser(data: UserResponse): User {
     role: data.role,
     bio: data.bio ?? '',
     preferredCategories: data.preferred_categories ?? [],
+    createdAt: data.createdAt,
+    lastLogin: data.last_login,
   };
 }
 
@@ -36,7 +40,7 @@ export async function createUser(
   name: string,
   email: string,
   password: string,
-  role: Role,
+  role: Role
 ): Promise<void> {
   await request<MessageResponse>('/users', {
     email,
@@ -46,10 +50,7 @@ export async function createUser(
   });
 }
 
-export async function updateUserRole(
-  userId: string,
-  role: Role,
-): Promise<void> {
+export async function updateUserRole(userId: string, role: Role): Promise<void> {
   await request<MessageResponse>(`/users/${userId}`, { role }, 'PATCH');
 }
 

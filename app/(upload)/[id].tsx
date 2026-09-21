@@ -1,19 +1,14 @@
 import { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Image,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, Heart } from 'lucide-react-native';
+import { ArrowLeft, Flag, Heart } from 'lucide-react-native';
 
 import { getPost } from '../../src/api/posts';
 import { getUserById } from '../../src/api/users';
+import { useSession } from '../../src/session/context';
 import type { Post, User } from '../../src/types';
 import { initialsOf } from '../../src/utils/strings';
+import ReportModal from '../../src/components/ReportModal';
 
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#3D6B52'];
 
@@ -41,6 +36,8 @@ export default function PostDetail() {
   const [author, setAuthor] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
+  const [reportVisible, setReportVisible] = useState(false);
+  const { user: me } = useSession();
 
   useEffect(() => {
     async function loadPost() {
@@ -79,14 +76,11 @@ export default function PostDetail() {
   if (!post) {
     return (
       <View className="flex-1 items-center justify-center bg-[#FCFAF8] px-6">
-        <Text className="text-center text-[#6E6B68]">
-          No se pudo encontrar esta publicación.
-        </Text>
+        <Text className="text-center text-[#6E6B68]">No se pudo encontrar esta publicación.</Text>
 
         <Pressable
           onPress={() => router.back()}
-          className="mt-5 rounded-full bg-[#A81245] px-6 py-3"
-        >
+          className="mt-5 rounded-full bg-[#A81245] px-6 py-3">
           <Text className="font-semibold text-white">Volver</Text>
         </Pressable>
       </View>
@@ -98,8 +92,7 @@ export default function PostDetail() {
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerClassName="pb-10 pt-14"
-      >
+        contentContainerClassName="pb-10 pt-14">
         {/* Imagen como tarjeta flotante, con margen y sombra — no pegada al borde */}
         <View className="px-5">
           <View className="overflow-hidden rounded-[24px]" style={imageShadow}>
@@ -114,11 +107,7 @@ export default function PostDetail() {
               onPress={() => router.back()}
               hitSlop={8}
               className="absolute left-4 top-4 h-10 w-10 items-center justify-center rounded-full"
-              style={[
-                { backgroundColor: 'rgba(255,255,255,0.85)' },
-                floatingButtonShadow,
-              ]}
-            >
+              style={[{ backgroundColor: 'rgba(255,255,255,0.85)' }, floatingButtonShadow]}>
               <ArrowLeft size={20} color="#292724" />
             </Pressable>
 
@@ -126,16 +115,8 @@ export default function PostDetail() {
               onPress={() => setLiked(!liked)}
               hitSlop={8}
               className="absolute right-4 top-4 h-10 w-10 items-center justify-center rounded-full"
-              style={[
-                { backgroundColor: 'rgba(255,255,255,0.85)' },
-                floatingButtonShadow,
-              ]}
-            >
-              <Heart
-                size={18}
-                color="#A81245"
-                fill={liked ? '#A81245' : 'none'}
-              />
+              style={[{ backgroundColor: 'rgba(255,255,255,0.85)' }, floatingButtonShadow]}>
+              <Heart size={18} color="#A81245" fill={liked ? '#A81245' : 'none'} />
             </Pressable>
           </View>
         </View>
@@ -157,13 +138,19 @@ export default function PostDetail() {
             </Text>
           </View>
 
-          <Text className="text-[15px] leading-6 text-[#6E6B68]">
-            {post.description}
-          </Text>
+          {post.userId !== me?.id && (
+            <Pressable
+              onPress={() => setReportVisible(true)}
+              hitSlop={8}
+              className="flex-row items-center gap-1.5 self-start">
+              <Flag size={14} color="#A09B95" />
+              <Text className="text-xs font-semibold text-[#A09B95]">Reportar publicación</Text>
+            </Pressable>
+          )}
 
-          <Text className="text-sm font-semibold text-[#292724]">
-            {liked ? '1' : '0'} Me gusta
-          </Text>
+          <Text className="text-[15px] leading-6 text-[#6E6B68]">{post.description}</Text>
+
+          <Text className="text-sm font-semibold text-[#292724]">{liked ? '1' : '0'} Me gusta</Text>
 
           <View className="gap-2">
             <Text className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#A09B95]">
@@ -187,6 +174,13 @@ export default function PostDetail() {
           </View>
         </View>
       </ScrollView>
+
+      <ReportModal
+        visible={reportVisible}
+        targetType="POST"
+        targetId={post.id}
+        onClose={() => setReportVisible(false)}
+      />
     </View>
   );
 }

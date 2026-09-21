@@ -22,6 +22,10 @@ export interface User {
   bio: string;
   /** IDs de las categorías de estilos que el usuario eligió al registrarse. */
   preferredCategories: string[];
+  /** Solo lo incluye la lista de admin (login/registro no). */
+  createdAt?: string;
+  /** Último inicio de sesión (solo lista de admin). */
+  lastLogin?: string;
 }
 
 /** Una publicación creada por un usuario. */
@@ -41,3 +45,75 @@ export interface Category {
   id: string;
   name: string;
 }
+
+// --- Reportes --------------------------------------------------------------
+
+/** Lo que se puede reportar. Hoy la app solo expone posts; user queda para el futuro. */
+export type ReportTargetType = 'POST' | 'USER';
+
+export const REPORT_REASONS = [
+  'SPAM',
+  'INAPPROPRIATE',
+  'HARASSMENT',
+  'FAKE_ACCOUNT',
+  'COPYRIGHT',
+  'OTHER',
+] as const;
+export type ReportReason = (typeof REPORT_REASONS)[number];
+
+export const REPORT_REASON_LABELS: Record<ReportReason, string> = {
+  SPAM: 'Spam',
+  INAPPROPRIATE: 'Contenido inapropiado',
+  HARASSMENT: 'Acoso',
+  FAKE_ACCOUNT: 'Cuenta falsa',
+  COPYRIGHT: 'Derechos de autor',
+  OTHER: 'Otro',
+};
+
+export const REPORT_STATUSES = ['PENDING', 'RESOLVED', 'DISMISSED'] as const;
+export type ReportStatus = (typeof REPORT_STATUSES)[number];
+
+export const REPORT_STATUS_LABELS: Record<ReportStatus, string> = {
+  PENDING: 'Pendiente',
+  RESOLVED: 'Resuelto',
+  DISMISSED: 'Descartado',
+};
+
+/** Contenido reportado, resuelto por el servidor para poder mostrarlo. */
+export interface ReportedTarget {
+  type: ReportTargetType;
+  /** Título del post, si el objetivo es una publicación. */
+  title?: string;
+  /** URL de la imagen del post, si el objetivo es una publicación. */
+  image?: string;
+  /** Autor del post reportado. */
+  ownerId?: string;
+  /** Nombre de usuario, si el objetivo es una cuenta. */
+  userName?: string;
+  /** El contenido ya no existe (se borró aparte). */
+  deleted?: boolean;
+}
+
+/** Un reporte tal como lo guarda el servidor. */
+export interface Report {
+  id: string;
+  reporterId: string;
+  targetType: ReportTargetType;
+  targetId: string;
+  reason: ReportReason;
+  description: string;
+  status: ReportStatus;
+  createdAt: string;
+  target: ReportedTarget;
+}
+
+/** Lo que el usuario llena al reportar. */
+export interface NewReport {
+  targetType: ReportTargetType;
+  targetId: string;
+  reason: ReportReason;
+  description?: string;
+}
+
+/** Acciones que el admin puede aplicar al resolver un reporte. */
+export type ReportAction = 'DELETE_POST' | 'DELETE_USER';

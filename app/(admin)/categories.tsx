@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Search, ShieldCheck, X } from 'lucide-react-native';
+import { ArrowLeft, Search, X } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 
 import {
   createCategory,
@@ -11,6 +12,7 @@ import {
 } from '../../src/api/categories';
 import Button from '../../src/components/Button';
 import ConfirmModal from '../../src/components/ConfirmModal';
+import AdminBrandHeader from '../../src/components/admin/AdminBrandHeader';
 import type { Category } from '../../src/types';
 import { cardShadow } from '../../src/constants/theme';
 
@@ -18,6 +20,7 @@ const CATEGORY_NAME_MIN_LENGTH = 2;
 const CATEGORY_NAME_MAX_LENGTH = 50;
 
 export default function AdminCategories() {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -153,20 +156,24 @@ export default function AdminCategories() {
   };
 
   return (
-    <>
+    <View className="flex-1 bg-[#FCFAF8]">
+      <AdminBrandHeader />
       <ScrollView
-        className="flex-1 bg-[#FCFAF8]"
-        contentContainerClassName="px-5 py-8"
-        contentContainerStyle={{ paddingBottom: 32 + insets.bottom }}>
+        className="flex-1"
+        contentContainerClassName="px-5 pb-8"
+        contentContainerStyle={{ paddingTop: 16, paddingBottom: 32 + insets.bottom }}>
         <View className="mx-auto w-full max-w-md">
           <View className="mb-6">
-            <View className="mb-3 flex-row items-center gap-1.5 self-start rounded-full bg-[#4A3728]/10 px-3 py-1.5">
-              <ShieldCheck size={13} color="#4A3728" />
-              <Text className="text-[10px] font-bold uppercase tracking-widest text-[#4A3728]">
-                Modo admin
-              </Text>
-            </View>
-            <Text className="text-[22px] font-bold uppercase tracking-wide text-[#292724]">
+            <Pressable
+              onPress={() => {
+                if (router.canGoBack()) router.back();
+                else router.replace('/(admin)');
+              }}
+              className="mb-3 h-8 w-8 items-center justify-center rounded-full bg-[#F4EEE7]"
+              hitSlop={8}>
+              <ArrowLeft size={16} color="#4A3728" />
+            </Pressable>
+            <Text className="font-['Lora-Italic'] text-[28px] leading-9 text-[#241E1B]">
               Categorías
             </Text>
           </View>
@@ -277,13 +284,15 @@ export default function AdminCategories() {
                             text={busyId === category.id ? 'Guardando...' : 'Guardar'}
                             onPress={onSaveEdit}
                             disabled={busyId !== null || editName.trim() === ''}
-                            className="rounded-xl bg-[#4A3728]"
+                            className="rounded-2xl bg-[#4A3728]"
                           />
                         </View>
                         <View className="flex-1">
                           <Button
                             text="Cancelar"
                             secondary
+                            textClassName="text-sm font-semibold text-[#292724]"
+                            className="rounded-2xl border border-[#EAE6E1] bg-white"
                             onPress={() => {
                               setEditingId(null);
                               setEditName('');
@@ -305,12 +314,14 @@ export default function AdminCategories() {
                       </View>
 
                       <View className="mt-4">
-                        <Button
-                          text={busyId === category.id ? 'Eliminando...' : 'Eliminar'}
-                          secondary
+                        <Pressable
                           onPress={() => onDeletePress(category)}
                           disabled={busyId !== null}
-                        />
+                          className="h-10 flex-row items-center justify-center gap-2 rounded-2xl border border-[#E9AFA6] bg-[#FBE6E1] active:opacity-80 disabled:opacity-50">
+                          <Text className="text-[13px] font-semibold text-[#C2391F]">
+                            {busyId === category.id ? 'Eliminando...' : 'Eliminar'}
+                          </Text>
+                        </Pressable>
                       </View>
                     </>
                   )}
@@ -344,6 +355,6 @@ export default function AdminCategories() {
         onConfirm={onDelete}
         onCancel={() => setConfirmDeleteId(null)}
       />
-    </>
+    </View>
   );
 }

@@ -1,124 +1,46 @@
-import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
-import { ChevronRight, ShieldCheck, Tag, Users } from 'lucide-react-native';
+import { useRef, useState } from 'react';
+import { View } from 'react-native';
 
-import { getAdminUsers } from '../../src/api/admin';
-import { getCategories } from '../../src/api/categories';
-import { useSession } from '../../src/session/context';
-import { cardShadow } from '../../src/constants/theme';
+import ResumenScreen from './_resumen';
+import MoreScreen from './more';
+import PostsScreen from './posts';
+import UsersScreen from './users';
+import AdminTabBar from '../../src/components/admin/AdminTabBar';
+import TabPager, { type TabPagerHandle } from '../../src/components/TabPager';
 
-function OptionCard({
-  icon,
-  title,
-  subtitle,
-  onPress,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  subtitle: string;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      className="mb-4 flex-row items-center gap-4 rounded-2xl bg-white p-5 active:opacity-80"
-      style={cardShadow}>
-      <View className="h-12 w-12 items-center justify-center rounded-full bg-[#F4EEE7]">
-        {icon}
-      </View>
+const PAGE_STYLE = { flex: 1, backgroundColor: '#FAF8F6' } as const;
 
-      <View className="flex-1">
-        <Text className="text-base font-semibold text-[#292724]">{title}</Text>
-        <Text className="mt-0.5 text-sm text-[#6E6B68]">{subtitle}</Text>
-      </View>
+export default function AdminPager() {
+  const [index, setIndex] = useState(0);
+  const pagerRef = useRef<TabPagerHandle>(null);
 
-      <ChevronRight size={18} color="#A09B95" />
-    </Pressable>
-  );
-}
+  const handlePageSelected = (event: { nativeEvent: { position: number } }) => {
+    setIndex(event.nativeEvent.position);
+  };
 
-export default function AdminIndex() {
-  const router = useRouter();
-  const { signOut } = useSession();
-
-  const [userCount, setUserCount] = useState<number | null>(null);
-  const [categoryCount, setCategoryCount] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-
-    Promise.all([getAdminUsers(), getCategories()])
-      .then(([users, categories]) => {
-        if (active) {
-          setUserCount(users.length);
-          setCategoryCount(categories.length);
-        }
-      })
-      .catch((err) => {
-        if (active) {
-          setError(err instanceof Error ? err.message : 'No se pudieron cargar los datos');
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
+  const goTo = (i: number) => {
+    pagerRef.current?.setPageWithoutAnimation(i);
+    setIndex(i);
+  };
 
   return (
-    <ScrollView className="flex-1 bg-[#FCFAF8]" contentContainerClassName="px-5 py-8">
-      <View className="mx-auto w-full max-w-md">
-        <View className="mb-1">
-          <View className="mb-3 flex-row items-center gap-1.5 self-start rounded-full bg-[#4A3728]/10 px-3 py-1.5">
-            <ShieldCheck size={13} color="#4A3728" />
-            <Text className="text-[10px] font-bold uppercase tracking-widest text-[#4A3728]">
-              Modo admin
-            </Text>
-          </View>
-          <Text className="text-[22px] font-bold uppercase tracking-wide text-[#292724]">
-            Panel de administración
-          </Text>
+    <View style={{ flex: 1, backgroundColor: '#FAF8F6' }}>
+      <TabPager ref={pagerRef} index={index} onPageSelected={handlePageSelected}>
+        <View key="resumen" style={PAGE_STYLE}>
+          <ResumenScreen />
         </View>
-        <Text className="mb-6 text-xs font-medium uppercase tracking-wide text-[#6E6B68]">
-          Gestión de usuarios, categorías y posts
-        </Text>
+        <View key="users" style={PAGE_STYLE}>
+          <UsersScreen />
+        </View>
+        <View key="posts" style={PAGE_STYLE}>
+          <PostsScreen />
+        </View>
+        <View key="more" style={PAGE_STYLE}>
+          <MoreScreen />
+        </View>
+      </TabPager>
 
-        {error && (
-          <View className="mb-4 rounded-2xl bg-red-50 p-4">
-            <Text className="text-center text-sm font-medium text-red-700">{error}</Text>
-          </View>
-        )}
-
-        {userCount === null || categoryCount === null ? (
-          <View className="items-center py-10">
-            <ActivityIndicator color="#4A3728" />
-          </View>
-        ) : (
-          <>
-            <OptionCard
-              icon={<Users size={20} color="#4A3728" />}
-              title="Usuarios"
-              subtitle={`${userCount} cuenta${userCount === 1 ? '' : 's'} registrada${userCount === 1 ? '' : 's'}`}
-              onPress={() => router.push('/(admin)/users')}
-            />
-
-            <OptionCard
-              icon={<Tag size={20} color="#4A3728" />}
-              title="Categorías"
-              subtitle={`${categoryCount} categoría${categoryCount === 1 ? '' : 's'}`}
-              onPress={() => router.push('/(admin)/categories')}
-            />
-          </>
-        )}
-
-        <Pressable
-          onPress={signOut}
-          className="mt-4 h-12 w-full items-center justify-center rounded-2xl border border-red-200 bg-white">
-          <Text className="text-sm font-semibold text-red-600">Cerrar sesión</Text>
-        </Pressable>
-      </View>
-    </ScrollView>
+      <AdminTabBar active={index} onChange={goTo} />
+    </View>
   );
 }

@@ -10,20 +10,13 @@ export default function AdminLayout() {
   }
 
   return (
-    <Stack
-      screenOptions={{
-        headerStyle: { backgroundColor: '#FCFAF8' },
-        headerTintColor: '#4A3728',
-        headerTitleStyle: { fontWeight: '700', color: '#292724' },
-        headerShadowVisible: false,
-      }}
-    >
-      <Stack.Screen
-        name="index"
-        options={{ title: 'Panel de administración' }}
-      />
-      <Stack.Screen name="users" options={{ title: 'Usuarios' }} />
-      <Stack.Screen name="categories" options={{ title: 'Categorías' }} />
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" />
+      <Stack.Screen name="users" />
+      <Stack.Screen name="posts" />
+      <Stack.Screen name="more" />
+      <Stack.Screen name="categories" />
+      <Stack.Screen name="reports" />
     </Stack>
   );
 }

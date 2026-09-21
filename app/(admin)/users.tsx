@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Search, ShieldCheck, X } from 'lucide-react-native';
+import { Search, X } from 'lucide-react-native';
 
 import { createUser, deleteUser, getAdminUsers, updateUserRole } from '../../src/api/admin';
 import Button from '../../src/components/Button';
 import ConfirmModal from '../../src/components/ConfirmModal';
 import Field from '../../src/components/Field';
+import AdminBrandHeader from '../../src/components/admin/AdminBrandHeader';
 import { useSession } from '../../src/session/context';
 import type { Role, User } from '../../src/types';
 import { ROLES } from '../../src/types';
@@ -145,216 +146,221 @@ export default function AdminUsers() {
   };
 
   return (
-    <ScrollView
-      className="flex-1 bg-[#FCFAF8]"
-      contentContainerClassName="px-5 py-8"
-      contentContainerStyle={{ paddingBottom: 32 + insets.bottom }}>
-      <View className="mx-auto w-full max-w-md">
-        <View className="mb-6">
-          <View className="mb-3 flex-row items-center gap-1.5 self-start rounded-full bg-[#4A3728]/10 px-3 py-1.5">
-            <ShieldCheck size={13} color="#4A3728" />
-            <Text className="text-[10px] font-bold uppercase tracking-widest text-[#4A3728]">
-              Modo admin
+    <View className="flex-1 bg-[#FCFAF8]">
+      <AdminBrandHeader />
+      <ScrollView
+        className="flex-1"
+        contentContainerClassName="px-5 pb-8"
+        contentContainerStyle={{ paddingTop: 24, paddingBottom: 32 + insets.bottom }}>
+        <View className="mx-auto w-full max-w-md">
+          <View className="mb-6">
+            <Text className="font-['Lora-Italic'] text-[28px] leading-9 text-[#241E1B]">
+              Usuarios
             </Text>
           </View>
-          <Text className="text-[22px] font-bold uppercase tracking-wide text-[#292724]">
-            Usuarios
-          </Text>
-        </View>
 
-        {error && (
-          <View className="mb-4 rounded-2xl bg-red-50 p-4">
-            <Text className="text-center text-sm font-medium text-red-700">{error}</Text>
-          </View>
-        )}
+          {error && (
+            <View className="mb-4 rounded-2xl bg-red-50 p-4">
+              <Text className="text-center text-sm font-medium text-red-700">{error}</Text>
+            </View>
+          )}
 
-        <Button
-          text={showCreate ? 'Cancelar' : 'Nuevo usuario'}
-          secondary
-          onPress={() => setShowCreate((current) => !current)}
-        />
+          <Button
+            text={showCreate ? 'Cancelar' : 'Nuevo usuario'}
+            secondary
+            textClassName="text-sm font-semibold text-[#292724]"
+            className="rounded-2xl border border-[#EAE6E1] bg-white"
+            onPress={() => setShowCreate((current) => !current)}
+          />
 
-        {!showCreate && (
-          <View className="mt-4 h-12 flex-row items-center gap-2 rounded-full border border-[#EAE6E1] bg-white px-4">
-            <Search size={18} color="#A09B95" />
-            <TextInput
-              value={query}
-              onChangeText={setQuery}
-              placeholder="Buscar usuario por nombre o correo..."
-              placeholderTextColor="#A09B95"
-              className="flex-1 text-sm text-[#292724]"
-              autoCapitalize="none"
-              returnKeyType="search"
-            />
-            {query.length > 0 && (
-              <Pressable onPress={() => setQuery('')} hitSlop={8}>
-                <X size={16} color="#A09B95" />
-              </Pressable>
-            )}
-          </View>
-        )}
-
-        {showCreate && (
-          <View className="mt-4 rounded-2xl bg-white p-5" style={cardShadow}>
-            <View className="gap-4">
-              <Field
-                control={control}
-                name="name"
-                label="Nombre de usuario"
-                placeholder="lirio_secret"
-                labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
-                inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
-                inputClassName="flex-1 text-sm text-[#292724]"
-                maxLength={50}
-                rules={{
-                  required: 'Escribe un nombre',
-                  minLength: { value: 3, message: 'Mínimo 3 caracteres' },
-                  maxLength: { value: 50, message: 'Máximo 50 caracteres' },
-                }}
+          {!showCreate && (
+            <View className="mt-4 h-12 flex-row items-center gap-2 rounded-full border border-[#EAE6E1] bg-white px-4">
+              <Search size={18} color="#A09B95" />
+              <TextInput
+                value={query}
+                onChangeText={setQuery}
+                placeholder="Buscar usuario por nombre o correo..."
+                placeholderTextColor="#A09B95"
+                className="flex-1 text-sm text-[#292724]"
+                autoCapitalize="none"
+                returnKeyType="search"
               />
-              <Field
-                control={control}
-                name="email"
-                label="Correo electrónico"
-                keyboardType="email-address"
-                placeholder="nombre@correo.com"
-                labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
-                inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
-                inputClassName="flex-1 text-sm text-[#292724]"
-                maxLength={100}
-                rules={{
-                  required: 'Escribe un correo',
-                  pattern: { value: /^\S+@\S+\.\S+$/, message: 'Correo inválido' },
-                  maxLength: { value: 100, message: 'Máximo 100 caracteres' },
-                }}
-              />
-              <Field
-                control={control}
-                name="password"
-                label="Contraseña"
-                secureTextEntry
-                placeholder="••••••••"
-                labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
-                inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
-                inputClassName="flex-1 text-sm text-[#292724]"
-                maxLength={128}
-                rules={{
-                  required: 'Escribe una contraseña',
-                  minLength: { value: 6, message: 'Mínimo 6 caracteres' },
-                  maxLength: { value: 128, message: 'Máximo 128 caracteres' },
-                }}
-              />
+              {query.length > 0 && (
+                <Pressable onPress={() => setQuery('')} hitSlop={8}>
+                  <X size={16} color="#A09B95" />
+                </Pressable>
+              )}
+            </View>
+          )}
 
-              <View className="gap-2">
-                <Text className="text-xs font-semibold uppercase text-[#6E6B68]">Rol</Text>
-                <View className="flex-row gap-2">
-                  {ROLES.map((role) => {
-                    const selected = role === newRole;
-                    return (
-                      <Pressable
-                        key={role}
-                        onPress={() => setNewRole(role)}
-                        className={`flex-1 items-center rounded-xl border px-3 py-3 active:opacity-80 ${
-                          selected ? 'border-[#4A3728] bg-[#4A3728]' : 'border-[#EAE6E1] bg-white'
-                        }`}>
-                        <Text
-                          className={`text-sm font-semibold ${
-                            selected ? 'text-white' : 'text-[#6E6B68]'
+          {showCreate && (
+            <View className="mt-4 rounded-2xl bg-white p-5" style={cardShadow}>
+              <View className="gap-4">
+                <Field
+                  control={control}
+                  name="name"
+                  label="Nombre de usuario"
+                  placeholder="lirio_secret"
+                  labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
+                  inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
+                  inputClassName="flex-1 text-sm text-[#292724]"
+                  maxLength={50}
+                  rules={{
+                    required: 'Escribe un nombre',
+                    minLength: { value: 3, message: 'Mínimo 3 caracteres' },
+                    maxLength: { value: 50, message: 'Máximo 50 caracteres' },
+                  }}
+                />
+                <Field
+                  control={control}
+                  name="email"
+                  label="Correo electrónico"
+                  keyboardType="email-address"
+                  placeholder="nombre@correo.com"
+                  labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
+                  inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
+                  inputClassName="flex-1 text-sm text-[#292724]"
+                  maxLength={100}
+                  rules={{
+                    required: 'Escribe un correo',
+                    pattern: { value: /^\S+@\S+\.\S+$/, message: 'Correo inválido' },
+                    maxLength: { value: 100, message: 'Máximo 100 caracteres' },
+                  }}
+                />
+                <Field
+                  control={control}
+                  name="password"
+                  label="Contraseña"
+                  secureTextEntry
+                  placeholder="••••••••"
+                  labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
+                  inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
+                  inputClassName="flex-1 text-sm text-[#292724]"
+                  maxLength={128}
+                  rules={{
+                    required: 'Escribe una contraseña',
+                    minLength: { value: 6, message: 'Mínimo 6 caracteres' },
+                    maxLength: { value: 128, message: 'Máximo 128 caracteres' },
+                  }}
+                />
+
+                <View className="gap-2">
+                  <Text className="text-xs font-semibold uppercase text-[#6E6B68]">Rol</Text>
+                  <View className="flex-row gap-2">
+                    {ROLES.map((role) => {
+                      const selected = role === newRole;
+                      return (
+                        <Pressable
+                          key={role}
+                          onPress={() => setNewRole(role)}
+                          className={`flex-1 items-center rounded-xl border px-3 py-3 active:opacity-80 ${
+                            selected ? 'border-[#4A3728] bg-[#4A3728]' : 'border-[#EAE6E1] bg-white'
                           }`}>
-                          {ROLE_STYLE[role].label}
+                          <Text
+                            className={`text-sm font-semibold ${
+                              selected ? 'text-white' : 'text-[#6E6B68]'
+                            }`}>
+                            {ROLE_STYLE[role].label}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                </View>
+
+                <Button
+                  text={submitting ? 'Creando...' : 'Crear usuario'}
+                  onPress={requestCreate}
+                  disabled={submitting}
+                  className="rounded-2xl bg-[#4A3728]"
+                />
+              </View>
+            </View>
+          )}
+
+          {loading && (
+            <View className="items-center py-10">
+              <ActivityIndicator color="#4A3728" />
+            </View>
+          )}
+
+          {!loading && !error && users.length === 0 && (
+            <View className="mt-4 rounded-2xl bg-white p-6" style={cardShadow}>
+              <Text className="text-center text-sm text-[#6E6B68]">
+                No hay usuarios registrados.
+              </Text>
+            </View>
+          )}
+
+          {!loading && !error && users.length > 0 && filteredUsers.length === 0 && (
+            <View className="mt-4 rounded-2xl bg-white p-6" style={cardShadow}>
+              <Text className="text-center text-sm text-[#6E6B68]">
+                No se encontraron usuarios para {`"${query}"`}.
+              </Text>
+            </View>
+          )}
+
+          {!loading &&
+            filteredUsers.map((user) => {
+              const role = ROLE_STYLE[user.role];
+              const isMe = user.id === me?.id;
+
+              return (
+                <View key={user.id} className="mt-4 rounded-2xl bg-white p-5" style={cardShadow}>
+                  <View className="flex-row items-center gap-3">
+                    <View className="h-11 w-11 items-center justify-center rounded-full bg-[#4A3728]">
+                      <Text className="text-sm font-bold text-white">{initialsOf(user.name)}</Text>
+                    </View>
+
+                    <View className="flex-1">
+                      <View className="flex-row items-center gap-2">
+                        <Text className="text-base font-semibold text-[#292724]">{user.name}</Text>
+                        {isMe && <Text className="text-xs text-[#A09B95]">(tú)</Text>}
+                      </View>
+                      <Text className="mt-0.5 text-sm text-[#6E6B68]">{user.email}</Text>
+                    </View>
+
+                    <View className={`rounded-full px-3 py-1 ${role.className}`}>
+                      <Text className="text-xs font-semibold">{role.label}</Text>
+                    </View>
+                  </View>
+
+                  <View className="mt-4 flex-row gap-2">
+                    <View className="flex-1">
+                      {!isMe ? (
+                        <Button
+                          text={
+                            busyId === user.id
+                              ? 'Guardando...'
+                              : user.role === 'ADMIN'
+                                ? 'Quitar admin'
+                                : 'Hacer admin'
+                          }
+                          secondary
+                          textClassName="text-sm font-semibold text-[#292724]"
+                          className="rounded-2xl border border-[#EAE6E1] bg-white"
+                          onPress={() => onToggleRole(user)}
+                          disabled={busyId !== null || isMe}
+                        />
+                      ) : null}
+                    </View>
+
+                    <View className="flex-1">
+                      <Pressable
+                        onPress={() => onRequestDelete(user)}
+                        disabled={busyId !== null || isMe}
+                        className="h-12 flex-row items-center justify-center gap-2 rounded-2xl border border-[#E9AFA6] bg-[#FBE6E1] active:opacity-80 disabled:opacity-50">
+                        <Text className="text-[13px] font-semibold text-[#C2391F]">
+                          {busyId === user.id ? 'Eliminando...' : 'Eliminar'}
                         </Text>
                       </Pressable>
-                    );
-                  })}
-                </View>
-              </View>
-
-              <Button
-                text={submitting ? 'Creando...' : 'Crear usuario'}
-                onPress={requestCreate}
-                disabled={submitting}
-                className="bg-[#4A3728]"
-              />
-            </View>
-          </View>
-        )}
-
-        {loading && (
-          <View className="items-center py-10">
-            <ActivityIndicator color="#4A3728" />
-          </View>
-        )}
-
-        {!loading && !error && users.length === 0 && (
-          <View className="mt-4 rounded-2xl bg-white p-6" style={cardShadow}>
-            <Text className="text-center text-sm text-[#6E6B68]">No hay usuarios registrados.</Text>
-          </View>
-        )}
-
-        {!loading && !error && users.length > 0 && filteredUsers.length === 0 && (
-          <View className="mt-4 rounded-2xl bg-white p-6" style={cardShadow}>
-            <Text className="text-center text-sm text-[#6E6B68]">
-              No se encontraron usuarios para {`"${query}"`}.
-            </Text>
-          </View>
-        )}
-
-        {!loading &&
-          filteredUsers.map((user) => {
-            const role = ROLE_STYLE[user.role];
-            const isMe = user.id === me?.id;
-
-            return (
-              <View key={user.id} className="mt-4 rounded-2xl bg-white p-5" style={cardShadow}>
-                <View className="flex-row items-center gap-3">
-                  <View className="h-11 w-11 items-center justify-center rounded-full bg-[#4A3728]">
-                    <Text className="text-sm font-bold text-white">{initialsOf(user.name)}</Text>
-                  </View>
-
-                  <View className="flex-1">
-                    <View className="flex-row items-center gap-2">
-                      <Text className="text-base font-semibold text-[#292724]">{user.name}</Text>
-                      {isMe && <Text className="text-xs text-[#A09B95]">(tú)</Text>}
                     </View>
-                    <Text className="mt-0.5 text-sm text-[#6E6B68]">{user.email}</Text>
-                  </View>
-
-                  <View className={`rounded-full px-3 py-1 ${role.className}`}>
-                    <Text className="text-xs font-semibold">{role.label}</Text>
                   </View>
                 </View>
-
-                <View className="mt-4 flex-row gap-2">
-                  <View className="flex-1">
-                    {!isMe ? (
-                      <Button
-                        text={
-                          busyId === user.id
-                            ? 'Guardando...'
-                            : user.role === 'ADMIN'
-                              ? 'Quitar admin'
-                              : 'Hacer admin'
-                        }
-                        secondary
-                        onPress={() => onToggleRole(user)}
-                        disabled={busyId !== null || isMe}
-                      />
-                    ) : null}
-                  </View>
-
-                  <View className="flex-1">
-                    <Button
-                      text={busyId === user.id ? 'Eliminando...' : 'Eliminar'}
-                      danger
-                      onPress={() => onRequestDelete(user)}
-                      disabled={busyId !== null || isMe}
-                    />
-                  </View>
-                </View>
-              </View>
-            );
-          })}
-      </View>
+              );
+            })}
+        </View>
+      </ScrollView>
 
       <ConfirmModal
         visible={pendingCreate !== null}
@@ -378,6 +384,6 @@ export default function AdminUsers() {
         onConfirm={onDelete}
         onCancel={() => setPendingDelete(null)}
       />
-    </ScrollView>
+    </View>
   );
 }

@@ -31,11 +31,7 @@ function messageOf(err: unknown): string {
   return err instanceof Error ? err.message : 'Ocurrió un error inesperado';
 }
 
-function ResultBanner({
-  message,
-}: {
-  message: { kind: 'ok' | 'error'; text: string } | null;
-}) {
+function ResultBanner({ message }: { message: { kind: 'ok' | 'error'; text: string } | null }) {
   if (!message) return null;
 
   return (
@@ -325,8 +321,8 @@ export default function Settings() {
             <Pressable
               onPress={() => setConfirmingDelete(true)}
               disabled={deleting}
-              className="h-11 items-center justify-center rounded-xl border border-red-200 disabled:opacity-50">
-              <Text className="text-sm font-semibold text-red-600">Eliminar cuenta</Text>
+              className="h-10 flex-row items-center justify-center gap-2 rounded-2xl border border-[#E9AFA6] bg-[#FBE6E1] active:opacity-80 disabled:opacity-50">
+              <Text className="text-[13px] font-semibold text-[#C2391F]">Eliminar cuenta</Text>
             </Pressable>
 
             <ResultBanner message={deleteMessage} />
