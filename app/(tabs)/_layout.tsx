@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'expo-router';
 import HomeScreen from './home';
 import ExploreScreen from './explore';
 import SavedScreen from './saved';
-import ProfileScreen from './profile';
+import ProfileLayout from './profile/_layout';
 import TabPager, { type TabPagerHandle } from '@/components/TabPager';
 
 const TAB_ROUTES = ['/home', '/explore', '/saved', '/profile'] as const;
@@ -105,7 +105,7 @@ export default function TabsLayout() {
   );
   const profile = (
     <View key="profile" style={PAGE_STYLE}>
-      <ProfileScreen active={index === 3} />
+      <ProfileLayout active={index === 3} />
     </View>
   );
 

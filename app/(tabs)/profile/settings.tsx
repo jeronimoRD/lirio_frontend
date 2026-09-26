@@ -5,18 +5,18 @@ import { Pressable, ScrollView, Switch, Text, View } from 'react-native';
 import { Bell, ChevronRight, Lock, Mail, TriangleAlert } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { deleteAccount, updatePassword, updateProfile } from '../../src/api/users';
-import ConfirmModal from '../../src/components/ConfirmModal';
-import Field from '../../src/components/Field';
-import { useSession } from '../../src/session/context';
+import { deleteAccount, updatePassword, updateProfile } from '../../../src/api/users';
+import ConfirmModal from '../../../src/components/ConfirmModal';
+import Field from '../../../src/components/Field';
+import { useSession } from '../../../src/session/context';
 
 import {
   IconWell,
   SectionCard,
   SectionHeaderRow,
   SectionLabel,
-} from '../../src/components/SettingsSections';
-import ScreenHeader from '../../src/components/ScreenHeader';
+} from '../../../src/components/SettingsSections';
+import ScreenHeader from '../../../src/components/ScreenHeader';
 
 type ProfileForm = {
   email: string;
@@ -74,7 +74,7 @@ function ToggleRow({
   );
 }
 
-export default function Settings() {
+export default function Settings({ onBack }: { onBack?: () => void }) {
   const { user, signOut, refreshUser } = useSession();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -167,7 +167,9 @@ export default function Settings() {
   };
 
   const handleBack = () => {
-    if (router.canGoBack()) {
+    if (onBack) {
+      onBack();
+    } else if (router.canGoBack()) {
       router.back();
     } else {
       router.replace('/home');

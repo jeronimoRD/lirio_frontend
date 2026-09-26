@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { Settings as SettingsIcon } from 'lucide-react-native';
 
-import { getPosts, deletePost } from '../../src/api/posts';
-import { useSession } from '../../src/session/context';
-import type { Post, Role } from '../../src/types';
+import { getPosts, deletePost } from '../../../src/api/posts';
+import { useSession } from '../../../src/session/context';
+import type { Post, Role } from '../../../src/types';
 import ConfirmModal from '@/components/ConfirmModal';
 import FeedCard from '@/components/FeedCard';
 import { cardShadowLg } from '@/constants/theme';
@@ -18,8 +18,14 @@ const ROLE_LABEL: Record<Role, string> = {
 
 type GalleryTab = 'outfits' | 'saved';
 
-export default function Profile({ active = true }: { active?: boolean }) {
-  const { user, signOut } = useSession();
+export default function Profile({
+  active = true,
+  onOpenDrawer,
+}: {
+  active?: boolean;
+  onOpenDrawer?: () => void;
+}) {
+  const { user } = useSession();
   const router = useRouter();
 
   const [posts, setPosts] = useState<Post[]>([]);
@@ -93,7 +99,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
         {/* header-banner */}
         <View className="h-[140px] w-full bg-[#A81245]">
           <Pressable
-            onPress={() => router.push('/settings')}
+            onPress={onOpenDrawer}
             hitSlop={8}
             className="absolute right-5 top-6 h-10 w-10 items-center justify-center rounded-full bg-white/20">
             <SettingsIcon size={20} color="#FFFFFF" />
@@ -139,20 +145,12 @@ export default function Profile({ active = true }: { active?: boolean }) {
             </View>
 
             {/* actions-card */}
-            <View className="flex-row gap-2.5">
-              <Pressable
-                onPress={() => router.push('/edit-profile' as any)}
-                className="h-12 flex-1 items-center justify-center rounded-2xl bg-[#A81245]"
-                style={cardShadowLg}>
-                <Text className="text-[13px] font-semibold text-white">Editar perfil</Text>
-              </Pressable>
-
-              <Pressable
-                onPress={() => router.push('/settings')}
-                className="h-12 flex-1 items-center justify-center rounded-2xl border border-[#EAE6E1] bg-white">
-                <Text className="text-[13px] font-semibold text-[#292724]">Configuración</Text>
-              </Pressable>
-            </View>
+            <Pressable
+              onPress={() => router.push('/edit-profile' as any)}
+              className="h-12 w-full items-center justify-center rounded-2xl bg-[#A81245]"
+              style={cardShadowLg}>
+              <Text className="text-[13px] font-semibold text-white">Editar perfil</Text>
+            </Pressable>
 
             {/* Outfit tabs */}
             <View className="flex-row rounded-2xl bg-white p-1.5" style={cardShadowLg}>
@@ -237,13 +235,6 @@ export default function Profile({ active = true }: { active?: boolean }) {
                 </Text>
               </View>
             )}
-
-            {/* Cerrar sesión */}
-            <Pressable
-              onPress={signOut}
-              className="mt-2 h-12 w-full items-center justify-center rounded-2xl border border-red-200 bg-white">
-              <Text className="text-sm font-semibold text-red-600">Cerrar sesión</Text>
-            </Pressable>
           </View>
         </View>
       </ScrollView>
