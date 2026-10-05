@@ -1,0 +1,188 @@
+import { Link, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
+import {
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
+import { useForm } from 'react-hook-form';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import Field from '../Field';
+import Button from '../Button';
+import { useSession } from '../../session/context';
+
+/** Los datos que captura este formulario. */
+type LoginForm = { email: string; password: string };
+
+// TODO: reemplaza esta URI por tu propia imagen (por ejemplo con require('../../../assets/hero-login.jpg'))
+const HERO_IMAGE_URI = require('../../../assets/pexels-karen-f-1376469-8883181.jpg');
+
+export default function Login() {
+  const { signIn } = useSession();
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  // `control` conecta los campos, `handleSubmit` valida antes de enviar y
+  // `formState` trae los errores y si se está enviando en este momento.
+  const { control, handleSubmit, setError, clearErrors, formState } = useForm<LoginForm>({
+    defaultValues: { email: '', password: '' },
+  });
+
+  const onSubmit = async ({ email, password }: LoginForm) => {
+    clearErrors('root');
+
+    try {
+      const user = await signIn(email, password);
+      router.replace(user.role === 'ADMIN' ? '/(admin)' : '/home');
+    } catch (error) {
+      // `root` es el error del formulario completo (credenciales malas, servidor
+      // caído...), a diferencia del error de un campo concreto. El mensaje es el
+      // que devolvió el servidor: la app no reescribe las reglas del backend.
+      setError('root', { message: (error as Error).message });
+    }
+  };
+
+  return (
+    <KeyboardAvoidingView
+      className="flex-1 bg-[#FCFAF8]"
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <ScrollView
+        className="flex-1"
+        contentContainerClassName="flex-grow"
+        contentContainerStyle={{ paddingBottom: insets.bottom }}
+        keyboardShouldPersistTaps="handled">
+        {/* hero-accent-block */}
+        <ImageBackground
+          source={HERO_IMAGE_URI}
+          resizeMode="cover"
+          className="h-[280px] w-full justify-end overflow-hidden">
+          {/* overlay oscuro (equivalente al linear-gradient plano del diseño) */}
+          <View className="absolute inset-0 bg-black/15" />
+        </ImageBackground>
+
+        {/* login-panel */}
+        <View className="gap-6 px-6 pb-4 pt-8">
+          {/* brand-logo */}
+          <View className="items-center gap-0.5">
+            {/* TODO: reemplaza por el nombre real de tu marca */}
+            <Text className="font-['Lora-Italic'] text-[32px] leading-[41px] text-[#A81245]">
+              Hibirio
+            </Text>
+            <Text className="text-[10px] font-semibold uppercase tracking-wide text-[#A81245]">
+              Tu estilo, tu esencia
+            </Text>
+          </View>
+
+          {/* form-block */}
+          <View className="gap-4">
+            <Field
+              control={control}
+              name="email"
+              label="Correo electrónico"
+              keyboardType="email-address"
+              placeholder="nombre@correo.com"
+              labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
+              inputWrapperClassName="h-12 flex-row items-center rounded-lg border border-[#EAE6E1] bg-white px-4"
+              inputClassName="flex-1 text-sm text-[#292724]"
+              maxLength={100}
+              rules={{
+                required: 'El correo es obligatorio',
+                pattern: { value: /^\S+@\S+\.\S+$/, message: 'Correo inválido' },
+                maxLength: { value: 100, message: 'Máximo 100 caracteres' },
+              }}
+            />
+
+            <Field
+              control={control}
+              name="password"
+              label="Contraseña"
+              secureTextEntry={!showPassword}
+              placeholder="••••••••"
+              labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
+              inputWrapperClassName="h-12 flex-row items-center rounded-lg border border-[#EAE6E1] bg-white px-4"
+              inputClassName="flex-1 text-sm text-[#292724]"
+              maxLength={128}
+              rules={{ required: 'La contraseña es obligatoria' }}
+              rightElement={
+                <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
+                  <Text className="text-xs font-medium text-[#292724]">
+                    {showPassword ? 'Ocultar' : 'Mostrar'}
+                  </Text>
+                </Pressable>
+              }
+            />
+
+            {/* forgot-password */}
+            {/* TODO: sin lógica de recuperación de contraseña todavía — conectar cuando exista el flujo */}
+            <Pressable>
+              <Text className="text-right text-xs font-medium text-[#A81245]">
+                ¿Olvidaste tu contraseña?
+              </Text>
+            </Pressable>
+          </View>
+
+          {/* MENSAJE DE ERROR */}
+          {formState.errors.root?.message && (
+            <View className="rounded-xl bg-red-50 p-4">
+              <Text className="text-center text-sm font-medium text-pink-700">
+                {formState.errors.root.message}
+              </Text>
+            </View>
+          )}
+
+          {/* login-action: btn-primary */}
+          <Button
+            text={formState.isSubmitting ? 'Ingresando...' : 'Iniciar sesión'}
+            onPress={handleSubmit(onSubmit)}
+            disabled={formState.isSubmitting}
+            className="h-12 flex-row items-center justify-center gap-3 rounded-full border border-[#EAE6E1] bg-[#A81245]"
+            textClassName="text-sm font-semibold text-white"
+          />
+
+          {/* divider-block */}
+          <View className="flex-row items-center gap-3">
+            <View className="h-px flex-1 bg-[#EAE6E1]" />
+            <Text className="text-[11px] font-medium uppercase text-[#292724]">O</Text>
+            <View className="h-px flex-1 bg-[#EAE6E1]" />
+          </View>
+
+          {/* social-stack */}
+          {/* TODO: sin lógica de auth social todavía — solo visual, conectar cuando exista el flujo */}
+          <View className="gap-2">
+            <Pressable className="h-12 flex-row items-center justify-center gap-3 rounded-full border border-[#EAE6E1] bg-white">
+              <Ionicons name="logo-google" size={18} color="#292724" />
+
+              <Text className="text-[13px] font-medium text-[#292724]">Continuar con Google</Text>
+            </Pressable>
+
+            <Pressable className="h-12 flex-row items-center justify-center gap-3 rounded-full border border-[#EAE6E1] bg-white">
+              <Ionicons name="logo-apple" size={18} color="#292724" />
+
+              <Text className="text-[13px] font-medium text-[#292724]">Continuar con Apple</Text>
+            </Pressable>
+          </View>
+        </View>
+
+        {/* footer-navigation */}
+        <View className="items-center pb-8 pt-2">
+          <Link href="/register" asChild>
+            <Pressable>
+              <Text className="text-[13px] text-[#6E6B68]">
+                ¿No tienes una cuenta?{' '}
+                <Text className="font-semibold text-[#A81245]">Crear cuenta</Text>
+              </Text>
+            </Pressable>
+          </Link>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
+}

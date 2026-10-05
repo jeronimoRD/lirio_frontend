@@ -3,17 +3,17 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { ChevronRight, Image as ImageIcon, Tag, TriangleAlert, Users } from 'lucide-react-native';
 
-import { getAdminUsers } from '../../src/api/admin';
-import { getCategories } from '../../src/api/categories';
-import { getPosts } from '../../src/api/posts';
-import { getReports, updateReport } from '../../src/api/reports';
-import AdminBrandHeader from '../../src/components/admin/AdminBrandHeader';
-import BarsChart from '../../src/components/admin/BarsChart';
-import ModerationCard from '../../src/components/admin/ModerationCard';
-import StatCard from '../../src/components/admin/StatCard';
-import ConfirmModal from '../../src/components/ConfirmModal';
-import type { Category, Post, Report, ReportReason, User } from '../../src/types';
-import { REPORT_REASON_LABELS } from '../../src/types';
+import AdminBrandHeader from './AdminBrandHeader';
+import BarsChart from './BarsChart';
+import ModerationCard from './ModerationCard';
+import StatCard from './StatCard';
+import ConfirmModal from '../ConfirmModal';
+import { getAdminUsers } from '../../api/admin';
+import { getCategories } from '../../api/categories';
+import { getPosts } from '../../api/posts';
+import { getReports, updateReport } from '../../api/reports';
+import type { Category, Post, Report, ReportReason, User } from '../../types';
+import { REPORT_REASON_LABELS } from '../../types';
 
 type ModGroup = {
   key: string;
@@ -97,7 +97,7 @@ function buildModGroups(reports: Report[]): ModGroup[] {
   return groups.sort((a, b) => b.count - a.count).slice(0, 2);
 }
 
-export default function ResumenScreen() {
+export default function AdminResumen() {
   const router = useRouter();
 
   const [users, setUsers] = useState<User[]>([]);
