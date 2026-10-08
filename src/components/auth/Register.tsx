@@ -1,78 +1,29 @@
-import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { ImageBackground, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Field from '../Field';
 import Button from '../Button';
 import ScreenHeader from '../ScreenHeader';
-import { useSession } from '../../session/context';
-import { getCategories } from '../../api/categories';
-import type { Category } from '../../types';
-
-/** Los datos que captura este formulario. El nombre del campo es `name`, no `user_name`. */
-type RegisterForm = { name: string; email: string; password: string };
+import { useRegister } from '../../hooks/auth/useRegister';
 
 // TODO: reemplaza esta URI por tu propia imagen de register
 const HERO_IMAGE_URI = require('../../../assets/pexels-karen-f-1376469-8883181.jpg');
 
 export default function Register() {
-  const router = useRouter();
-  const { signUp } = useSession();
   const insets = useSafeAreaInsets();
-
-  const [success, setSuccess] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
-  const [styleOptions, setStyleOptions] = useState<Category[]>([]);
-
-  const { control, handleSubmit, setError, clearErrors, formState } = useForm<RegisterForm>({
-    defaultValues: { name: '', email: '', password: '' },
-  });
-
-  useEffect(() => {
-    let active = true;
-
-    getCategories()
-      .then((categories) => {
-        if (active) setStyleOptions(categories);
-      })
-      .catch(() => {
-        if (active) setStyleOptions([]);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const toggleStyle = (categoryId: string) => {
-    setSelectedStyles((prev) =>
-      prev.includes(categoryId) ? prev.filter((s) => s !== categoryId) : [...prev, categoryId]
-    );
-  };
-
-  const onSubmit = async (data: RegisterForm) => {
-    clearErrors('root');
-    setSuccess(false);
-
-    try {
-      await signUp(data.name, data.email, data.password, selectedStyles);
-      setSuccess(true);
-    } catch (error) {
-      // `root` es el error del formulario completo, no el de un campo concreto.
-      setError('root', { message: (error as Error).message });
-    }
-  };
-
-  const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/(login)/login');
-    }
-  };
+  const {
+    control,
+    success,
+    showPassword,
+    togglePassword,
+    selectedStyles,
+    styleOptions,
+    toggleStyle,
+    goBack,
+    isSubmitting,
+    rootError,
+    submit,
+  } = useRegister();
 
   return (
     <View className="flex-1 bg-[#FCFAF8]">
@@ -90,7 +41,7 @@ export default function Register() {
 
           {/* botón atrás flotando sobre la imagen */}
           <Pressable
-            onPress={handleBack}
+            onPress={goBack}
             hitSlop={8}
             className="absolute left-5 top-5 h-8 w-8 items-center justify-center rounded-full bg-black/30">
             <Text className="text-lg text-white">←</Text>
@@ -162,7 +113,7 @@ export default function Register() {
                 maxLength: { value: 128, message: 'Máximo 128 caracteres' },
               }}
               rightElement={
-                <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
+                <Pressable onPress={togglePassword} hitSlop={8}>
                   <Text className="text-xs font-medium text-[#A81245]">
                     {showPassword ? 'Ocultar' : 'Mostrar'}
                   </Text>
@@ -204,11 +155,9 @@ export default function Register() {
             </View>
           </View>
 
-          {formState.errors.root?.message && (
+          {rootError && (
             <View className="rounded-xl bg-red-50 p-4">
-              <Text className="text-center text-sm font-medium text-pink-700">
-                {formState.errors.root.message}
-              </Text>
+              <Text className="text-center text-sm font-medium text-pink-700">{rootError}</Text>
             </View>
           )}
 
@@ -224,9 +173,9 @@ export default function Register() {
         {/* footer-actions */}
         <View className="items-center gap-4 px-6 pb-8">
           <Button
-            text={formState.isSubmitting ? 'Registrando...' : 'Crear cuenta'}
-            onPress={handleSubmit(onSubmit)}
-            disabled={formState.isSubmitting}
+            text={isSubmitting ? 'Registrando...' : 'Crear cuenta'}
+            onPress={submit}
+            disabled={isSubmitting}
             className="h-12 w-full rounded-full bg-[#A81245]"
             textClassName="text-sm font-semibold text-white"
           />

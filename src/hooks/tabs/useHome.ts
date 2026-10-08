@@ -1,9 +1,7 @@
-import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 
 import { getFeedPosts } from '../../api/posts';
 import { getCategories } from '../../api/categories';
-import { useFavorites } from '../../favorites/context';
 import type { Post, Category } from '../../types';
 
 const ALL_FILTER = 'Ver todos';
@@ -78,21 +76,5 @@ export function useHome() {
     featuredPost: displayedPosts[0],
     leftColumn,
     rightColumn,
-    };
-}
-
-/** Lógica de cada tarjeta del feed: favoritos y navegación al detalle. */
-export function usePostCard(post: Post) {
-    const { isFavorite, toggleFavorite } = useFavorites();
-    const router = useRouter();
-
-    return {
-        favorited: isFavorite(post.id),
-        toggleFavorite: () => toggleFavorite(post.id),
-        openPost: () =>
-        router.push({
-            pathname: '/(upload)/[id]',
-            params: { id: post.id },
-        }),
     };
 }

@@ -3,7 +3,8 @@ import { Heart } from 'lucide-react-native';
 
 import ScreenHeader from '../ScreenHeader';
 import type { Post } from '../../types';
-import { useHome, usePostCard } from '../../hooks/tabs/useHome';
+import { useHome } from '../../hooks/tabs/useHome';
+import { usePostCard } from '../../hooks/tabs/usePostCard';
 
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#292724', '#6E6B68', '#EAE6E1', '#A09B95'];
 

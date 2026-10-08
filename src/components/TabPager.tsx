@@ -1,6 +1,8 @@
 import { forwardRef, type ReactNode } from 'react';
 import PagerView from 'react-native-pager-view';
-import { useTabPager, type TabPagerHandle } from '../hooks/useTabPager';
+import { useTabPager, type TabPagerHandle } from '../hooks/general/useTabPager';
+
+export type { TabPagerHandle };
 
 export type TabPagerProps = {
   index: number;

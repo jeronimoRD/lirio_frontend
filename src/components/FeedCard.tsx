@@ -3,7 +3,7 @@ import { Image, Pressable, Text, View } from 'react-native';
 import { MoreVertical } from 'lucide-react-native';
 import type { Post } from '@/types';
 
-import { useFeedCard } from '@/hooks/useFeedCard';
+import { useFeedCard } from '@/hooks/general/useFeedCard';
 
 type FeedCardProps = {
   post: Post;

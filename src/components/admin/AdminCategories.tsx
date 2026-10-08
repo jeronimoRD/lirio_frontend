@@ -1,159 +1,45 @@
-import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Search, X } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
 
 import AdminBrandHeader from './AdminBrandHeader';
 import Button from '../Button';
 import ConfirmModal from '../ConfirmModal';
-import {
-  createCategory,
-  deleteCategory,
-  getCategories,
-  updateCategory,
-} from '../../api/categories';
-import type { Category } from '../../types';
 import { cardShadow } from '../../constants/theme';
-
-const CATEGORY_NAME_MIN_LENGTH = 2;
-const CATEGORY_NAME_MAX_LENGTH = 50;
+import { useAdminCategories } from '../../hooks/admin/useAdminCategories';
 
 export default function AdminCategories() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
-
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const [newName, setNewName] = useState('');
-  const [nameError, setNameError] = useState<string | null>(null);
-  const [confirmCreate, setConfirmCreate] = useState(false);
-  const [creating, setCreating] = useState(false);
-
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editName, setEditName] = useState('');
-
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
-
-  const filteredCategories = categories.filter((category) =>
-    category.name.toLowerCase().includes(searchQuery.trim().toLowerCase())
-  );
-
-  const loadCategories = async () => {
-    try {
-      const data = await getCategories();
-      setCategories(data);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudieron cargar las categorías');
-    }
-  };
-
-  useEffect(() => {
-    getCategories()
-      .then((data) => {
-        setCategories(data);
-        setError(null);
-      })
-      .catch((err) =>
-        setError(err instanceof Error ? err.message : 'No se pudieron cargar las categorías')
-      )
-      .finally(() => setLoading(false));
-  }, []);
-
-  const requestCreate = () => {
-    const name = newName.trim();
-
-    if (!name || creating || confirmCreate) return;
-
-    if (name.length < CATEGORY_NAME_MIN_LENGTH) {
-      setNameError(`Mínimo ${CATEGORY_NAME_MIN_LENGTH} caracteres para crear la categoría`);
-      return;
-    }
-
-    if (name.length > CATEGORY_NAME_MAX_LENGTH) {
-      setNameError(`Máximo ${CATEGORY_NAME_MAX_LENGTH} caracteres para crear la categoría`);
-      return;
-    }
-
-    setNameError(null);
-    setConfirmCreate(true);
-  };
-
-  const onCreate = async () => {
-    const name = newName.trim();
-
-    if (!name || creating) return;
-
-    setConfirmCreate(false);
-    setCreating(true);
-    setError(null);
-
-    try {
-      await createCategory(name);
-      setNewName('');
-      await loadCategories();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo crear la categoría');
-    } finally {
-      setCreating(false);
-    }
-  };
-
-  const onStartEdit = (category: Category) => {
-    setEditingId(category.id);
-    setEditName(category.name);
-  };
-
-  const onSaveEdit = async () => {
-    const name = editName.trim();
-
-    if (!editingId || !name || busyId) return;
-
-    setBusyId(editingId);
-    setError(null);
-
-    try {
-      await updateCategory(editingId, name);
-      setEditingId(null);
-      setEditName('');
-      setCategories((current) => current.map((c) => (c.id === editingId ? { ...c, name } : c)));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo guardar la categoría');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const onDeletePress = (category: Category) => {
-    if (busyId) return;
-
-    setError(null);
-    setConfirmDeleteId(category.id);
-  };
-
-  const onDelete = async () => {
-    const id = confirmDeleteId;
-
-    if (!id || busyId) return;
-
-    setBusyId(id);
-    setConfirmDeleteId(null);
-    setError(null);
-
-    try {
-      await deleteCategory(id);
-      setCategories((current) => current.filter((c) => c.id !== id));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo eliminar la categoría');
-    } finally {
-      setBusyId(null);
-    }
-  };
+  const {
+    categories,
+    filteredCategories,
+    loading,
+    error,
+    searchQuery,
+    setSearchQuery,
+    clearSearch,
+    newName,
+    changeNewName,
+    nameError,
+    confirmCreate,
+    creating,
+    requestCreate,
+    onCreate,
+    cancelCreate,
+    editingId,
+    editName,
+    setEditName,
+    startEdit,
+    saveEdit,
+    cancelEdit,
+    busyId,
+    confirmDeleteId,
+    requestDelete,
+    onDelete,
+    cancelDelete,
+    maxNameLength,
+    goBack,
+  } = useAdminCategories();
 
   return (
     <View className="flex-1 bg-[#FCFAF8]">
@@ -165,10 +51,7 @@ export default function AdminCategories() {
         <View className="mx-auto w-full max-w-md">
           <View className="mb-6">
             <Pressable
-              onPress={() => {
-                if (router.canGoBack()) router.back();
-                else router.replace('/(admin)');
-              }}
+              onPress={goBack}
               className="mb-3 h-8 w-8 items-center justify-center rounded-full bg-[#F4EEE7]"
               hitSlop={8}>
               <ArrowLeft size={16} color="#4A3728" />
@@ -189,11 +72,8 @@ export default function AdminCategories() {
               <TextInput
                 className="h-12 w-full rounded-xl border border-[#EAE6E1] bg-white px-4 text-sm text-[#292724]"
                 value={newName}
-                onChangeText={(text) => {
-                  setNewName(text);
-                  setNameError(null);
-                }}
-                maxLength={CATEGORY_NAME_MAX_LENGTH}
+                onChangeText={changeNewName}
+                maxLength={maxNameLength}
                 placeholder="Nueva categoría"
                 placeholderTextColor="#A09B95"
                 autoCapitalize="words"
@@ -203,7 +83,7 @@ export default function AdminCategories() {
                 <Text className="mt-1 text-[11px] font-medium text-red-600">{nameError}</Text>
               ) : (
                 <Text className="mt-1 text-right text-[11px] text-[#A09B95]">
-                  {newName.trim().length}/{CATEGORY_NAME_MAX_LENGTH}
+                  {newName.trim().length}/{maxNameLength}
                 </Text>
               )}
             </View>
@@ -229,7 +109,7 @@ export default function AdminCategories() {
               returnKeyType="search"
             />
             {searchQuery.length > 0 && (
-              <Pressable onPress={() => setSearchQuery('')} hitSlop={8}>
+              <Pressable onPress={clearSearch} hitSlop={8}>
                 <X size={16} color="#A09B95" />
               </Pressable>
             )}
@@ -272,17 +152,17 @@ export default function AdminCategories() {
                         className="h-12 rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4 text-sm text-[#292724]"
                         value={editName}
                         onChangeText={setEditName}
-                        maxLength={50}
+                        maxLength={maxNameLength}
                         placeholder="Nombre de la categoría"
                         placeholderTextColor="#A09B95"
                         autoCapitalize="words"
-                        onSubmitEditing={onSaveEdit}
+                        onSubmitEditing={saveEdit}
                       />
                       <View className="mt-3 flex-row gap-2">
                         <View className="flex-1">
                           <Button
                             text={busyId === category.id ? 'Guardando...' : 'Guardar'}
-                            onPress={onSaveEdit}
+                            onPress={saveEdit}
                             disabled={busyId !== null || editName.trim() === ''}
                             className="rounded-2xl bg-[#4A3728]"
                           />
@@ -293,10 +173,7 @@ export default function AdminCategories() {
                             secondary
                             textClassName="text-sm font-semibold text-[#292724]"
                             className="rounded-2xl border border-[#EAE6E1] bg-white"
-                            onPress={() => {
-                              setEditingId(null);
-                              setEditName('');
-                            }}
+                            onPress={cancelEdit}
                             disabled={busyId !== null}
                           />
                         </View>
@@ -308,14 +185,14 @@ export default function AdminCategories() {
                         <Text className="flex-1 text-base font-semibold text-[#292724]">
                           {category.name}
                         </Text>
-                        <Pressable onPress={() => onStartEdit(category)}>
+                        <Pressable onPress={() => startEdit(category)}>
                           <Text className="text-sm font-semibold text-[#4A3728]">Renombrar</Text>
                         </Pressable>
                       </View>
 
                       <View className="mt-4">
                         <Pressable
-                          onPress={() => onDeletePress(category)}
+                          onPress={() => requestDelete(category)}
                           disabled={busyId !== null}
                           className="h-10 flex-row items-center justify-center gap-2 rounded-2xl border border-[#E9AFA6] bg-[#FBE6E1] active:opacity-80 disabled:opacity-50">
                           <Text className="text-[13px] font-semibold text-[#C2391F]">
@@ -338,7 +215,7 @@ export default function AdminCategories() {
         confirmLabel="Crear"
         loading={creating}
         onConfirm={onCreate}
-        onCancel={() => setConfirmCreate(false)}
+        onCancel={cancelCreate}
       />
 
       <ConfirmModal
@@ -353,7 +230,7 @@ export default function AdminCategories() {
         danger
         loading={busyId !== null}
         onConfirm={onDelete}
-        onCancel={() => setConfirmDeleteId(null)}
+        onCancel={cancelDelete}
       />
     </View>
   );
