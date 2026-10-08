@@ -1,10 +1,6 @@
-import { forwardRef, type ReactNode, useImperativeHandle, useRef } from 'react';
+import { forwardRef, type ReactNode } from 'react';
 import PagerView from 'react-native-pager-view';
-
-export type TabPagerHandle = {
-  setPage: (page: number) => void;
-  setPageWithoutAnimation: (page: number) => void;
-};
+import { useTabPager, type TabPagerHandle } from '../hooks/useTabPager';
 
 export type TabPagerProps = {
   index: number;
@@ -14,12 +10,7 @@ export type TabPagerProps = {
 
 const TabPager = forwardRef<TabPagerHandle, TabPagerProps>(
   ({ index, onPageSelected, children }, ref) => {
-    const pagerRef = useRef<PagerView>(null);
-
-    useImperativeHandle(ref, () => ({
-      setPage: (page: number) => pagerRef.current?.setPage(page),
-      setPageWithoutAnimation: (page: number) => pagerRef.current?.setPageWithoutAnimation(page),
-    }));
+    const { pagerRef } = useTabPager(ref);
 
     return (
       <PagerView
