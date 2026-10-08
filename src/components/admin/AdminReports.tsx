@@ -1,18 +1,14 @@
-import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Flag } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
 
 import AdminBrandHeader from './AdminBrandHeader';
 import Button from '../Button';
 import ConfirmModal from '../ConfirmModal';
-import { getReports, updateReport } from '../../api/reports';
-import type { Report, ReportAction, ReportStatus } from '../../types';
+import type { ReportStatus } from '../../types';
 import { REPORT_REASON_LABELS, REPORT_STATUS_LABELS } from '../../types';
 import { cardShadow } from '../../constants/theme';
-
-type StatusFilter = ReportStatus | null;
+import { useAdminReports, type StatusFilter } from '../../hooks/admin/useAdminReports';
 
 const FILTERS: { label: string; value: StatusFilter }[] = [
   { label: 'Todas', value: null },
@@ -28,74 +24,22 @@ const STATUS_BADGE: Record<ReportStatus, string> = {
 };
 
 export default function AdminReports() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
-
-  const [reports, setReports] = useState<Report[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<StatusFilter>(null);
-
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [pendingDelete, setPendingDelete] = useState<Report | null>(null);
-
-  useEffect(() => {
-    getReports()
-      .then((data) => {
-        setReports(data);
-        setError(null);
-      })
-      .catch((err) =>
-        setError(err instanceof Error ? err.message : 'No se pudieron cargar los reportes')
-      )
-      .finally(() => setLoading(false));
-  }, []);
-
-  const onStatusChange = async (report: Report, status: ReportStatus) => {
-    if (busyId !== null) return;
-
-    setBusyId(report.id);
-    setError(null);
-
-    try {
-      await updateReport(report.id, status);
-      setReports((current) => current.map((r) => (r.id === report.id ? { ...r, status } : r)));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo actualizar el reporte');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const onDeleteContent = async () => {
-    const report = pendingDelete;
-
-    if (!report || busyId !== null || report.target.deleted) return;
-
-    const action: ReportAction = report.targetType === 'POST' ? 'DELETE_POST' : 'DELETE_USER';
-
-    setPendingDelete(null);
-    setBusyId(report.id);
-    setError(null);
-
-    try {
-      await updateReport(report.id, 'RESOLVED', action);
-      setReports((current) =>
-        current.map((r) =>
-          r.id === report.id
-            ? { ...r, status: 'RESOLVED', target: { ...r.target, deleted: true } }
-            : r
-        )
-      );
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo eliminar el contenido');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const filteredReports =
-    filter === null ? reports : reports.filter((report) => report.status === filter);
+  const {
+    reports,
+    filteredReports,
+    loading,
+    error,
+    filter,
+    setFilter,
+    busyId,
+    pendingDelete,
+    onStatusChange,
+    requestDeleteContent,
+    cancelDeleteContent,
+    onDeleteContent,
+    goBack,
+  } = useAdminReports();
 
   return (
     <View className="flex-1 bg-[#FCFAF8]">
@@ -107,10 +51,7 @@ export default function AdminReports() {
         <View className="mx-auto w-full max-w-md">
           <View className="mb-6">
             <Pressable
-              onPress={() => {
-                if (router.canGoBack()) router.back();
-                else router.replace('/(admin)');
-              }}
+              onPress={goBack}
               className="mb-3 h-8 w-8 items-center justify-center rounded-full bg-[#F4EEE7]"
               hitSlop={8}>
               <ArrowLeft size={16} color="#4A3728" />
@@ -236,7 +177,7 @@ export default function AdminReports() {
 
                       {!deleted && (
                         <Pressable
-                          onPress={() => setPendingDelete(report)}
+                          onPress={() => requestDeleteContent(report)}
                           disabled={busyId !== null}
                           className="h-10 flex-row items-center justify-center gap-2 rounded-2xl border border-[#E9AFA6] bg-[#FBE6E1] active:opacity-80 disabled:opacity-50">
                           <Text className="text-[13px] font-semibold text-[#C2391F]">
@@ -266,7 +207,7 @@ export default function AdminReports() {
         danger
         loading={busyId !== null}
         onConfirm={onDeleteContent}
-        onCancel={() => setPendingDelete(null)}
+        onCancel={cancelDeleteContent}
       />
     </View>
   );
