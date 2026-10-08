@@ -1,6 +1,5 @@
-import { Redirect, useRouter } from 'expo-router';
-import { useState, type ReactNode } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
+import { Redirect } from 'expo-router';
+import type { ReactNode } from 'react';
 import { Pressable, ScrollView, Switch, Text, View } from 'react-native';
 import { Bell, ChevronRight, Lock, Mail, TriangleAlert } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,23 +8,10 @@ import ScreenHeader from '../ScreenHeader';
 import ConfirmModal from '../ConfirmModal';
 import Field from '../Field';
 import { IconWell, SectionCard, SectionHeaderRow, SectionLabel } from '../SettingsSections';
-import { deleteAccount, updatePassword, updateProfile } from '../../api/users';
-import { useSession } from '../../session/context';
+import type { ResultMessage } from '../../utils/resultMessage';
+import { useSettings } from '../../hooks/settings/useSettings';
 
-type ProfileForm = {
-  email: string;
-};
-
-type PasswordForm = {
-  password: string;
-  confirm: string;
-};
-
-function messageOf(err: unknown): string {
-  return err instanceof Error ? err.message : 'Ocurrió un error inesperado';
-}
-
-function ResultBanner({ message }: { message: { kind: 'ok' | 'error'; text: string } | null }) {
+function ResultBanner({ message }: { message: ResultMessage | null }) {
   if (!message) return null;
 
   return (
@@ -69,104 +55,34 @@ function ToggleRow({
 }
 
 export default function Settings() {
-  const { user, signOut, refreshUser } = useSession();
-  const router = useRouter();
   const insets = useSafeAreaInsets();
-
-  const profileForm = useForm<ProfileForm>({
-    defaultValues: {
-      email: user?.email ?? '',
-    },
-  });
-
-  const passwordForm = useForm<PasswordForm>({
-    defaultValues: {
-      password: '',
-      confirm: '',
-    },
-  });
-
-  const newPassword = useWatch({
-    control: passwordForm.control,
-    name: 'password',
-  });
-
-  const [savingProfile, setSavingProfile] = useState(false);
-  const [savingPassword, setSavingPassword] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
-  const [profileMessage, setProfileMessage] = useState<{
-    kind: 'ok' | 'error';
-    text: string;
-  } | null>(null);
-  const [passwordMessage, setPasswordMessage] = useState<{
-    kind: 'ok' | 'error';
-    text: string;
-  } | null>(null);
-  const [deleteMessage, setDeleteMessage] = useState<{
-    kind: 'ok' | 'error';
-    text: string;
-  } | null>(null);
-
-  const [pushEnabled, setPushEnabled] = useState(true);
-  const [emailEnabled, setEmailEnabled] = useState(false);
+  const {
+    user,
+    goBack,
+    profileControl,
+    submitProfile,
+    savingProfile,
+    profileMessage,
+    passwordControl,
+    submitPassword,
+    validateConfirm,
+    savingPassword,
+    passwordMessage,
+    pushEnabled,
+    setPushEnabled,
+    emailEnabled,
+    setEmailEnabled,
+    deleting,
+    deleteMessage,
+    confirmingDelete,
+    askDeleteConfirmation,
+    cancelDeleteConfirmation,
+    removeAccount,
+  } = useSettings();
 
   if (!user) {
     return <Redirect href="/(login)/login" />;
   }
-
-  const saveProfile = async (data: ProfileForm) => {
-    setProfileMessage(null);
-    setSavingProfile(true);
-
-    try {
-      await updateProfile(user.name, data.email.trim().toLowerCase(), user.bio);
-      await refreshUser();
-      setProfileMessage({ kind: 'ok', text: 'Datos actualizados correctamente' });
-    } catch (err) {
-      setProfileMessage({ kind: 'error', text: messageOf(err) });
-    } finally {
-      setSavingProfile(false);
-    }
-  };
-
-  const savePassword = async (data: PasswordForm) => {
-    setPasswordMessage(null);
-    setSavingPassword(true);
-
-    try {
-      await updatePassword(data.password);
-      passwordForm.reset();
-      setPasswordMessage({ kind: 'ok', text: 'Contraseña actualizada correctamente' });
-    } catch (err) {
-      setPasswordMessage({ kind: 'error', text: messageOf(err) });
-    } finally {
-      setSavingPassword(false);
-    }
-  };
-
-  const removeAccount = async () => {
-    setConfirmingDelete(false);
-    setDeleteMessage(null);
-    setDeleting(true);
-
-    try {
-      await deleteAccount();
-      signOut();
-    } catch (err) {
-      setDeleteMessage({ kind: 'error', text: messageOf(err) });
-    } finally {
-      setDeleting(false);
-    }
-  };
-
-  const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/home');
-    }
-  };
 
   return (
     <ScrollView
@@ -174,8 +90,7 @@ export default function Settings() {
       contentContainerClassName="items-center px-5"
       contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: insets.bottom + 40 }}>
       <View className="w-full max-w-[390px] gap-6">
-        {/* Settings header */}
-        <ScreenHeader title="Configuración" onBack={handleBack} />
+        <ScreenHeader title="Configuración" onBack={goBack} />
 
         {/* Cuenta */}
         <View className="gap-2.5">
@@ -188,7 +103,7 @@ export default function Settings() {
 
             <View className="gap-4">
               <Field
-                control={profileForm.control}
+                control={profileControl}
                 name="email"
                 label="Correo electrónico"
                 keyboardType="email-address"
@@ -207,7 +122,7 @@ export default function Settings() {
               />
 
               <Pressable
-                onPress={profileForm.handleSubmit(saveProfile)}
+                onPress={submitProfile}
                 disabled={savingProfile}
                 className="h-11 items-center justify-center rounded-xl bg-[#A81245] disabled:opacity-50">
                 <Text className="text-sm font-semibold text-white">
@@ -228,7 +143,7 @@ export default function Settings() {
 
             <View className="gap-4">
               <Field
-                control={passwordForm.control}
+                control={passwordControl}
                 name="password"
                 label="Contraseña nueva"
                 secureTextEntry
@@ -247,7 +162,7 @@ export default function Settings() {
               />
 
               <Field
-                control={passwordForm.control}
+                control={passwordControl}
                 name="confirm"
                 label="Confirmar contraseña"
                 secureTextEntry
@@ -257,12 +172,12 @@ export default function Settings() {
                 maxLength={128}
                 rules={{
                   required: 'Confirma la contraseña',
-                  validate: (value) => value === newPassword || 'Las contraseñas no coinciden',
+                  validate: validateConfirm,
                 }}
               />
 
               <Pressable
-                onPress={passwordForm.handleSubmit(savePassword)}
+                onPress={submitPassword}
                 disabled={savingPassword}
                 className="h-11 items-center justify-center rounded-xl bg-[#A81245] disabled:opacity-50">
                 <Text className="text-sm font-semibold text-white">
@@ -313,7 +228,7 @@ export default function Settings() {
             </Text>
 
             <Pressable
-              onPress={() => setConfirmingDelete(true)}
+              onPress={askDeleteConfirmation}
               disabled={deleting}
               className="h-10 flex-row items-center justify-center gap-2 rounded-2xl border border-[#E9AFA6] bg-[#FBE6E1] active:opacity-80 disabled:opacity-50">
               <Text className="text-[13px] font-semibold text-[#C2391F]">Eliminar cuenta</Text>
@@ -331,7 +246,7 @@ export default function Settings() {
           danger
           loading={deleting}
           onConfirm={removeAccount}
-          onCancel={() => setConfirmingDelete(false)}
+          onCancel={cancelDeleteConfirmation}
         />
       </View>
     </ScrollView>

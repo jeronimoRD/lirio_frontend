@@ -1,10 +1,10 @@
 import { useState } from 'react';
 
-import { createReport } from '../api/reports';
+import { createReport } from '../../api/reports';
 import {
   type NewReport,
   type ReportReason,
-} from '../types';
+} from '../../types';
 
 type UseReportModalProps = {
   targetType: 'POST' | 'USER';

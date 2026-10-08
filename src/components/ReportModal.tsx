@@ -5,7 +5,7 @@ import {
   REPORT_REASON_LABELS,
 } from '../types';
 import Button from './Button';
-import { useReportModal } from '../hooks/useReportModal';
+import { useReportModal } from '../hooks/general/useReportModal';
 
 interface Props {
   visible: boolean;

@@ -1,7 +1,7 @@
 import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { ArrowLeft, Flag, Heart } from 'lucide-react-native';
 
-import ReportModal from '../ReportModal';
+import ReportModal from '.';
 import { initialsOf } from '../../utils/strings';
 import { usePostDetail } from './../../hooks/upload/usePostDetail';
 

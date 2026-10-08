@@ -2,9 +2,9 @@ import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { useSession } from '../session/context';
-import { getCategories } from '../api/categories';
-import type { Category } from '../types';
+import { useSession } from '../../session/context';
+import { getCategories } from '../../api/categories';
+import type { Category } from '../../types';
 
 export type RegisterForm = { name: string; email: string; password: string };
 
