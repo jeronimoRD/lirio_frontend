@@ -1,39 +1,10 @@
-import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native';
 
 import ScreenHeader from '../ScreenHeader';
-import { getPosts } from '../../api/posts';
-import { useFavorites } from '../../favorites/context';
-import type { Post } from '../../types';
+import { useSaved } from './../../hooks/tabs/useSaved';
 
 export default function Saved() {
-  const { favoriteIds } = useFavorites();
-  const [allPosts, setAllPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-
-    getPosts()
-      .then((all) => {
-        if (active) setAllPosts(all);
-      })
-      .catch((err) => {
-        if (active) {
-          setError(err instanceof Error ? err.message : 'No se pudo cargar tus guardados');
-        }
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const savedPosts = allPosts.filter((post) => favoriteIds.has(post.id));
+  const { savedPosts, loading, error } = useSaved();
 
   return (
     <View className="flex-1 bg-[#FCFAF8]">

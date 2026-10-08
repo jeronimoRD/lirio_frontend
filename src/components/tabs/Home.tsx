@@ -1,73 +1,26 @@
-import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { Heart } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
 
 import ScreenHeader from '../ScreenHeader';
-import { getFeedPosts } from '../../api/posts';
-import { getCategories } from '../../api/categories';
-import { useFavorites } from '../../favorites/context';
-import type { Post, Category } from '../../types';
+import type { Post } from '../../types';
+import { useHome, usePostCard } from '../../hooks/tabs/useHome';
 
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#292724', '#6E6B68', '#EAE6E1', '#A09B95'];
 
 export default function Home() {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeFilter, setActiveFilter] = useState('Ver todos');
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const load = async () => {
-      setLoading(true);
-      setError(null);
-
-      getCategories()
-        .then((allCategories) => {
-          if (cancelled) return;
-          setCategories(allCategories);
-        })
-        .catch(() => {});
-
-      try {
-        const allPosts = await getFeedPosts();
-        if (cancelled) return;
-        setPosts(allPosts);
-      } catch (err) {
-        if (cancelled) return;
-        setError(err instanceof Error ? err.message : 'No se pudo cargar el feed');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    load();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const filters = ['Ver todos', ...categories.map((category) => category.name)];
-
-  // "Ver todos" muestra el feed completo (ya viene priorizado por preferencias
-  // desde el backend). Elegir una categoría puntual filtra por su id.
-  const activeCategoryId =
-    activeFilter === 'Ver todos'
-      ? null
-      : (categories.find((c) => c.name === activeFilter)?.id ?? null);
-
-  const displayedPosts = activeCategoryId
-    ? posts.filter((post) => post.categoryId === activeCategoryId)
-    : posts;
-
-  const leftColumn = displayedPosts.filter((_, i) => i % 2 === 0);
-  const rightColumn = displayedPosts.filter((_, i) => i % 2 === 1);
-
-  const showSpinner = loading && posts.length === 0;
+  const {
+    loading,
+    error,
+    showSpinner,
+    filters,
+    activeFilter,
+    setActiveFilter,
+    activeCategoryId,
+    displayedPosts,
+    featuredPost,
+    leftColumn,
+    rightColumn,
+  } = useHome();
 
   return (
     <View className="flex-1 bg-[#FCFAF8]">
@@ -137,7 +90,7 @@ export default function Home() {
               ))}
             </View>
 
-            {displayedPosts[0] && <EditorialSpread post={displayedPosts[0]} />}
+            {featuredPost && <EditorialSpread post={featuredPost} />}
           </View>
         )}
       </ScrollView>
@@ -146,18 +99,10 @@ export default function Home() {
 }
 
 function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
-  const { isFavorite, toggleFavorite } = useFavorites();
-  const favorited = isFavorite(post.id);
-  const router = useRouter();
+  const { favorited, toggleFavorite, openPost } = usePostCard(post);
 
   return (
-    <Pressable
-      onPress={() =>
-        router.push({
-          pathname: '/(upload)/[id]',
-          params: { id: post.id },
-        })
-      }>
+    <Pressable onPress={openPost}>
       <Image
         source={{ uri: post.image }}
         className="w-full rounded-[14px]"
@@ -175,7 +120,7 @@ function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
         <Pressable
           onPress={(event) => {
             event.stopPropagation();
-            toggleFavorite(post.id);
+            toggleFavorite();
           }}
           hitSlop={8}>
           <Heart size={14} color="#FFFFFF" fill={favorited ? '#FFFFFF' : 'none'} />
