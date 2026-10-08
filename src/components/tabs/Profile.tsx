@@ -1,91 +1,43 @@
-import { Redirect, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { Redirect } from 'expo-router';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { Settings as SettingsIcon } from 'lucide-react-native';
 
 import ConfirmModal from '../ConfirmModal';
 import FeedCard from '../FeedCard';
-import { getPosts, deletePost } from '../../api/posts';
-import { useSession } from '../../session/context';
-import type { Post, Role } from '../../types';
+import type { Role } from '../../types';
 import { cardShadowLg } from '../../constants/theme';
 import { initialsOf } from '../../utils/strings';
+import { useProfile } from './../../hooks/tabs/useProfile';
 
 const ROLE_LABEL: Record<Role, string> = {
   USER: 'Usuario',
   ADMIN: 'Administrador',
 };
 
-type GalleryTab = 'outfits' | 'saved';
-
 export default function Profile({ active = true }: { active?: boolean }) {
-  const { user, signOut } = useSession();
-  const router = useRouter();
-
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<GalleryTab>('outfits');
-  const [deleteTarget, setDeleteTarget] = useState<Post | null>(null);
-  const [deleting, setDeleting] = useState(false);
-
-  useEffect(() => {
-    if (!active || !user) return;
-
-    let cancelled = false;
-
-    const load = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const all = await getPosts();
-        if (cancelled) return;
-        setPosts(all.filter((post) => post.userId === user.id));
-      } catch (err) {
-        if (cancelled) return;
-        setError(err instanceof Error ? err.message : 'No se pudieron cargar tus publicaciones');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    load();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [active, user]);
+  const {
+    user,
+    signOut,
+    posts,
+    leftColumn,
+    rightColumn,
+    error,
+    showSpinner,
+    activeTab,
+    setActiveTab,
+    goToSettings,
+    goToEditProfile,
+    editPost,
+    deleteTarget,
+    deleting,
+    askDelete,
+    cancelDelete,
+    onDeleteConfirmed,
+  } = useProfile(active);
 
   if (!user) {
     return active ? <Redirect href="/(login)/login" /> : null;
   }
-
-  const leftColumn = posts.filter((_, i) => i % 2 === 0);
-  const rightColumn = posts.filter((_, i) => i % 2 === 1);
-
-  const showSpinner = loading && posts.length === 0;
-
-  const onDeleteConfirmed = async () => {
-    if (!deleteTarget || deleting) return;
-
-    const id = deleteTarget.id;
-
-    setDeleting(true);
-
-    try {
-      await deletePost(id);
-      setDeleteTarget(null);
-      setPosts((currentPosts) => currentPosts.filter((post) => post.id !== id));
-    } catch (error) {
-      Alert.alert(
-        'Error',
-        error instanceof Error ? error.message : 'No se pudo eliminar la publicación.'
-      );
-    } finally {
-      setDeleting(false);
-    }
-  };
 
   return (
     <>
@@ -93,7 +45,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
         {/* header-banner */}
         <View className="h-[140px] w-full bg-[#A81245]">
           <Pressable
-            onPress={() => router.push('/settings')}
+            onPress={goToSettings}
             hitSlop={8}
             className="absolute right-5 top-6 h-10 w-10 items-center justify-center rounded-full bg-white/20">
             <SettingsIcon size={20} color="#FFFFFF" />
@@ -141,14 +93,14 @@ export default function Profile({ active = true }: { active?: boolean }) {
             {/* actions-card */}
             <View className="flex-row gap-2.5">
               <Pressable
-                onPress={() => router.push('/edit-profile' as any)}
+                onPress={goToEditProfile}
                 className="h-12 flex-1 items-center justify-center rounded-2xl bg-[#A81245]"
                 style={cardShadowLg}>
                 <Text className="text-[13px] font-semibold text-white">Editar perfil</Text>
               </Pressable>
 
               <Pressable
-                onPress={() => router.push('/settings')}
+                onPress={goToSettings}
                 className="h-12 flex-1 items-center justify-center rounded-2xl border border-[#EAE6E1] bg-white">
                 <Text className="text-[13px] font-semibold text-[#292724]">Configuración</Text>
               </Pressable>
@@ -214,15 +166,8 @@ export default function Profile({ active = true }: { active?: boolean }) {
                           key={post.id}
                           post={post}
                           showMenu
-                          onEdit={() => {
-                            router.push({
-                              pathname: '/(upload)/edit-upload',
-                              params: {
-                                id: post.id,
-                              },
-                            } as any);
-                          }}
-                          onDelete={() => setDeleteTarget(post)}
+                          onEdit={() => editPost(post)}
+                          onDelete={() => askDelete(post)}
                         />
                       ))}
                     </View>
@@ -256,7 +201,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
         danger
         loading={deleting}
         onConfirm={onDeleteConfirmed}
-        onCancel={() => setDeleteTarget(null)}
+        onCancel={cancelDelete}
       />
     </>
   );

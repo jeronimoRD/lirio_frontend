@@ -1,14 +1,9 @@
-import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, Flag, Heart } from 'lucide-react-native';
 
 import ReportModal from '../ReportModal';
-import { getPost } from '../../api/posts';
-import { getUserById } from '../../api/users';
-import { useSession } from '../../session/context';
-import type { Post, User } from '../../types';
 import { initialsOf } from '../../utils/strings';
+import { usePostDetail } from './../../hooks/upload/usePostDetail';
 
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#3D6B52'];
 
@@ -29,41 +24,18 @@ const floatingButtonShadow = {
 };
 
 export default function PostDetail() {
-  const router = useRouter();
-  const { id } = useLocalSearchParams<{ id: string }>();
-
-  const [post, setPost] = useState<Post | null>(null);
-  const [author, setAuthor] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [liked, setLiked] = useState(false);
-  const [reportVisible, setReportVisible] = useState(false);
-  const { user: me } = useSession();
-
-  useEffect(() => {
-    async function loadPost() {
-      if (!id) return;
-
-      try {
-        const data = await getPost(id);
-        setPost(data);
-
-        // El autor se busca aparte: si falla (usuario borrado, etc.) el
-        // post igual se muestra, solo sin el nombre de quien lo publicó.
-        try {
-          const user = await getUserById(data.userId);
-          setAuthor(user);
-        } catch (error) {
-          console.log('ERROR AL CARGAR AUTOR:', error);
-        }
-      } catch (error) {
-        console.log('ERROR AL CARGAR POST:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadPost();
-  }, [id]);
+  const {
+    post,
+    author,
+    loading,
+    goBack,
+    liked,
+    toggleLike,
+    canReport,
+    reportVisible,
+    openReport,
+    closeReport,
+  } = usePostDetail();
 
   if (loading) {
     return (
@@ -78,9 +50,7 @@ export default function PostDetail() {
       <View className="flex-1 items-center justify-center bg-[#FCFAF8] px-6">
         <Text className="text-center text-[#6E6B68]">No se pudo encontrar esta publicación.</Text>
 
-        <Pressable
-          onPress={() => router.back()}
-          className="mt-5 rounded-full bg-[#A81245] px-6 py-3">
+        <Pressable onPress={goBack} className="mt-5 rounded-full bg-[#A81245] px-6 py-3">
           <Text className="font-semibold text-white">Volver</Text>
         </Pressable>
       </View>
@@ -104,7 +74,7 @@ export default function PostDetail() {
             />
 
             <Pressable
-              onPress={() => router.back()}
+              onPress={goBack}
               hitSlop={8}
               className="absolute left-4 top-4 h-10 w-10 items-center justify-center rounded-full"
               style={[{ backgroundColor: 'rgba(255,255,255,0.85)' }, floatingButtonShadow]}>
@@ -112,7 +82,7 @@ export default function PostDetail() {
             </Pressable>
 
             <Pressable
-              onPress={() => setLiked(!liked)}
+              onPress={toggleLike}
               hitSlop={8}
               className="absolute right-4 top-4 h-10 w-10 items-center justify-center rounded-full"
               style={[{ backgroundColor: 'rgba(255,255,255,0.85)' }, floatingButtonShadow]}>
@@ -138,9 +108,9 @@ export default function PostDetail() {
             </Text>
           </View>
 
-          {post.userId !== me?.id && (
+          {canReport && (
             <Pressable
-              onPress={() => setReportVisible(true)}
+              onPress={openReport}
               hitSlop={8}
               className="flex-row items-center gap-1.5 self-start">
               <Flag size={14} color="#A09B95" />
@@ -179,7 +149,7 @@ export default function PostDetail() {
         visible={reportVisible}
         targetType="POST"
         targetId={post.id}
-        onClose={() => setReportVisible(false)}
+        onClose={closeReport}
       />
     </View>
   );

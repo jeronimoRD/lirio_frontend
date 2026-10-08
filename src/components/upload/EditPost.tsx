@@ -1,18 +1,10 @@
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Image, Pressable, ScrollView, Text, View } from 'react-native';
-import { useForm } from 'react-hook-form';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
 
 import Field from '../Field';
-import { getPost, updatePost } from '../../api/posts';
 import { cardShadow } from '../../constants/theme';
-
-type FormData = {
-  title: string;
-  description: string;
-};
+import { useEditPost } from '../../hooks/upload/useEditPost';
 
 const imageShadow = {
   shadowColor: '#292724',
@@ -23,66 +15,8 @@ const imageShadow = {
 };
 
 export default function EditPost() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { id } = useLocalSearchParams<{ id: string }>();
-
-  const { control, handleSubmit, reset } = useForm<FormData>({
-    defaultValues: { title: '', description: '' },
-  });
-
-  const [image, setImage] = useState<string | null>(null);
-
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    async function loadPost() {
-      if (!id) return;
-
-      try {
-        const post = await getPost(id);
-
-        reset({ title: post.title ?? '', description: post.description ?? '' });
-        setImage(post.image);
-      } catch (error) {
-        Alert.alert('Error', error instanceof Error ? error.message : 'No se pudo cargar el post.');
-
-        router.back();
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadPost();
-  }, [id, reset, router]);
-
-  const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/(tabs)/profile');
-    }
-  };
-
-  const requestUpdate = handleSubmit(async ({ title, description }) => {
-    if (!id) return;
-
-    try {
-      setSaving(true);
-
-      await updatePost(id, title.trim(), description.trim());
-
-      router.replace('/(tabs)/profile');
-    } catch (error) {
-      Alert.alert(
-        'Error',
-        error instanceof Error ? error.message : 'No se pudo actualizar el post.'
-      );
-    } finally {
-      setSaving(false);
-    }
-  });
+  const { control, image, loading, saving, goBack, requestUpdate } = useEditPost();
 
   if (loading) {
     return (
@@ -111,7 +45,7 @@ export default function EditPost() {
             )}
 
             <Pressable
-              onPress={handleBack}
+              onPress={goBack}
               hitSlop={8}
               className="absolute left-4 top-4 h-10 w-10 items-center justify-center rounded-full"
               style={{
