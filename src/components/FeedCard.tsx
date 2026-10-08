@@ -1,8 +1,9 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { MoreVertical } from 'lucide-react-native';
 import type { Post } from '@/types';
+
+import { useFeedCard } from '@/hooks/general/useFeedCard';
 
 type FeedCardProps = {
   post: Post;
@@ -19,7 +20,7 @@ export default function FeedCard({
   onEdit,
   onDelete,
 }: FeedCardProps) {
-  const [openMenu, setOpenMenu] = useState(false);
+  const { openMenu, toggleMenu, closeMenu } = useFeedCard();
 
   return (
     <Pressable
@@ -36,7 +37,7 @@ export default function FeedCard({
       {showMenu && (
         <>
           <Pressable
-            onPress={() => setOpenMenu((prev) => !prev)}
+            onPress={toggleMenu}
             hitSlop={8}
             className="absolute right-2 top-2 h-8 w-8 items-center justify-center rounded-full bg-black/35"
           >
@@ -48,7 +49,7 @@ export default function FeedCard({
               {onEdit && (
                 <Pressable
                   onPress={() => {
-                    setOpenMenu(false);
+                    closeMenu();
                     onEdit();
                   }}
                   className="px-4 py-3"
@@ -62,7 +63,7 @@ export default function FeedCard({
               {onDelete && (
                 <Pressable
                   onPress={() => {
-                    setOpenMenu(false);
+                    closeMenu();
                     onDelete();
                   }}
                   className="border-t border-[#EAE6E1] px-4 py-3"
