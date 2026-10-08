@@ -1,58 +1,25 @@
-import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
 
 import AdminBrandHeader from './AdminBrandHeader';
 import ConfirmModal from '../ConfirmModal';
-import { getAdminUsers } from '../../api/admin';
-import { deletePost, getPosts } from '../../api/posts';
-import type { Post, User } from '../../types';
 import { cardShadow } from '../../constants/theme';
+import { useAdminPosts } from '../../hooks/admin/useAdminPosts';
 
 export default function AdminPosts() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
-
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [usersById, setUsersById] = useState<Record<string, User>>({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [pendingDelete, setPendingDelete] = useState<Post | null>(null);
-
-  useEffect(() => {
-    Promise.all([getPosts(), getAdminUsers()])
-      .then(([loadedPosts, loadedUsers]) => {
-        setPosts(loadedPosts);
-        setUsersById(Object.fromEntries(loadedUsers.map((user) => [user.id, user])));
-        setError(null);
-      })
-      .catch((err) =>
-        setError(err instanceof Error ? err.message : 'No se pudieron cargar las publicaciones')
-      )
-      .finally(() => setLoading(false));
-  }, []);
-
-  const onDelete = async () => {
-    const target = pendingDelete;
-
-    if (!target || busyId !== null) return;
-
-    setPendingDelete(null);
-    setBusyId(target.id);
-    setError(null);
-
-    try {
-      await deletePost(target.id);
-      setPosts((current) => current.filter((post) => post.id !== target.id));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo eliminar la publicación');
-    } finally {
-      setBusyId(null);
-    }
-  };
+  const {
+    posts,
+    usersById,
+    loading,
+    error,
+    busyId,
+    pendingDelete,
+    requestDelete,
+    cancelDelete,
+    onDelete,
+    openPost,
+  } = useAdminPosts();
 
   return (
     <View className="flex-1 bg-[#FAF8F6]">
@@ -91,11 +58,7 @@ export default function AdminPosts() {
 
               return (
                 <View key={post.id} className="mb-3 rounded-2xl bg-white p-4" style={cardShadow}>
-                  <Pressable
-                    onPress={() =>
-                      router.push({ pathname: '/(upload)/[id]', params: { id: post.id } })
-                    }
-                    className="flex-row items-center gap-3">
+                  <Pressable onPress={() => openPost(post)} className="flex-row items-center gap-3">
                     <Image
                       source={{ uri: post.image }}
                       className="h-14 w-14 rounded-xl"
@@ -113,7 +76,7 @@ export default function AdminPosts() {
                   </Pressable>
 
                   <Pressable
-                    onPress={() => setPendingDelete(post)}
+                    onPress={() => requestDelete(post)}
                     disabled={busy}
                     className="mt-3 h-10 flex-row items-center justify-center gap-2 rounded-2xl border border-[#E9AFA6] bg-[#FBE6E1] active:opacity-80 disabled:opacity-50">
                     <Text className="text-[13px] font-semibold text-[#C2391F]">
@@ -136,7 +99,7 @@ export default function AdminPosts() {
         danger
         loading={busyId !== null}
         onConfirm={onDelete}
-        onCancel={() => setPendingDelete(null)}
+        onCancel={cancelDelete}
       />
     </View>
   );
