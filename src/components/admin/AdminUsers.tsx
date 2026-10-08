@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
-import { useForm } from 'react-hook-form';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Search, X } from 'lucide-react-native';
 
@@ -8,18 +6,11 @@ import AdminBrandHeader from './AdminBrandHeader';
 import Button from '../Button';
 import ConfirmModal from '../ConfirmModal';
 import Field from '../Field';
-import { createUser, deleteUser, getAdminUsers, updateUserRole } from '../../api/admin';
-import { useSession } from '../../session/context';
-import type { Role, User } from '../../types';
+import type { Role } from '../../types';
 import { ROLES } from '../../types';
 import { cardShadow } from '../../constants/theme';
 import { initialsOf } from '../../utils/strings';
-
-type CreateForm = {
-  name: string;
-  email: string;
-  password: string;
-};
+import { useAdminUsers } from '../../hooks/admin/useAdminUsers';
 
 const ROLE_STYLE: Record<Role, { label: string; className: string }> = {
   USER: { label: 'Usuario', className: 'bg-[#F4EEE7] text-[#6E6B68]' },
@@ -27,123 +18,32 @@ const ROLE_STYLE: Record<Role, { label: string; className: string }> = {
 };
 
 export default function AdminUsers() {
-  const { user: me } = useSession();
   const insets = useSafeAreaInsets();
-
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const [showCreate, setShowCreate] = useState(false);
-  const [newRole, setNewRole] = useState<Role>('USER');
-  const [submitting, setSubmitting] = useState(false);
-
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [pendingDelete, setPendingDelete] = useState<User | null>(null);
-  const [pendingCreate, setPendingCreate] = useState<CreateForm | null>(null);
-  const [query, setQuery] = useState('');
-
-  const filteredUsers = users.filter((user) => {
-    const q = query.trim().toLowerCase();
-    if (!q) return true;
-    return user.name.toLowerCase().includes(q) || user.email.toLowerCase().includes(q);
-  });
-
-  const { control, handleSubmit, reset } = useForm<CreateForm>({
-    defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-    },
-  });
-
-  const loadUsers = async () => {
-    try {
-      const data = await getAdminUsers();
-      setUsers(data);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudieron cargar los usuarios');
-    }
-  };
-
-  useEffect(() => {
-    getAdminUsers()
-      .then((data) => {
-        setUsers(data);
-        setError(null);
-      })
-      .catch((err) =>
-        setError(err instanceof Error ? err.message : 'No se pudieron cargar los usuarios')
-      )
-      .finally(() => setLoading(false));
-  }, []);
-
-  const requestCreate = () => {
-    handleSubmit((data) => setPendingCreate(data))();
-  };
-
-  const onCreate = async () => {
-    if (!pendingCreate) return;
-
-    const data = pendingCreate;
-    setPendingCreate(null);
-    setSubmitting(true);
-    setError(null);
-
-    try {
-      await createUser(data.name, data.email, data.password, newRole);
-      setShowCreate(false);
-      reset();
-      setNewRole('USER');
-      await loadUsers();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo crear el usuario');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const onToggleRole = async (user: User) => {
-    if (busyId || user.id === me?.id) return;
-
-    const nextRole: Role = user.role === 'ADMIN' ? 'USER' : 'ADMIN';
-    setBusyId(user.id);
-    setError(null);
-
-    try {
-      await updateUserRole(user.id, nextRole);
-      setUsers((current) => current.map((u) => (u.id === user.id ? { ...u, role: nextRole } : u)));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo cambiar el rol del usuario');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const onRequestDelete = (user: User) => {
-    if (busyId || user.id === me?.id) return;
-
-    setPendingDelete(user);
-  };
-
-  const onDelete = async () => {
-    if (!pendingDelete || busyId) return;
-
-    const target = pendingDelete;
-    setPendingDelete(null);
-    setBusyId(target.id);
-    setError(null);
-
-    try {
-      await deleteUser(target.id);
-      setUsers((current) => current.filter((u) => u.id !== target.id));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo eliminar el usuario');
-    } finally {
-      setBusyId(null);
-    }
-  };
+  const {
+    meId,
+    users,
+    filteredUsers,
+    loading,
+    error,
+    showCreate,
+    newRole,
+    setNewRole,
+    submitting,
+    busyId,
+    pendingDelete,
+    pendingCreate,
+    query,
+    setQuery,
+    control,
+    toggleCreate,
+    requestCreate,
+    onCreate,
+    onToggleRole,
+    requestDelete,
+    onDelete,
+    cancelCreate,
+    cancelDelete,
+  } = useAdminUsers();
 
   return (
     <View className="flex-1 bg-[#FCFAF8]">
@@ -170,7 +70,7 @@ export default function AdminUsers() {
             secondary
             textClassName="text-sm font-semibold text-[#292724]"
             className="rounded-2xl border border-[#EAE6E1] bg-white"
-            onPress={() => setShowCreate((current) => !current)}
+            onPress={toggleCreate}
           />
 
           {!showCreate && (
@@ -303,7 +203,7 @@ export default function AdminUsers() {
           {!loading &&
             filteredUsers.map((user) => {
               const role = ROLE_STYLE[user.role];
-              const isMe = user.id === me?.id;
+              const isMe = user.id === meId;
 
               return (
                 <View key={user.id} className="mt-4 rounded-2xl bg-white p-5" style={cardShadow}>
@@ -347,7 +247,7 @@ export default function AdminUsers() {
 
                     <View className="flex-1">
                       <Pressable
-                        onPress={() => onRequestDelete(user)}
+                        onPress={() => requestDelete(user)}
                         disabled={busyId !== null || isMe}
                         className="h-12 flex-row items-center justify-center gap-2 rounded-2xl border border-[#E9AFA6] bg-[#FBE6E1] active:opacity-80 disabled:opacity-50">
                         <Text className="text-[13px] font-semibold text-[#C2391F]">
@@ -371,7 +271,7 @@ export default function AdminUsers() {
         confirmLabel="Crear"
         loading={submitting}
         onConfirm={onCreate}
-        onCancel={() => setPendingCreate(null)}
+        onCancel={cancelCreate}
       />
 
       <ConfirmModal
@@ -382,7 +282,7 @@ export default function AdminUsers() {
         danger
         loading={busyId !== null}
         onConfirm={onDelete}
-        onCancel={() => setPendingDelete(null)}
+        onCancel={cancelDelete}
       />
     </View>
   );
