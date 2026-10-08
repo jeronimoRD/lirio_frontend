@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "frontend",
-    "slug": "frontend",
+    "slug": "lirio-hibisco",
     "scheme": "your-app-scheme",
     "version": "1.0.0",
     "web": {
@@ -25,7 +25,9 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
@@ -35,6 +37,13 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.anonymous.frontend"
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "dc1dc5a7-0a14-4ee0-97a6-b7a19d28b0c6"
+      }
+    },
+    "owner": "korezz"
   }
 }

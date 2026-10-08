@@ -14,9 +14,9 @@ import {
 import { useForm } from 'react-hook-form';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import Field from '../../src/components/Field';
-import Button from '../../src/components/Button';
-import { useSession } from '../../src/session/context';
+import Field from '../Field';
+import Button from '../Button';
+import { useSession } from '../../session/context';
 
 type FormData = {
   email: string;
