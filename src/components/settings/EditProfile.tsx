@@ -1,6 +1,4 @@
-import { Redirect, useRouter } from 'expo-router';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Redirect } from 'expo-router';
 import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { UserRound } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,61 +6,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ScreenHeader from '../ScreenHeader';
 import Field from '../Field';
 import { SectionCard, SectionHeaderRow, SectionLabel } from '../SettingsSections';
-import { updateProfile } from '../../api/users';
-import { useSession } from '../../session/context';
-
-type ProfileForm = {
-  name: string;
-};
-
-function messageOf(err: unknown): string {
-  return err instanceof Error ? err.message : 'Ocurrió un error inesperado';
-}
+import { useEditProfile } from '../../hooks/settings/useEditProfile';
 
 export default function EditProfile() {
-  const { user, refreshUser } = useSession();
-  const router = useRouter();
   const insets = useSafeAreaInsets();
-
-  const profileForm = useForm<ProfileForm>({
-    defaultValues: {
-      name: user?.name ?? '',
-    },
-  });
-
-  const [bio, setBio] = useState(user?.bio ?? '');
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{
-    kind: 'ok' | 'error';
-    text: string;
-  } | null>(null);
+  const { user, control, bio, setBio, saving, message, submit, goBack } = useEditProfile();
 
   if (!user) {
     return <Redirect href="/(login)/login" />;
   }
-
-  const saveProfile = async (data: ProfileForm) => {
-    setMessage(null);
-    setSaving(true);
-
-    try {
-      await updateProfile(data.name.trim(), user.email.trim().toLowerCase(), bio.trim());
-      await refreshUser();
-      setMessage({ kind: 'ok', text: 'Datos actualizados correctamente' });
-    } catch (err) {
-      setMessage({ kind: 'error', text: messageOf(err) });
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/home');
-    }
-  };
 
   return (
     <ScrollView
@@ -70,8 +22,7 @@ export default function EditProfile() {
       contentContainerClassName="items-center px-5"
       contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: insets.bottom + 40 }}>
       <View className="w-full max-w-[390px] gap-6">
-        {/* Edit-profile header */}
-        <ScreenHeader title="Editar perfil" onBack={handleBack} />
+        <ScreenHeader title="Editar perfil" onBack={goBack} />
 
         {/* Perfil */}
         <View className="gap-2.5">
@@ -84,7 +35,7 @@ export default function EditProfile() {
 
             <View className="gap-4">
               <Field
-                control={profileForm.control}
+                control={control}
                 name="name"
                 label="Nombre"
                 labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
@@ -116,7 +67,7 @@ export default function EditProfile() {
               </View>
 
               <Pressable
-                onPress={profileForm.handleSubmit(saveProfile)}
+                onPress={submit}
                 disabled={saving}
                 className="h-11 items-center justify-center rounded-xl bg-[#A81245] disabled:opacity-50">
                 <Text className="text-sm font-semibold text-white">

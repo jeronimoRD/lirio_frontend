@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Field from '../Field';
 import Button from '../Button';
-import { useLogin } from '../../hooks/useLogin';
+import { useLogin } from '../../hooks/auth/useLogin';
 
 // TODO: reemplaza esta imagen por la tuya
 const HERO_IMAGE = require('../../../assets/pexels-karen-f-1376469-8883181.jpg');
