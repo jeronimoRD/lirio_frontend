@@ -13,34 +13,21 @@ type FeedCardProps = {
   onDelete?: () => void;
 };
 
-export default function FeedCard({
-  post,
-  swatchColor,
-  showMenu,
-  onEdit,
-  onDelete,
-}: FeedCardProps) {
+export default function FeedCard({ post, swatchColor, showMenu, onEdit, onDelete }: FeedCardProps) {
   const { openMenu, toggleMenu, closeMenu } = useFeedCard();
 
   return (
     <Pressable
       onPress={() => router.push(`/${post.id}`)}
-      className="overflow-hidden rounded-[14px]"
-    >
-      <Image
-        source={{ uri: post.image }}
-        className="w-full"
-        style={{ height: 200 }}
-        resizeMode="cover"
-      />
+      className="overflow-hidden rounded-[14px]">
+      <Image source={{ uri: post.image }} className="h-[200px] w-full" resizeMode="cover" />
 
       {showMenu && (
         <>
           <Pressable
             onPress={toggleMenu}
             hitSlop={8}
-            className="absolute right-2 top-2 h-8 w-8 items-center justify-center rounded-full bg-black/35"
-          >
+            className="absolute right-2 top-2 h-8 w-8 items-center justify-center rounded-full bg-black/35">
             <MoreVertical size={18} color="#FFFFFF" />
           </Pressable>
 
@@ -52,11 +39,8 @@ export default function FeedCard({
                     closeMenu();
                     onEdit();
                   }}
-                  className="px-4 py-3"
-                >
-                  <Text className="text-sm text-[#292724]">
-                    Editar
-                  </Text>
+                  className="px-4 py-3">
+                  <Text className="text-sm text-[#292724]">Editar</Text>
                 </Pressable>
               )}
 
@@ -66,11 +50,8 @@ export default function FeedCard({
                     closeMenu();
                     onDelete();
                   }}
-                  className="border-t border-[#EAE6E1] px-4 py-3"
-                >
-                  <Text className="text-sm text-red-600">
-                    Eliminar
-                  </Text>
+                  className="border-t border-[#EAE6E1] px-4 py-3">
+                  <Text className="text-sm text-red-600">Eliminar</Text>
                 </Pressable>
               )}
             </View>
@@ -79,10 +60,7 @@ export default function FeedCard({
       )}
 
       <View className="absolute bottom-0 left-0 right-0 bg-black/30 px-2 py-1.5">
-        <Text
-          numberOfLines={1}
-          className="text-[11px] font-semibold text-white"
-        >
+        <Text numberOfLines={1} className="text-[11px] font-semibold text-white">
           {post.title}
         </Text>
       </View>

@@ -6,12 +6,8 @@ export default function AdminBrandHeader() {
 
   return (
     <View
-      className="items-center justify-center px-4"
-      style={{
-        paddingTop: insets.top + 16,
-        paddingBottom: 16,
-        backgroundColor: '#241E1B',
-      }}>
+      className="items-center justify-center bg-[#241E1B] px-4 pb-4"
+      style={{ paddingTop: insets.top + 16 }}>
       <Text className="font-['Lora-Italic'] text-[28px] leading-9 text-white">Hibirio</Text>
       <Text className="text-[11px] font-light leading-[13px] text-white/70">
         Panel de administración

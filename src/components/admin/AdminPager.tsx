@@ -8,8 +8,6 @@ import AdminMore from './AdminMore';
 import AdminTabBar from './AdminTabBar';
 import TabPager, { type TabPagerHandle } from '../TabPager';
 
-const PAGE_STYLE = { flex: 1, backgroundColor: '#FAF8F6' } as const;
-
 export default function AdminPager() {
   const [index, setIndex] = useState(0);
   const pagerRef = useRef<TabPagerHandle>(null);
@@ -24,18 +22,18 @@ export default function AdminPager() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FAF8F6' }}>
+    <View className="flex-1 bg-[#FAF8F6]">
       <TabPager ref={pagerRef} index={index} onPageSelected={handlePageSelected}>
-        <View key="resumen" style={PAGE_STYLE}>
+        <View key="resumen" className="flex-1 bg-[#FAF8F6]">
           <AdminResumen />
         </View>
-        <View key="users" style={PAGE_STYLE}>
+        <View key="users" className="flex-1 bg-[#FAF8F6]">
           <AdminUsers />
         </View>
-        <View key="posts" style={PAGE_STYLE}>
+        <View key="posts" className="flex-1 bg-[#FAF8F6]">
           <AdminPosts />
         </View>
-        <View key="more" style={PAGE_STYLE}>
+        <View key="more" className="flex-1 bg-[#FAF8F6]">
           <AdminMore />
         </View>
       </TabPager>

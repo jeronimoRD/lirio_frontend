@@ -106,14 +106,11 @@ function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
     <Pressable onPress={openPost}>
       <Image
         source={{ uri: post.image }}
-        className="w-full rounded-[14px]"
-        style={{ height: 220 }}
+        className="h-[220px] w-full rounded-[14px]"
         resizeMode="cover"
       />
 
-      <View
-        className="absolute bottom-2 left-2 right-2 flex-row items-center justify-between rounded-full px-2 py-1.5"
-        style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}>
+      <View className="absolute bottom-2 left-2 right-2 flex-row items-center justify-between rounded-full bg-white/15 px-2 py-1.5">
         <Text numberOfLines={1} className="flex-1 text-[11px] font-semibold text-white">
           {post.title}
         </Text>
@@ -129,11 +126,8 @@ function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
       </View>
 
       <View
-        className="absolute -left-1 rounded-full border-2 border-white"
+        className="absolute -bottom-1.5 -left-1 h-[22px] w-[22px] rounded-full border-2 border-white"
         style={{
-          bottom: -6,
-          width: 22,
-          height: 22,
           backgroundColor: swatchColor,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 2 },
@@ -148,15 +142,8 @@ function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
 function EditorialSpread({ post }: { post: Post }) {
   return (
     <View className="overflow-hidden rounded-2xl">
-      <Image
-        source={{ uri: post.image }}
-        className="w-full"
-        style={{ height: 260 }}
-        resizeMode="cover"
-      />
-      <View
-        className="absolute inset-0 justify-end p-5"
-        style={{ backgroundColor: 'rgba(0,0,0,0.35)' }}>
+      <Image source={{ uri: post.image }} className="h-[260px] w-full" resizeMode="cover" />
+      <View className="absolute inset-0 justify-end bg-black/35 p-5">
         <Text className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#DCC7A8]">
           {"Editor's choice"}
         </Text>

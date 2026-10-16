@@ -36,20 +36,14 @@ export default function EditPost() {
         <View className="px-5 pt-14">
           <View className="overflow-hidden rounded-[24px]" style={imageShadow}>
             {image && (
-              <Image
-                source={{ uri: image }}
-                className="w-full"
-                style={{ aspectRatio: 4 / 5 }}
-                resizeMode="cover"
-              />
+              <Image source={{ uri: image }} className="aspect-[4/5] w-full" resizeMode="cover" />
             )}
 
             <Pressable
               onPress={goBack}
               hitSlop={8}
-              className="absolute left-4 top-4 h-10 w-10 items-center justify-center rounded-full"
+              className="absolute left-4 top-4 h-10 w-10 items-center justify-center rounded-full bg-white/85"
               style={{
-                backgroundColor: 'rgba(255,255,255,0.85)',
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 2 },
                 shadowRadius: 6,
@@ -60,9 +54,7 @@ export default function EditPost() {
             </Pressable>
 
             {/* Aviso de solo-lectura: esta pantalla no permite cambiar la foto, solo texto */}
-            <View
-              className="absolute bottom-4 left-4 rounded-full px-3 py-1.5"
-              style={{ backgroundColor: 'rgba(41,39,36,0.55)' }}>
+            <View className="absolute bottom-4 left-4 rounded-full bg-[#292724]/55 px-3 py-1.5">
               <Text className="text-[11px] font-semibold text-white">Foto no editable aquí</Text>
             </View>
           </View>

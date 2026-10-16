@@ -38,8 +38,7 @@ export default function Saved() {
               <Image
                 key={post.id}
                 source={{ uri: post.image }}
-                className="rounded-[14px]"
-                style={{ width: '48%', height: 220 }}
+                className="h-[220px] w-[48%] rounded-[14px]"
                 resizeMode="cover"
               />
             ))}

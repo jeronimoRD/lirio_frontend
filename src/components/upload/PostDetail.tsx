@@ -68,24 +68,23 @@ export default function PostDetail() {
           <View className="overflow-hidden rounded-[24px]" style={imageShadow}>
             <Image
               source={{ uri: post.image }}
-              className="w-full"
-              style={{ aspectRatio: 4 / 5 }}
+              className="aspect-[4/5] w-full"
               resizeMode="cover"
             />
 
             <Pressable
               onPress={goBack}
               hitSlop={8}
-              className="absolute left-4 top-4 h-10 w-10 items-center justify-center rounded-full"
-              style={[{ backgroundColor: 'rgba(255,255,255,0.85)' }, floatingButtonShadow]}>
+              className="absolute left-4 top-4 h-10 w-10 items-center justify-center rounded-full bg-white/85"
+              style={floatingButtonShadow}>
               <ArrowLeft size={20} color="#292724" />
             </Pressable>
 
             <Pressable
               onPress={toggleLike}
               hitSlop={8}
-              className="absolute right-4 top-4 h-10 w-10 items-center justify-center rounded-full"
-              style={[{ backgroundColor: 'rgba(255,255,255,0.85)' }, floatingButtonShadow]}>
+              className="absolute right-4 top-4 h-10 w-10 items-center justify-center rounded-full bg-white/85"
+              style={floatingButtonShadow}>
               <Heart size={18} color="#A81245" fill={liked ? '#A81245' : 'none'} />
             </Pressable>
           </View>

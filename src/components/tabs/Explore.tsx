@@ -280,13 +280,8 @@ function AvatarRing({ initials, size = 64 }: { initials: string; size?: number }
   const ringSize = size + 8;
   return (
     <View
-      className="items-center justify-center rounded-full"
-      style={{
-        width: ringSize,
-        height: ringSize,
-        borderWidth: 2,
-        borderColor: '#DCC7A8',
-      }}>
+      className="items-center justify-center rounded-full border-2 border-[#DCC7A8]"
+      style={{ width: ringSize, height: ringSize }}>
       <View
         className="items-center justify-center rounded-full bg-[#A81245]"
         style={{ width: size, height: size }}>

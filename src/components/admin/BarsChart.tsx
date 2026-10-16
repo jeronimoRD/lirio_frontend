@@ -27,8 +27,6 @@ export default function BarsChart({
               style={{
                 height,
                 backgroundColor: highlighted ? '#A91243' : '#F8E7ED',
-                borderTopLeftRadius: 4,
-                borderTopRightRadius: 4,
               }}
             />
             <Text className="text-[11px] font-semibold text-[#7A6E65]">

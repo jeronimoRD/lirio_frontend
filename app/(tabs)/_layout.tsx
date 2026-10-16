@@ -12,21 +12,13 @@ import TabPager, { type TabPagerHandle } from '@/components/TabPager';
 
 const TAB_ROUTES = ['/home', '/explore', '/saved', '/profile'] as const;
 
-const PAGE_STYLE = { flex: 1, backgroundColor: '#FCFAF8' } as const;
-
 function UploadButton() {
   const router = useRouter();
   return (
     <Pressable
       onPress={() => router.push('/upload')}
+      className="relative -top-[18px] h-14 w-14 items-center justify-center rounded-full bg-[#A81245]"
       style={{
-        top: -18,
-        height: 56,
-        width: 56,
-        borderRadius: 28,
-        backgroundColor: '#A81245',
-        alignItems: 'center',
-        justifyContent: 'center',
         shadowColor: '#A81245',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
@@ -89,28 +81,28 @@ export default function TabsLayout() {
   };
 
   const home = (
-    <View key="home" style={PAGE_STYLE}>
+    <View key="home" className="flex-1 bg-[#FCFAF8]">
       <HomeScreen />
     </View>
   );
   const explore = (
-    <View key="explore" style={PAGE_STYLE}>
+    <View key="explore" className="flex-1 bg-[#FCFAF8]">
       <ExploreScreen />
     </View>
   );
   const saved = (
-    <View key="saved" style={PAGE_STYLE}>
+    <View key="saved" className="flex-1 bg-[#FCFAF8]">
       <SavedScreen />
     </View>
   );
   const profile = (
-    <View key="profile" style={PAGE_STYLE}>
+    <View key="profile" className="flex-1 bg-[#FCFAF8]">
       <ProfileScreen active={index === 3} />
     </View>
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FCFAF8' }}>
+    <View className="flex-1 bg-[#FCFAF8]">
       <TabPager ref={pagerRef} index={index} onPageSelected={onPageSelected}>
         {home}
         {explore}
@@ -119,19 +111,11 @@ export default function TabsLayout() {
       </TabPager>
 
       <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          backgroundColor: '#FCFAF8',
-          borderTopColor: '#EAE6E1',
-          borderTopWidth: 1,
-          height: 64 + insets.bottom,
-          paddingTop: 8,
-          paddingBottom: insets.bottom,
-        }}>
+        className="flex-row items-center border-t border-[#EAE6E1] bg-[#FCFAF8] pt-2"
+        style={{ height: 64 + insets.bottom, paddingBottom: insets.bottom }}>
         <TabButton label="Home" icon={House} active={index === 0} onPress={() => goTo(0)} />
         <TabButton label="Explore" icon={Search} active={index === 1} onPress={() => goTo(1)} />
-        <View style={{ flex: 1, alignItems: 'center' }}>
+        <View className="flex-1 items-center">
           <UploadButton />
         </View>
         <TabButton label="Saved" icon={Heart} active={index === 2} onPress={() => goTo(2)} />
@@ -159,14 +143,11 @@ function TabButton({
       accessibilityRole="tab"
       accessibilityLabel={label}
       accessibilityState={{ selected: active }}
-      style={{
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 3,
-      }}>
+      className="flex-1 items-center justify-center gap-[3px]">
       <Icon size={22} color={color} />
-      <Text style={{ fontSize: 11, fontWeight: '600', color }}>{label}</Text>
+      <Text className="text-[11px] font-semibold" style={{ color }}>
+        {label}
+      </Text>
     </Pressable>
   );
 }
