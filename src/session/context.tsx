@@ -1,11 +1,3 @@
-/**
- * Contexto de sesión: quién está dentro de la app en este momento.
- *
- * Un "contexto" de React es un valor que se comparte con todas las pantallas
- * sin tener que pasarlo de una a otra por props. Aquí guardamos el usuario y
- * exponemos las tres acciones que lo cambian: entrar, registrarse y salir.
- */
-
 import { createContext, use, useState, type PropsWithChildren } from 'react';
 import * as api from '../api/auth';
 import { getMe } from '../api/users';
