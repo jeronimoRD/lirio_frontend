@@ -5,6 +5,7 @@ import ScreenHeader from '../ScreenHeader';
 import type { Post } from '../../types';
 import { useHome } from '../../hooks/tabs/useHome';
 import { usePostCard } from '../../hooks/tabs/usePostCard';
+import GlassSurface from '@/components/LiquidGlass/GlassSurface';
 
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#292724', '#6E6B68', '#EAE6E1', '#A09B95'];
 
