@@ -2,6 +2,7 @@ import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'rea
 import { ArrowLeft, Flag, Heart } from 'lucide-react-native';
 
 import ReportModal from '../ReportModal';
+import GlassIconButton from '@/components/LiquidGlass/GlassIconButton';
 import { initialsOf } from '../../utils/strings';
 import { usePostDetail } from './../../hooks/upload/usePostDetail';
 
@@ -13,14 +14,6 @@ const imageShadow = {
   shadowRadius: 24,
   shadowOpacity: 0.18,
   elevation: 8,
-};
-
-const floatingButtonShadow = {
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 2 },
-  shadowRadius: 6,
-  shadowOpacity: 0.15,
-  elevation: 3,
 };
 
 export default function PostDetail() {
@@ -72,21 +65,17 @@ export default function PostDetail() {
               resizeMode="cover"
             />
 
-            <Pressable
+            <GlassIconButton
               onPress={goBack}
-              hitSlop={8}
-              className="absolute left-4 top-4 h-10 w-10 items-center justify-center rounded-full bg-white/85"
-              style={floatingButtonShadow}>
+              style={{ position: 'absolute', left: 16, top: 16 }}>
               <ArrowLeft size={20} color="#292724" />
-            </Pressable>
+            </GlassIconButton>
 
-            <Pressable
+            <GlassIconButton
               onPress={toggleLike}
-              hitSlop={8}
-              className="absolute right-4 top-4 h-10 w-10 items-center justify-center rounded-full bg-white/85"
-              style={floatingButtonShadow}>
+              style={{ position: 'absolute', right: 16, top: 16 }}>
               <Heart size={18} color="#A81245" fill={liked ? '#A81245' : 'none'} />
-            </Pressable>
+            </GlassIconButton>
           </View>
         </View>
 

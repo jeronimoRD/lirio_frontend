@@ -30,7 +30,7 @@ export default function Home() {
 
       <ScrollView
         className="flex-1"
-        contentContainerClassName="pb-24"
+        contentContainerClassName="pb-32"
         showsVerticalScrollIndicator={false}>
         <ScrollView
           horizontal
@@ -111,7 +111,21 @@ function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
         resizeMode="cover"
       />
 
-      <View className="absolute bottom-2 left-2 right-2 flex-row items-center justify-between rounded-full bg-white/15 px-2 py-1.5">
+      <GlassSurface
+        intensity={30}
+        tintColor="rgba(41, 39, 36, 0.28)"
+        style={{
+          position: 'absolute',
+          bottom: 8,
+          left: 8,
+          right: 8,
+          borderRadius: 999,
+          paddingHorizontal: 10,
+          paddingVertical: 6,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
         <Text numberOfLines={1} className="flex-1 text-[11px] font-semibold text-white">
           {post.title}
         </Text>
@@ -124,7 +138,7 @@ function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
           hitSlop={8}>
           <Heart size={14} color="#FFFFFF" fill={favorited ? '#FFFFFF' : 'none'} />
         </Pressable>
-      </View>
+      </GlassSurface>
 
       <View
         className="absolute -bottom-1.5 -left-1 h-[22px] w-[22px] rounded-full border-2 border-white"

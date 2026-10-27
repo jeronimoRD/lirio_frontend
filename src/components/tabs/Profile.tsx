@@ -1,9 +1,9 @@
 import { Redirect } from 'expo-router';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
-import { Settings as SettingsIcon } from 'lucide-react-native';
 
 import ConfirmModal from '../ConfirmModal';
 import FeedCard from '../FeedCard';
+import ProfileCover from '@/components/LiquidGlass/ProfileCover';
 import type { Role } from '../../types';
 import { cardShadowLg } from '../../constants/theme';
 import { initialsOf } from '../../utils/strings';
@@ -41,19 +41,12 @@ export default function Profile({ active = true }: { active?: boolean }) {
 
   return (
     <>
-      <ScrollView className="flex-1 bg-[#FCFAF8]" contentContainerClassName="pb-10">
-        {/* header-banner */}
-        <View className="h-[140px] w-full bg-[#A81245]">
-          <Pressable
-            onPress={goToSettings}
-            hitSlop={8}
-            className="absolute right-5 top-6 h-10 w-10 items-center justify-center rounded-full bg-white/20">
-            <SettingsIcon size={20} color="#FFFFFF" />
-          </Pressable>
-        </View>
+      <ScrollView className="flex-1 bg-[#FCFAF8]" contentContainerClassName="pb-32">
+        {/* portada: tu última foto desenfocada + engrane de vidrio */}
+        <ProfileCover imageUri={posts[0]?.image} onSettings={goToSettings} />
 
         <View className="items-center px-5">
-          {/* avatar flotando sobre el banner */}
+          {/* avatar flotando sobre la portada */}
           <View
             className="-mt-12 h-24 w-24 items-center justify-center rounded-full border-[4px] border-[#FCFAF8] bg-[#DCC7A8]"
             style={cardShadowLg}>
@@ -144,7 +137,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
 
             {showSpinner && (
               <View className="items-center py-10">
-                <ActivityIndicator />
+                <ActivityIndicator color="#A81245" />
               </View>
             )}
 

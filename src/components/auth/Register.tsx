@@ -1,190 +1,190 @@
-import { ImageBackground, Pressable, ScrollView, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import Field from '../Field';
-import Button from '../Button';
-import ScreenHeader from '../ScreenHeader';
-import { useRegister } from '../../hooks/auth/useRegister';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
-// TODO: reemplaza esta URI por tu propia imagen de register
-const HERO_IMAGE_URI = require('../../../assets/pexels-karen-f-1376469-8883181.jpg');
+import Field from '@/components/Field';
+import HeroScreen from '@/components/LiquidGlass/HeroScreen';
+import { useRegister } from '@/hooks/auth/useRegister';
+
+const HERO_IMAGE = require('../../../assets/pexels-karen-f-1376469-8883181.jpg');
+const LABEL = 'text-xs font-semibold uppercase text-[#6E6B68]';
+
+const INPUT_WRAPPER =
+  'h-12 flex-row items-center rounded-lg border border-[#EAE6E1] bg-white px-4';
+
+const INPUT = 'flex-1 text-sm text-[#292724]';
 
 export default function Register() {
-  const insets = useSafeAreaInsets();
   const {
     control,
     success,
     showPassword,
-    togglePassword,
+    toggleShowPassword,
     selectedStyles,
     styleOptions,
     toggleStyle,
-    goBack,
+    loadingCategories,
     isSubmitting,
     rootError,
     submit,
+    goBack,
   } = useRegister();
 
   return (
-    <View className="flex-1 bg-[#FCFAF8]">
-      <ScrollView
-        className="flex-1"
-        contentContainerClassName="flex-grow"
-        contentContainerStyle={{ paddingBottom: insets.bottom }}
-        keyboardShouldPersistTaps="handled">
-        {/* hero-accent-block */}
-        <ImageBackground
-          source={HERO_IMAGE_URI}
-          resizeMode="cover"
-          className="h-[180px] w-full justify-end overflow-hidden">
-          <View className="absolute inset-0 bg-black/25" />
+    <HeroScreen
+      image={HERO_IMAGE}
+      title="Crear cuenta"
+      subtitle="Súmate a nuestra comunidad"
+      onBack={goBack}
+    >
+      <View className="gap-6 px-6">
+        {/* Campos del formulario */}
+        <View className="gap-4">
+          <Field
+            control={control}
+            name="user_name"
+            label="Nombre completo"
+            placeholder="Tu nombre"
+            labelClassName={LABEL}
+            inputWrapperClassName={INPUT_WRAPPER}
+            inputClassName={INPUT}
+          />
 
-          {/* botón atrás flotando sobre la imagen */}
-          <Pressable
-            onPress={goBack}
-            hitSlop={8}
-            className="absolute left-5 top-5 h-8 w-8 items-center justify-center rounded-full bg-black/30">
-            <Text className="text-lg text-white">←</Text>
-          </Pressable>
+          <Field
+            control={control}
+            name="email"
+            label="Correo electrónico"
+            keyboardType="email-address"
+            placeholder="nombre@correo.com"
+            labelClassName={LABEL}
+            inputWrapperClassName={INPUT_WRAPPER}
+            inputClassName={INPUT}
+          />
 
-          <Text className="px-5 pb-5 font-['Lora-Italic'] text-xl leading-7 text-white">
-            Empieza tu historia con nosotros
-          </Text>
-        </ImageBackground>
+          <Field
+            control={control}
+            name="password"
+            label="Contraseña"
+            secureTextEntry={!showPassword}
+            placeholder="••••••••"
+            labelClassName={LABEL}
+            inputWrapperClassName={INPUT_WRAPPER}
+            inputClassName={INPUT}
+            rightElement={
+              <Pressable
+                onPress={toggleShowPassword}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                }
+              >
+                <Text className="text-xs font-medium text-[#A81245]">
+                  {showPassword ? 'Ocultar' : 'Mostrar'}
+                </Text>
+              </Pressable>
+            }
+          />
+        </View>
 
-        {/* register-body */}
-        <View className="gap-6 px-6 pb-6 pt-6">
-          {/* title-block */}
-          <View className="items-center gap-0.5">
-            <ScreenHeader title="Crear cuenta" />
-            <Text className="text-[10px] font-semibold uppercase tracking-wide text-[#6E6B68]">
-              Sumate a nuestra comunidad
+        {/* Preferencias de estilo */}
+        <View className="gap-3">
+          <View className="gap-1">
+            <Text className={LABEL}>Estilo preferido</Text>
+            <Text className="text-xs text-[#A39E9A]">
+              Elige lo que más se parezca a ti (opcional)
             </Text>
           </View>
 
-          {/* fields-stack */}
-          <View className="gap-4">
-            <Field
-              control={control}
-              name="name"
-              label="Nombre completo"
-              placeholder="Tu nombre"
-              labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
-              inputWrapperClassName="h-12 flex-row items-center rounded-lg border border-[#EAE6E1] bg-white px-4"
-              inputClassName="flex-1 text-sm text-[#292724]"
-              maxLength={50}
-              rules={{
-                required: 'El nombre es obligatorio',
-                minLength: { value: 3, message: 'Mínimo 3 caracteres' },
-                maxLength: { value: 50, message: 'Máximo 50 caracteres' },
-              }}
-            />
-
-            <Field
-              control={control}
-              name="email"
-              label="Correo electrónico"
-              keyboardType="email-address"
-              placeholder="nombre@correo.com"
-              labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
-              inputWrapperClassName="h-12 flex-row items-center rounded-lg border border-[#EAE6E1] bg-white px-4"
-              inputClassName="flex-1 text-sm text-[#292724]"
-              maxLength={100}
-              rules={{
-                required: 'El correo es obligatorio',
-                pattern: { value: /^\S+@\S+\.\S+$/, message: 'Correo inválido' },
-                maxLength: { value: 100, message: 'Máximo 100 caracteres' },
-              }}
-            />
-
-            <Field
-              control={control}
-              name="password"
-              label="Contraseña"
-              secureTextEntry={!showPassword}
-              placeholder="••••••••"
-              labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
-              inputWrapperClassName="h-12 flex-row items-center rounded-lg border border-[#EAE6E1] bg-white px-4"
-              inputClassName="flex-1 text-sm text-[#292724]"
-              maxLength={128}
-              rules={{
-                required: 'La contraseña es obligatoria',
-                minLength: { value: 6, message: 'Mínimo 6 caracteres' },
-                maxLength: { value: 128, message: 'Máximo 128 caracteres' },
-              }}
-              rightElement={
-                <Pressable onPress={togglePassword} hitSlop={8}>
-                  <Text className="text-xs font-medium text-[#A81245]">
-                    {showPassword ? 'Ocultar' : 'Mostrar'}
-                  </Text>
-                </Pressable>
-              }
-            />
-          </View>
-
-          {/* preferences-block */}
-          <View className="gap-3">
-            <View className="gap-1">
-              <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
-                Estilo preferido
-              </Text>
-              <Text className="text-xs text-[#A39E9A]">
-                Elige lo que más se parezca a ti (opcional)
+          {loadingCategories ? (
+            <View className="items-center py-4">
+              <ActivityIndicator color="#A81245" />
+              <Text className="mt-2 text-xs text-[#A39E9A]">
+                Cargando estilos...
               </Text>
             </View>
-
+          ) : styleOptions.length > 0 ? (
             <View className="flex-row flex-wrap gap-2">
-              {styleOptions.map((category) => {
-                const selected = selectedStyles.includes(category.id);
+              {styleOptions.map((style) => {
+                const categoryId = String(style.id);
+                const selected = selectedStyles.includes(categoryId);
+
                 return (
                   <Pressable
-                    key={category.id}
-                    onPress={() => toggleStyle(category.id)}
+                    key={categoryId}
+                    onPress={() => toggleStyle(categoryId)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected }}
                     className={`h-9 items-center justify-center rounded-full border px-4 ${
-                      selected ? 'border-[#A81245] bg-[#A81245]/10' : 'border-[#EAE6E1] bg-white'
-                    }`}>
+                      selected
+                        ? 'border-[#A81245] bg-[#A81245]/10'
+                        : 'border-[#EAE6E1] bg-white'
+                    }`}
+                  >
                     <Text
                       className={`text-[13px] font-medium ${
-                        selected ? 'text-[#A81245]' : 'text-[#6E6B68]'
-                      }`}>
-                      {category.name}
+                        selected
+                          ? 'text-[#A81245]'
+                          : 'text-[#6E6B68]'
+                      }`}
+                    >
+                      {style.name}
                     </Text>
                   </Pressable>
                 );
               })}
             </View>
+          ) : (
+            <Text className="text-xs text-[#A39E9A]">
+              No fue posible cargar los estilos. Puedes continuar sin elegir
+              preferencias.
+            </Text>
+          )}
+        </View>
+
+        {/* Error del registro */}
+        {rootError && (
+          <View className="rounded-xl bg-red-50 p-4">
+            <Text className="text-center text-sm font-medium text-red-700">
+              {rootError}
+            </Text>
           </View>
+        )}
 
-          {rootError && (
-            <View className="rounded-xl bg-red-50 p-4">
-              <Text className="text-center text-sm font-medium text-pink-700">{rootError}</Text>
-            </View>
+        {/* Registro exitoso */}
+        {success && (
+          <View className="rounded-xl bg-green-50 p-4">
+            <Text className="text-center text-sm font-medium text-green-700">
+              Usuario registrado correctamente
+            </Text>
+          </View>
+        )}
+      </View>
+
+      {/* Botón y términos */}
+      <View className="items-center gap-4 px-6 pt-6">
+        <Pressable
+          onPress={submit}
+          disabled={isSubmitting}
+          accessibilityRole="button"
+          className="h-12 w-full items-center justify-center rounded-full bg-[#A81245] disabled:opacity-50"
+        >
+          {isSubmitting ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text
+              numberOfLines={1}
+              className="text-sm font-semibold text-white"
+            >
+              Crear cuenta
+            </Text>
           )}
+        </Pressable>
 
-          {success && (
-            <View className="rounded-xl bg-green-50 p-4">
-              <Text className="text-center text-sm font-medium text-green-700">
-                Usuario registrado correctamente
-              </Text>
-            </View>
-          )}
-        </View>
-
-        {/* footer-actions */}
-        <View className="items-center gap-4 px-6 pb-8">
-          <Button
-            text={isSubmitting ? 'Registrando...' : 'Crear cuenta'}
-            onPress={submit}
-            disabled={isSubmitting}
-            className="h-12 w-full rounded-full bg-[#A81245]"
-            textClassName="text-sm font-semibold text-white"
-          />
-
-          <Text className="text-center text-[11px] leading-[15px] text-[#A39E9A]">
-            Al crear una cuenta aceptas nuestros Términos de servicio y Política de privacidad.
-          </Text>
-        </View>
-      </ScrollView>
-    </View>
+        <Text className="text-center text-[11px] leading-[15px] text-[#A39E9A]">
+          Al crear una cuenta aceptas nuestros Términos de servicio y Política
+          de privacidad.
+        </Text>
+      </View>
+    </HeroScreen>
   );
 }

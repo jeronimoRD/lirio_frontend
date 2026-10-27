@@ -3,6 +3,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
 
 import Field from '../Field';
+import GlassIconButton from '@/components/LiquidGlass/GlassIconButton';
+import GlassSurface from '@/components/LiquidGlass/GlassSurface';
 import { cardShadow } from '../../constants/theme';
 import { useEditPost } from '../../hooks/upload/useEditPost';
 
@@ -39,24 +41,26 @@ export default function EditPost() {
               <Image source={{ uri: image }} className="aspect-[4/5] w-full" resizeMode="cover" />
             )}
 
-            <Pressable
+            <GlassIconButton
               onPress={goBack}
-              hitSlop={8}
-              className="absolute left-4 top-4 h-10 w-10 items-center justify-center rounded-full bg-white/85"
-              style={{
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowRadius: 6,
-                shadowOpacity: 0.15,
-                elevation: 3,
-              }}>
+              style={{ position: 'absolute', left: 16, top: 16 }}>
               <ArrowLeft size={20} color="#292724" />
-            </Pressable>
+            </GlassIconButton>
 
             {/* Aviso de solo-lectura: esta pantalla no permite cambiar la foto, solo texto */}
-            <View className="absolute bottom-4 left-4 rounded-full bg-[#292724]/55 px-3 py-1.5">
+            <GlassSurface
+              intensity={30}
+              tintColor="rgba(41, 39, 36, 0.35)"
+              style={{
+                position: 'absolute',
+                bottom: 16,
+                left: 16,
+                borderRadius: 999,
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+              }}>
               <Text className="text-[11px] font-semibold text-white">Foto no editable aquí</Text>
-            </View>
+            </GlassSurface>
           </View>
         </View>
 

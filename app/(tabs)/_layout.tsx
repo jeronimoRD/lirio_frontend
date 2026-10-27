@@ -11,6 +11,7 @@ import SavedScreen from './saved';
 import ProfileScreen from './profile';
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
 import TabPager, { type TabPagerHandle } from '@/components/TabPager';
+import FloatingTabBar from '@/components/LiquidGlass/FloatingTabBar';
 
 const TAB_ROUTES = ['/home', '/explore', '/saved', '/profile'] as const;
 
@@ -86,10 +87,22 @@ export default function TabsLayout() {
     syncUrl(i);
   };
 
+  // Cambia la página del TabPager y sincroniza la URL con el índice de la pestaña seleccionada.
+  // Si la pestaña seleccionada es la misma que la actual, no hace nada.
+  // Si la diferencia entre la pestaña actual y la seleccionada es mayor a 1, cambia la página sin animación.
+  // Esto es útil para saltar de la primera a la última pestaña (o viceversa) sin animación, evitando un efecto visual extraño.
   const goTo = (i: number) => {
+    const current = pagerIndexRef.current;
+    if (i === current) return;
+
     pagerIndexRef.current = i;
     setIndex(i);
-    pagerRef.current?.setPageWithoutAnimation(i);
+
+    if (Math.abs(i - current) > 1) {
+      pagerRef.current?.setPageWithoutAnimation(i);
+    } else {
+      pagerRef.current?.setPage(i);
+    }
     syncUrl(i);
   };
 
@@ -131,36 +144,7 @@ export default function TabsLayout() {
       </BlurTargetView>
 
       {/* Tab bar flotante */}
-      <View
-        pointerEvents="box-none"
-        style={{
-          position: 'absolute',
-          left: SIDE_MARGIN,
-          right: SIDE_MARGIN,
-          bottom: insets.bottom + BOTTOM_GAP,
-        }}>
-        <View style={barShadow}>
-          <GlassSurface
-            blurTarget={blurTargetRef}
-            intensity={60}
-            style={{ height: BAR_HEIGHT, borderRadius: BAR_HEIGHT / 2 }}>
-            <View className="h-full flex-row items-center px-2">
-              <TabButton label="Home" icon={House} active={index === 0} onPress={() => goTo(0)} />
-              <TabButton label="Explore" icon={Search} active={index === 1} onPress={() => goTo(1)} />
-              <View className="flex-1" />
-              <TabButton label="Saved" icon={Heart} active={index === 2} onPress={() => goTo(2)} />
-              <TabButton label="Profile" icon={UserRound} active={index === 3} onPress={() => goTo(3)} />
-            </View>
-          </GlassSurface>
-        </View>
-
-        {/* El + vive fuera del vidrio para poder sobresalir, o sino se perdería la estetica buscada en la interfaz */}
-        <View
-          pointerEvents="box-none"
-          style={{ position: 'absolute', left: 0, right: 0, top: -22, alignItems: 'center' }}>
-          <UploadButton />
-        </View>
-      </View>
+        <FloatingTabBar index={index} onChange={goTo} blurTarget={blurTargetRef} />
     </View>
   );
 }
