@@ -1,7 +1,7 @@
 import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import {
-  ImageBackground,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -32,12 +32,14 @@ export default function Login() {
         contentContainerStyle={{ paddingBottom: insets.bottom }}
         keyboardShouldPersistTaps="handled">
         {/* hero-accent-block */}
-        <ImageBackground
-          source={HERO_IMAGE}
-          resizeMode="cover"
-          className="h-[280px] w-full justify-end overflow-hidden">
+        <View className="h-[280px] w-full justify-end overflow-hidden">
+          <Image
+            source={HERO_IMAGE}
+            resizeMode="cover"
+            className="absolute inset-0 h-full w-full"
+          />
           <View className="absolute inset-0 bg-black/15" />
-        </ImageBackground>
+        </View>
 
         {/* login-panel */}
         <View className="gap-6 px-6 pb-4 pt-8">

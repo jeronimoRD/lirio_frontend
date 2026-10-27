@@ -323,16 +323,21 @@ const rightColumn = posts.filter((_, i) => i % 2 === 1);
 
 ## Imagen de cabecera (hero)
 
+En RN 0.88 `ImageBackground` está deprecado. Usa un `View` con la imagen
+posicionada de forma absoluta y el contenido encima:
+
 ```tsx
-<ImageBackground
-  source={HERO_IMAGE_URI}
-  resizeMode="cover"
-  className="h-[280px] w-full justify-end overflow-hidden">
+<View className="h-[280px] w-full justify-end overflow-hidden">
+  <Image
+    source={HERO_IMAGE_URI}
+    resizeMode="cover"
+    className="absolute inset-0 h-full w-full"
+  />
   <View className="absolute inset-0 bg-black/15" />
   <Text className="px-5 pb-5 font-['Lora-Italic'] text-xl leading-7 text-white">
     Frase de la pantalla
   </Text>
-</ImageBackground>
+</View>
 ```
 
 `objectPosition` no existe en `ImageStyle` de React Native. Para mover el

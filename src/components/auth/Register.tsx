@@ -1,4 +1,4 @@
-import { ImageBackground, Pressable, ScrollView, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Field from '../Field';
@@ -33,10 +33,12 @@ export default function Register() {
         contentContainerStyle={{ paddingBottom: insets.bottom }}
         keyboardShouldPersistTaps="handled">
         {/* hero-accent-block */}
-        <ImageBackground
-          source={HERO_IMAGE_URI}
-          resizeMode="cover"
-          className="h-[180px] w-full justify-end overflow-hidden">
+        <View className="h-[180px] w-full justify-end overflow-hidden">
+          <Image
+            source={HERO_IMAGE_URI}
+            resizeMode="cover"
+            className="absolute inset-0 h-full w-full"
+          />
           <View className="absolute inset-0 bg-black/25" />
 
           {/* botón atrás flotando sobre la imagen */}
@@ -50,7 +52,7 @@ export default function Register() {
           <Text className="px-5 pb-5 font-['Lora-Italic'] text-xl leading-7 text-white">
             Empieza tu historia con nosotros
           </Text>
-        </ImageBackground>
+        </View>
 
         {/* register-body */}
         <View className="gap-6 px-6 pb-6 pt-6">
