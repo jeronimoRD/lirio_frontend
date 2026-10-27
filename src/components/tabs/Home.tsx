@@ -23,6 +23,7 @@ export default function Home() {
     leftColumn,
     rightColumn,
   } = useHome();
+  
 
   return (
     <View className="flex-1 bg-[#FCFAF8]">
