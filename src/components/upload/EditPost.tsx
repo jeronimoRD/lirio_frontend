@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react-native';
 
 import Field from '../Field';
 import GarmentPicker from './GarmentPicker';
+import StylePicker from './StylePicker';
 import GlassIconButton from '@/components/LiquidGlass/GlassIconButton';
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
 import { cardShadow } from '../../constants/theme';
@@ -26,6 +27,10 @@ export default function EditPost() {
     saving,
     goBack,
     requestUpdate,
+    categories,
+    categoryIds,
+    categoryError,
+    toggleCategory,
     garmentType,
     garmentError,
     selectGarment,
@@ -113,6 +118,13 @@ export default function EditPost() {
               }}
               inputWrapperClassName="min-h-[120px] flex-row items-start rounded-lg border border-[#EAE6E1] bg-[#FCFAF8] p-4"
               inputClassName="flex-1 text-sm text-[#292724]"
+            />
+
+            <StylePicker
+              categories={categories}
+              value={categoryIds}
+              onToggle={toggleCategory}
+              error={categoryError}
             />
 
             <GarmentPicker value={garmentType} onChange={selectGarment} error={garmentError} />

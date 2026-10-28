@@ -9,7 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Heart, House, Plus, Search, UserRound } from 'lucide-react-native';
+import { House, Plus, Search, Shirt, UserRound } from 'lucide-react-native';
 
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
 
@@ -28,7 +28,7 @@ const ACTIVE = '#A81245';
 const TABS = [
     { label: 'Inicio', icon: House, slot: 0 },
     { label: 'Explorar', icon: Search, slot: 1 },
-    { label: 'Favoritos', icon: Heart, slot: 3 },
+    { label: 'Ropero', icon: Shirt, slot: 3 },
     { label: 'Perfil', icon: UserRound, slot: 4 },
 ] as const;
 

@@ -118,6 +118,7 @@ export async function updatePost(
   id: string,
   title: string,
   description: string,
+  categoryIds: string[],
   garmentType: GarmentType,
   image?: string,
 ): Promise<Post> {
@@ -126,6 +127,7 @@ export async function updatePost(
     {
       title,
       description,
+      category_ids: categoryIds,
       garment_type: garmentType,
       ...(image ? { image } : {}),
     },

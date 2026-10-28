@@ -4,7 +4,8 @@ import { useForm } from 'react-hook-form';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { getPost, updatePost } from '../../api/posts';
-import type { GarmentType } from '../../types';
+import { getCategories } from '../../api/categories';
+import type { Category, GarmentType } from '../../types';
 
 export type EditPostForm = {
     title: string;
@@ -22,6 +23,9 @@ export function useEditPost() {
     const [image, setImage] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [categoryIds, setCategoryIds] = useState<string[]>([]);
+    const [categoryError, setCategoryError] = useState<string | null>(null);
     const [garmentType, setGarmentType] = useState<GarmentType | null>(null);
     const [garmentError, setGarmentError] = useState<string | null>(null);
 
@@ -29,6 +33,21 @@ export function useEditPost() {
         setGarmentType(type);
         setGarmentError(null);
     };
+
+    const toggleCategory = (categoryId: string) => {
+        setCategoryIds((previous) =>
+            previous.includes(categoryId)
+                ? previous.filter((item) => item !== categoryId)
+                : [...previous, categoryId],
+        );
+        setCategoryError(null);
+    };
+
+    useEffect(() => {
+        getCategories()
+            .then(setCategories)
+            .catch((error) => console.log('Error cargando estilos:', error));
+    }, []);
 
     useEffect(() => {
         async function loadPost() {
@@ -40,6 +59,7 @@ export function useEditPost() {
         reset({ title: post.title ?? '', description: post.description ?? '' });
         setImage(post.image);
         setGarmentType(post.garmentType ?? null);
+        setCategoryIds(post.categoryIds);
         } catch (error) {
             Alert.alert('Error', error instanceof Error ? error.message : 'No se pudo cargar el post.');
 
@@ -63,6 +83,11 @@ export function useEditPost() {
   const requestUpdate = handleSubmit(async ({ title, description }) => {
     if (!id) return;
 
+    if (categoryIds.length === 0) {
+        setCategoryError('Selecciona al menos un estilo.');
+        return;
+    }
+
     if (!garmentType) {
         setGarmentError('Selecciona el tipo de prenda.');
         return;
@@ -71,7 +96,7 @@ export function useEditPost() {
     try {
         setSaving(true);
 
-        await updatePost(id, title.trim(), description.trim(), garmentType);
+        await updatePost(id, title.trim(), description.trim(), categoryIds, garmentType);
 
         router.replace('/(tabs)/profile');
         } catch (error) {
@@ -91,6 +116,10 @@ export function useEditPost() {
         saving,
         goBack,
         requestUpdate,
+        categories,
+        categoryIds,
+        categoryError,
+        toggleCategory,
         garmentType,
         garmentError,
         selectGarment,
