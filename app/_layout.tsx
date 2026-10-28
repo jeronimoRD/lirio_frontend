@@ -4,7 +4,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import '../global.css';
 import { SessionProvider } from '../src/session/context';
-import { FavoritesProvider } from '../src/favorites/context';
 import { LikesProvider } from '../src/likes/context';
 
 SplashScreen.preventAutoHideAsync();
@@ -28,11 +27,9 @@ export default function RootLayout() {
 
   return (
     <SessionProvider>
-      <FavoritesProvider>
-        <LikesProvider>
-          <Stack screenOptions={{ headerShown: false }} />
-        </LikesProvider>
-      </FavoritesProvider>
+      <LikesProvider>
+        <Stack screenOptions={{ headerShown: false }} />
+      </LikesProvider>
     </SessionProvider>
   );
 }

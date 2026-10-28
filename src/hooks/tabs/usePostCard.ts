@@ -1,18 +1,16 @@
 import { useRouter } from 'expo-router';
 
-import { useFavorites } from '../../favorites/context';
 import type { Post } from '../../types';
 import { useEffect, useState } from 'react';
 import { toggleLike as toggleLikeApi } from '../../api/posts';
 import { useSession } from '../../session/context';
 import { useLikes } from '../../likes/context';
 
-/** Lógica de cada tarjeta del feed: favoritos y navegación al detalle. */
+/** Lógica de cada tarjeta del feed: navegación al detalle y likes. */
 export function usePostCard(post: Post) {
-  const { isFavorite, toggleFavorite } = useFavorites();
   const router = useRouter();
   const { user } = useSession();
-  const { get, setState, update } = useLikes();
+  const { get, setState } = useLikes();
   const cached = get(post.id);
 
   const initialLiked =
@@ -59,8 +57,6 @@ export function usePostCard(post: Post) {
   };
 
   return {
-    favorited: isFavorite(post.id),
-    toggleFavorite: () => toggleFavorite(post.id),
     openPost: () =>
       router.push({
         pathname: '/(upload)/[id]',
