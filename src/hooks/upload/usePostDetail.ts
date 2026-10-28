@@ -3,8 +3,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { getPost, toggleLike as toggleLikeApi } from '../../api/posts';
 import { getUserById } from '../../api/users';
+import { getCategories } from '../../api/categories';
 import { useSession } from '../../session/context';
-import type { Post, User } from '../../types';
+import type { Category, Post, User } from '../../types';
 import { useLikes } from '../../likes/context';
 
 export function usePostDetail() {
@@ -21,6 +22,17 @@ export function usePostDetail() {
   const [liked, setLiked] = useState(cached?.liked ?? false);
   const [likesCount, setLikesCount] = useState(cached?.likesCount ?? 0);
   const [reportVisible, setReportVisible] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    getCategories()
+      .then(setCategories)
+      .catch((error) => console.log('ERROR AL CARGAR ESTILOS:', error));
+  }, []);
+
+  const styleNames = (post?.categoryIds ?? [])
+    .map((id) => categories.find((category) => category.id === id)?.name)
+    .filter((name): name is string => !!name);
 
   useEffect(() => {
     async function loadPost() {
@@ -79,6 +91,7 @@ export function usePostDetail() {
 
   return {
     post,
+    styleNames,
     author,
     loading,
     goBack,

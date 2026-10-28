@@ -28,6 +28,10 @@ export interface User {
   lastLogin?: string;
 }
 
+/** Tipos de prenda del post. Los valores coinciden con el enum del backend. */
+export const GARMENT_TYPES = ['SHIRT', 'PANTS', 'SHOES'] as const;
+export type GarmentType = (typeof GARMENT_TYPES)[number];
+
 /** Una publicación creada por un usuario. */
 export interface Post {
   id: string;
@@ -36,8 +40,8 @@ export interface Post {
   description: string;
   userId: string;
   createdAt: string;
-  /** ID de la categoría del outfit (opcional hasta que todos los posts la tengan). */
-  categoryId?: string;
+  /** IDs de los estilos (categorías) del outfit. */
+  categoryIds: string[];
   /** Número total de likes */
   likesCount?: number;
   /** Indica si el usuario actual ha dado like */
@@ -48,6 +52,8 @@ export interface Post {
   isSavedByMe?: boolean;
   /** Lista de usuarios que han guardado el post (opcional) */
   savedBy?: string[];
+  /** Tipo de prenda principal del post */
+  garmentType?: GarmentType;
 }
 
 /** Categoría de los posts (outfits). La gestiona el admin. */

@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { getPost, updatePost } from '../../api/posts';
+import type { GarmentType } from '../../types';
 
 export type EditPostForm = {
     title: string;
@@ -21,6 +22,13 @@ export function useEditPost() {
     const [image, setImage] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [garmentType, setGarmentType] = useState<GarmentType | null>(null);
+    const [garmentError, setGarmentError] = useState<string | null>(null);
+
+    const selectGarment = (type: GarmentType) => {
+        setGarmentType(type);
+        setGarmentError(null);
+    };
 
     useEffect(() => {
         async function loadPost() {
@@ -31,6 +39,7 @@ export function useEditPost() {
 
         reset({ title: post.title ?? '', description: post.description ?? '' });
         setImage(post.image);
+        setGarmentType(post.garmentType ?? null);
         } catch (error) {
             Alert.alert('Error', error instanceof Error ? error.message : 'No se pudo cargar el post.');
 
@@ -54,10 +63,15 @@ export function useEditPost() {
   const requestUpdate = handleSubmit(async ({ title, description }) => {
     if (!id) return;
 
+    if (!garmentType) {
+        setGarmentError('Selecciona el tipo de prenda.');
+        return;
+    }
+
     try {
         setSaving(true);
 
-        await updatePost(id, title.trim(), description.trim());
+        await updatePost(id, title.trim(), description.trim(), garmentType);
 
         router.replace('/(tabs)/profile');
         } catch (error) {
@@ -70,5 +84,15 @@ export function useEditPost() {
         }
     });
 
-    return { control, image, loading, saving, goBack, requestUpdate };
+    return {
+        control,
+        image,
+        loading,
+        saving,
+        goBack,
+        requestUpdate,
+        garmentType,
+        garmentError,
+        selectGarment,
+    };
 }

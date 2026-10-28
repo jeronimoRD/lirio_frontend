@@ -27,6 +27,7 @@ import { initialsOf } from '../../utils/strings';
 import { formatLikeCount } from '../../utils/format';
 import { usePostDetail } from '../../hooks/upload/usePostDetail';
 import { toggleSave as toggleSaveApi } from '../../api/posts';
+import { garmentLabel } from './GarmentPicker';
 import { useSession } from '../../session/context';
 
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#3D6B52'];
@@ -75,6 +76,7 @@ function LoadingState() {
 export default function PostDetail() {
   const {
     post,
+    styleNames,
     author,
     loading,
     goBack,
@@ -89,16 +91,20 @@ export default function PostDetail() {
   const { user: me } = useSession();
   const insets = useSafeAreaInsets();
 
-  // Estado optimista de guardado, sincronizado con el servidor.
+
   const serverSaved = !!(
     post?.isSavedByMe ??
     (post?.savedBy && me ? post.savedBy.includes(me.id) : false)
   );
+
+  // Estado optimista de guardado, sincronizado con el servidor.
   const [saved, setSaved] = useState(serverSaved);
   const savingRef = useRef(false);
 
   useEffect(() => {
-    if (!savingRef.current) setSaved(serverSaved);
+    if (!savingRef.current) {
+      setSaved(serverSaved);
+    }
   }, [serverSaved, post?.id]);
 
   // Aviso discreto para confirmar acciones y comunicar errores.
@@ -107,13 +113,21 @@ export default function PostDetail() {
 
   const showNotice = (message: string) => {
     setNotice(message);
-    if (noticeTimer.current) clearTimeout(noticeTimer.current);
-    noticeTimer.current = setTimeout(() => setNotice(null), 2400);
+
+    if (noticeTimer.current) {
+      clearTimeout(noticeTimer.current);
+    }
+
+    noticeTimer.current = setTimeout(() => {
+      setNotice(null);
+    }, 2400);
   };
 
   useEffect(
     () => () => {
-      if (noticeTimer.current) clearTimeout(noticeTimer.current);
+      if (noticeTimer.current) {
+        clearTimeout(noticeTimer.current);
+      }
     },
     [],
   );
@@ -130,12 +144,18 @@ export default function PostDetail() {
 
     savingRef.current = true;
     const previousSaved = saved;
+
     setSaved(!previousSaved);
 
     try {
       const response = await toggleSaveApi(post.id);
+
       setSaved(response.saved);
-      showNotice(response.saved ? 'Publicación guardada' : 'Quitada de guardados');
+      showNotice(
+        response.saved
+          ? 'Publicación guardada'
+          : 'Quitada de guardados',
+      );
     } catch {
       setSaved(previousSaved);
       showNotice('No se pudo actualizar. Inténtalo de nuevo.');
@@ -143,6 +163,7 @@ export default function PostDetail() {
       savingRef.current = false;
     }
   };
+
 
   // Respeta, en lo posible, la proporción original de la fotografía.
   const [ratio, setRatio] = useState(DEFAULT_RATIO);
@@ -485,6 +506,16 @@ export default function PostDetail() {
                 </Text>
               </View>
             </View>
+            {post.garmentType && (
+              <View className="gap-1 pt-2">
+                <Text className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#A09B95]">
+                  Tipo de prenda
+                </Text>
+                <Text className="text-sm font-semibold text-[#292724]">
+                  {garmentLabel(post.garmentType)}
+                </Text>
+              </View>
+            )}
           </View>
 
           <View className="mx-6 mt-9 h-px bg-[#EAE6E1]" />
