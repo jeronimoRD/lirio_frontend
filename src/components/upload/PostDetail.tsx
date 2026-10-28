@@ -1,12 +1,14 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Image, Pressable, ScrollView, Text, View } from 'react-native';
-import { ArrowLeft, Flag, Heart } from 'lucide-react-native';
+import { ArrowLeft, Bookmark, Flag, Heart } from 'lucide-react-native';
 
 import ReportModal from '../ReportModal';
 import GlassIconButton from '@/components/LiquidGlass/GlassIconButton';
 import { initialsOf } from '../../utils/strings';
 import { formatLikeCount } from '../../utils/format';
 import { usePostDetail } from './../../hooks/upload/usePostDetail';
+import { toggleSave as toggleSaveApi } from '../../api/posts';
+import { useSession } from '../../session/context';
 
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#3D6B52'];
 
@@ -32,10 +34,37 @@ export default function PostDetail() {
     openReport,
     closeReport,
   } = usePostDetail();
+  const { user: me } = useSession();
 
   const lastTapRef = useRef<number>(0);
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
   const heartScale = useRef(new Animated.Value(0)).current;
+  const [saved, setSaved] = useState(
+    !!(
+      post?.isSavedByMe ??
+      (post?.savedBy && me ? post.savedBy.includes(me.id) : false)
+    ),
+  );
+
+  useEffect(() => {
+    if (post) {
+      setSaved(
+        !!(post.isSavedByMe ?? (post.savedBy && me ? post.savedBy.includes(me.id) : false)),
+      );
+    }
+  }, [post, me?.id]);
+
+  const handleToggleSave = async () => {
+    if (!post || !me) return;
+    const prev = saved;
+    setSaved(!saved);
+    try {
+      const res = await toggleSaveApi(post.id);
+      setSaved(res.saved);
+    } catch (e) {
+      setSaved(prev);
+    }
+  };
 
   const handleDoubleTap = () => {
     const now = Date.now();
@@ -92,7 +121,7 @@ export default function PostDetail() {
         {/* Imagen como tarjeta flotante, con margen y sombra — no pegada al borde */}
         <View className="px-5">
           <View className="overflow-hidden rounded-[24px]" style={imageShadow}>
-            <Pressable onPress={handleDoubleTap} activeOpacity={1}>
+            <Pressable onPress={handleDoubleTap}>
               <Image
                 source={{ uri: post.image }}
                 className="aspect-[4/5] w-full"
@@ -103,6 +132,10 @@ export default function PostDetail() {
                 onPress={goBack}
                 style={{ position: 'absolute', left: 16, top: 16 }}>
                 <ArrowLeft size={20} color="#292724" />
+              </GlassIconButton>
+
+              <GlassIconButton onPress={handleToggleSave} style={{ position: 'absolute', right: 16, top: 16 }}>
+                <Bookmark size={18} color="#292724" fill={saved ? '#292724' : 'none'} strokeWidth={saved ? 2.5 : 2} />
               </GlassIconButton>
 
               {showHeartAnimation && (

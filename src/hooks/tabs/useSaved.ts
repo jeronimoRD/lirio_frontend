@@ -1,21 +1,21 @@
 import { useEffect, useState } from 'react';
 
-import { getLikedPosts, getPosts } from '../../api/posts';
-import { useFavorites } from '../../favorites/context';
+import { getLikedPosts, getSavedPosts } from '../../api/posts';
 import type { Post } from '../../types';
 
 export function useSaved() {
-  const { favoriteIds } = useFavorites();
-  const [allPosts, setAllPosts] = useState<Post[]>([]);
+  const [savedPosts, setSavedPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
+    setLoading(true);
+    setError(null);
 
-    getPosts()
-      .then((all) => {
-        if (active) setAllPosts(all);
+    getSavedPosts()
+      .then((posts) => {
+        if (active) setSavedPosts(posts);
       })
       .catch((err) => {
         if (active) {
@@ -30,8 +30,6 @@ export function useSaved() {
       active = false;
     };
   }, []);
-
-  const savedPosts = allPosts.filter((post) => favoriteIds.has(post.id));
 
   return { savedPosts, loading, error };
 }

@@ -44,6 +44,10 @@ export interface Post {
   isLikedByMe?: boolean;
   /** Lista de usuarios que han dado like (opcional) */
   likedBy?: string[];
+  /** Indica si el usuario actual ha guardado el post */
+  isSavedByMe?: boolean;
+  /** Lista de usuarios que han guardado el post (opcional) */
+  savedBy?: string[];
 }
 
 /** Categoría de los posts (outfits). La gestiona el admin. */

@@ -12,10 +12,12 @@ interface PostResponse {
   createdAt: string;
   updatedAt: string;
   liked_by?: string[];
+  saved_by?: string[];
 }
 
 function toPost(data: PostResponse): Post {
   const likedBy = data.liked_by ?? [];
+  const savedBy = data.saved_by ?? [];
   return {
     id: data._id,
     title: data.title,
@@ -26,6 +28,7 @@ function toPost(data: PostResponse): Post {
     createdAt: data.createdAt,
     likesCount: likedBy.length,
     likedBy: likedBy,
+    savedBy: savedBy,
   };
 }
 
@@ -65,6 +68,24 @@ export async function toggleLike(postId: string): Promise<{
 
 export async function getLikedPosts(): Promise<Post[]> {
   const data = await request<PostResponse[]>('/posts/liked/me');
+  return data.map(toPost);
+}
+
+export async function toggleSave(postId: string): Promise<{
+  message: string;
+  saved: boolean;
+  savedCount: number;
+}> {
+  const data = await request<{
+    message: string;
+    saved: boolean;
+    savedCount: number;
+  }>(`/posts/${postId}/save`, undefined, 'POST');
+  return data;
+}
+
+export async function getSavedPosts(): Promise<Post[]> {
+  const data = await request<PostResponse[]>('/posts/saved/me');
   return data.map(toPost);
 }
 

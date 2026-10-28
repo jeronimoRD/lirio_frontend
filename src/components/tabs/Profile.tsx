@@ -1,5 +1,6 @@
-import { Redirect } from 'expo-router';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { Redirect, useRouter } from 'expo-router';
+import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import ConfirmModal from '../ConfirmModal';
 import FeedCard from '../FeedCard';
@@ -8,6 +9,7 @@ import type { Role } from '../../types';
 import { cardShadowLg } from '../../constants/theme';
 import { initialsOf } from '../../utils/strings';
 import { useProfile } from './../../hooks/tabs/useProfile';
+import { useSaved } from '../../hooks/tabs/useSaved';
 
 const ROLE_LABEL: Record<Role, string> = {
   USER: 'Usuario',
@@ -15,6 +17,8 @@ const ROLE_LABEL: Record<Role, string> = {
 };
 
 export default function Profile({ active = true }: { active?: boolean }) {
+  const insets = useSafeAreaInsets();
+  const TAB_BAR_HEIGHT = 80;
   const {
     user,
     signOut,
@@ -41,7 +45,9 @@ export default function Profile({ active = true }: { active?: boolean }) {
 
   return (
     <>
-      <ScrollView className="flex-1 bg-[#FCFAF8]" contentContainerClassName="pb-32">
+      <ScrollView
+        className="flex-1 bg-[#FCFAF8]"
+        contentContainerStyle={{ paddingBottom: insets.bottom + TAB_BAR_HEIGHT + 24 }}>
         {/* portada: tu última foto desenfocada + engrane de vidrio */}
         <ProfileCover imageUri={posts[0]?.image} onSettings={goToSettings} />
 
@@ -169,19 +175,17 @@ export default function Profile({ active = true }: { active?: boolean }) {
               ))}
 
             {!error && activeTab === 'saved' && (
-              <View className="rounded-2xl bg-white p-6" style={cardShadowLg}>
-                <Text className="text-center text-sm text-[#6E6B68]">
-                  Próximamente: outfits guardados.
-                </Text>
-              </View>
+              <SavedPostsGrid />
             )}
 
             {/* Cerrar sesión */}
-            <Pressable
-              onPress={signOut}
-              className="mt-2 h-12 w-full items-center justify-center rounded-2xl border border-red-200 bg-white">
-              <Text className="text-sm font-semibold text-red-600">Cerrar sesión</Text>
-            </Pressable>
+            <View className="mt-8">
+              <Pressable
+                onPress={signOut}
+                className="h-12 w-full items-center justify-center rounded-2xl border border-red-200 bg-white">
+                <Text className="text-sm font-semibold text-red-600">Cerrar sesión</Text>
+              </Pressable>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -197,5 +201,62 @@ export default function Profile({ active = true }: { active?: boolean }) {
         onCancel={cancelDelete}
       />
     </>
+  );
+}
+
+function SavedPostsGrid() {
+  const { savedPosts, loading, error } = useSaved();
+  const router = useRouter();
+
+  const goToPost = (id: string) => {
+    router.push({
+      pathname: '/(upload)/[id]',
+      params: { id },
+    });
+  };
+
+  if (loading) {
+    return (
+      <View className="items-center py-10">
+        <ActivityIndicator color="#A81245" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className="rounded-2xl bg-red-50 p-4" style={cardShadowLg}>
+        <Text className="text-center text-sm font-medium text-red-700">{error}</Text>
+      </View>
+    );
+  }
+
+  if (savedPosts.length === 0) {
+    return (
+      <View className="rounded-2xl bg-white p-6" style={cardShadowLg}>
+        <Text className="text-center text-sm text-[#6E6B68]">Aún no has guardado ningún outfit.</Text>
+      </View>
+    );
+  }
+
+  const leftColumn = savedPosts.filter((_, i) => i % 2 === 0);
+  const rightColumn = savedPosts.filter((_, i) => i % 2 === 1);
+
+  return (
+    <View className="flex-row gap-2.5">
+      {[leftColumn, rightColumn].map((column, colIndex) => (
+        <View key={colIndex} className="flex-1 gap-2.5">
+          {column.map((post) => (
+            <Pressable
+              key={post.id}
+              onPress={() => goToPost(post.id)}
+              className="overflow-hidden rounded-2xl bg-white"
+              style={cardShadowLg}>
+              <Image source={{ uri: post.image }} className="aspect-[3/4] w-full" resizeMode="cover" />
+            </Pressable>
+          ))}
+        </View>
+      ))}
+    </View>
   );
 }
