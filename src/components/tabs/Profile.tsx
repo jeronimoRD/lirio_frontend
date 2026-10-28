@@ -129,9 +129,6 @@ export default function Profile({ active = true }: { active?: boolean }) {
               <Text className="font-['Lora-Italic'] text-base text-[#292724]">
                 Tu colección
               </Text>
-              <Text className="mt-0.5 text-[11px] text-[#A09B95]">
-                Outfits que has compartido
-              </Text>
             </View>
 
             <View className="items-end">
@@ -377,9 +374,6 @@ function SavedPostsGrid() {
     <View>
       <View className="mb-4 flex-row items-end justify-between">
         <View>
-          <Text className="font-['Lora-Italic'] text-xl text-[#292724]">
-            Inspiración guardada
-          </Text>
           <Text className="mt-1 text-[11px] text-[#6E6B68]">
             Tus favoritos, todos en un solo lugar.
           </Text>

@@ -54,18 +54,14 @@ export default function Favorites() {
           paddingHorizontal: 18,
           paddingBottom: insets.bottom + 36,
         }}>
-        <ScreenHeader title="Mi ropero" />
+        <ScreenHeader title="Mi vestidor" />
 
         {/* Cabecera editorial */}
         <View className="mb-7 mt-4">
           <View className="flex-row items-start justify-between">
             <View className="flex-1 pr-3">
               <Text className="font-['Lora-Italic'] text-[30px] leading-[38px] text-[#292724]">
-                Tu estilo, tu universo.
-              </Text>
-
-              <Text className="mt-2 text-[13px] leading-5 text-[#6E6B68]">
-                Tus outfits en un solo lugar, listos para cuando los necesites.
+                Tu estilo
               </Text>
             </View>
 
@@ -101,9 +97,6 @@ export default function Favorites() {
             Outfits que has armado
           </Text>
 
-          <Text className="mt-1 text-[12px] leading-5 text-[#6E6B68]">
-            Combina una prenda de cada tipo y decide si los compartes.
-          </Text>
         </View>
 
         {!!error && (

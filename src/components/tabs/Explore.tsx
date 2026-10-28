@@ -128,9 +128,6 @@ export default function Explore() {
                 Encuentra tu estilo
               </Text>
 
-              <Text className="mt-1 text-[13px] leading-5 text-[#6E6B68]">
-                Ideas para vestir como tú.
-              </Text>
             </View>
 
             <Pressable
