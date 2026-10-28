@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ComponentType, type Ref } from 'react';
-import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
+import { Pressable, StyleSheet, View, Text, Modal, type LayoutChangeEvent } from 'react-native';
 import Animated, {
     interpolate,
     interpolateColor,
@@ -210,51 +210,116 @@ useEffect(() => {
     );
 }
 
+
 function AddButton() {
     const router = useRouter();
     const press = useSharedValue(0);
+    const [modalVisible, setModalVisible] = useState(false);
 
     const buttonStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: interpolate(press.value, [0, 1], [1, 0.9]) }],
-    }));
-    const plusStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${press.value * 90}deg` }],
+        transform: [{ scale: interpolate(press.value, [0, 1], [1, 0.9]) }],
     }));
 
+    const plusStyle = useAnimatedStyle(() => ({
+        transform: [{ rotate: `${press.value * 90}deg` }],
+    }));
+
+    const navigateTo = (route: '/upload' | '/outfit/new') => {
+        setModalVisible(false);
+        router.push(route);
+    };
+
     return (
-    <Pressable
-        onPressIn={() => {
-        press.value = withSpring(1, SPRING);
-        }}
-        onPressOut={() => {
-        press.value = withSpring(0, BOUNCE);
-        }}
-        onPress={() => router.push('/upload')}
-        accessibilityRole="button"
-        accessibilityLabel="Crear publicación">
-        <Animated.View
-        style={[
-            {
-            width: ADD_SIZE,
-            height: ADD_SIZE,
-            borderRadius: ADD_SIZE / 2,
-            backgroundColor: ACTIVE,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderWidth: 4,
-            borderColor: 'rgba(255, 255, 255, 0.75)',
-            shadowColor: ACTIVE,
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.4,
-            shadowRadius: 12,
-            elevation: 8,
-            },
-            buttonStyle,
-        ]}>
-        <Animated.View style={plusStyle}>
-            <Plus size={28} color="#FFFFFF" strokeWidth={2.4} />
-        </Animated.View>
-        </Animated.View>
-    </Pressable>
+        <>
+            <Pressable
+                onPressIn={() => {
+                    press.value = withSpring(1, SPRING);
+                }}
+                onPressOut={() => {
+                    press.value = withSpring(0, BOUNCE);
+                }}
+                onPress={() => setModalVisible(true)}
+                accessibilityRole="button"
+                accessibilityLabel="Elegir qué crear"
+            >
+                <Animated.View
+                    style={[
+                        {
+                            width: ADD_SIZE,
+                            height: ADD_SIZE,
+                            borderRadius: ADD_SIZE / 2,
+                            backgroundColor: ACTIVE,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderWidth: 4,
+                            borderColor: 'rgba(255, 255, 255, 0.75)',
+                            shadowColor: ACTIVE,
+                            shadowOffset: { width: 0, height: 8 },
+                            shadowOpacity: 0.4,
+                            shadowRadius: 12,
+                            elevation: 8,
+                        },
+                        buttonStyle,
+                    ]}
+                >
+                    <Animated.View style={plusStyle}>
+                        <Plus size={28} color="#FFFFFF" strokeWidth={2.4} />
+                    </Animated.View>
+                </Animated.View>
+            </Pressable>
+
+            <Modal
+                visible={modalVisible}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setModalVisible(false)}
+                statusBarTranslucent
+            >
+                <Pressable
+                    className="flex-1 items-center justify-center bg-black/40 px-6"
+                    onPress={() => setModalVisible(false)}
+                >
+                    <Pressable
+                        onPress={(event) => event.stopPropagation()}
+                        className="w-full max-w-[340px] rounded-[28px] border border-[#EAE6E1] bg-[#FCFAF8] p-6"
+                    >
+                        <Text className="font-['Lora-Italic'] text-[25px] text-[#292724]">
+                            ¿Qué quieres crear?
+                        </Text>
+
+                        <Text className="mb-6 mt-2 text-[13px] leading-5 text-[#6E6B68]">
+                            Elige qué quieres agregar a LirioHibisco.
+                        </Text>
+
+                        <Pressable
+                            onPress={() => navigateTo('/upload')}
+                            className="mb-3 items-center rounded-full bg-[#A81245] px-5 py-4 active:opacity-80"
+                        >
+                            <Text className="text-[14px] font-semibold text-white">
+                                Crear publicación
+                            </Text>
+                        </Pressable>
+
+                        <Pressable
+                            onPress={() => navigateTo('/outfit/new')}
+                            className="items-center rounded-full border border-[#EAE6E1] bg-white px-5 py-4 active:opacity-80"
+                        >
+                            <Text className="text-[14px] font-semibold text-[#292724]">
+                                Crear outfit
+                            </Text>
+                        </Pressable>
+
+                        <Pressable
+                            onPress={() => setModalVisible(false)}
+                            className="mt-4 items-center py-2"
+                        >
+                            <Text className="text-[13px] font-medium text-[#6E6B68]">
+                                Cancelar
+                            </Text>
+                        </Pressable>
+                    </Pressable>
+                </Pressable>
+            </Modal>
+        </>
     );
 }
