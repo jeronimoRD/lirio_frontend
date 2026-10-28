@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router';
 
 import { createPost } from '../../api/posts';
 import { getCategories } from '../../api/categories';
-import type { Category } from '../../types';
+import type { Category, GarmentType } from '../../types';
 
 export type CreatePostForm = {
     title: string;
@@ -23,10 +23,11 @@ export function useCreatePost() {
     const [image, setImage] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [categories, setCategories] = useState<Category[]>([]);
-    const [category, setCategory] = useState<Category | null>(null);
-    const [showCategories, setShowCategories] = useState(false);
+    const [categoryIds, setCategoryIds] = useState<string[]>([]);
+    const [garmentType, setGarmentType] = useState<GarmentType | null>(null);
     const [confirm, setConfirm] = useState(false);
     const [categoryError, setCategoryError] = useState<string | null>(null);
+    const [garmentError, setGarmentError] = useState<string | null>(null);
     const [imageError, setImageError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -50,11 +51,10 @@ export function useCreatePost() {
         }
     };
 
-    const toggleCategories = () => setShowCategories((v) => !v);
-
-    const selectCategory = (item: Category) => {
-    setCategory(item);
-    setShowCategories(false);
+    const toggleCategory = (id: string) => {
+    setCategoryIds((previous) =>
+        previous.includes(id) ? previous.filter((item) => item !== id) : [...previous, id],
+    );
     setCategoryError(null);
     };
 
@@ -78,12 +78,23 @@ export function useCreatePost() {
     }
     };
 
+    const selectGarment = (type: GarmentType) => {
+    setGarmentType(type);
+    setGarmentError(null);
+    };
+
     const requestCreate = handleSubmit(() => {
     setCategoryError(null);
+    setGarmentError(null);
     setImageError(null);
 
-    if (!category) {
-        setCategoryError('Selecciona una categoría.');
+    if (categoryIds.length === 0) {
+        setCategoryError('Selecciona al menos un estilo.');
+        return;
+    }
+
+    if (!garmentType) {
+        setGarmentError('Selecciona el tipo de prenda.');
         return;
     }
 
@@ -96,14 +107,14 @@ export function useCreatePost() {
     });
 
     const onConfirmCreate = async () => {
-    if (loading || !category || !image) return;
+    if (loading || categoryIds.length === 0 || !garmentType || !image) return;
 
     const { title, description } = getValues();
 
     setLoading(true);
 
     try {
-        await createPost(title, description, image, category.id);
+        await createPost(title, description, image, categoryIds, garmentType);
         setConfirm(false);
         router.replace('/(tabs)/profile');
         } catch (error) {
@@ -122,11 +133,13 @@ export function useCreatePost() {
     selectImage,
 
     categories,
-    category,
+    categoryIds,
     categoryError,
-    showCategories,
-    toggleCategories,
-    selectCategory,
+    toggleCategory,
+
+    garmentType,
+    garmentError,
+    selectGarment,
 
     loading,
     requestCreate,

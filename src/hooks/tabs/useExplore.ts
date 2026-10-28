@@ -128,14 +128,16 @@ export function useExplore() {
         const q = query.trim().toLowerCase();
 
     return posts.filter((post) => {
-        const categoryName = post.categoryId ? (categoryNameById.get(post.categoryId) ?? '') : '';
-        const haystack = `${post.title} ${post.description ?? ''} ${categoryName}`.toLowerCase();
+        const categoryNames = post.categoryIds
+            .map((id) => categoryNameById.get(id) ?? '')
+            .join(' ');
+        const haystack = `${post.title} ${post.description ?? ''} ${categoryNames}`.toLowerCase();
 
         const matchesQuery = !q || haystack.includes(q);
 
         const matchesCategory =
         activeCategoryIds.length === 0 ||
-        (post.categoryId !== undefined && activeCategoryIds.includes(post.categoryId));
+        post.categoryIds.some((id) => activeCategoryIds.includes(id));
 
         return matchesQuery && matchesCategory;
     });

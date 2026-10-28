@@ -4,6 +4,8 @@ import { ImagePlus } from 'lucide-react-native';
 import ScreenHeader from '../ScreenHeader';
 import ConfirmModal from '../ConfirmModal';
 import Field from '../Field';
+import GarmentPicker from './GarmentPicker';
+import GlassSurface from '@/components/LiquidGlass/GlassSurface';
 import { useCreatePost } from '../../hooks/upload/useCreatePost';
 
 export default function CreatePost() {
@@ -14,11 +16,12 @@ export default function CreatePost() {
     imageError,
     selectImage,
     categories,
-    category,
+    categoryIds,
     categoryError,
-    showCategories,
-    toggleCategories,
-    selectCategory,
+    toggleCategory,
+    garmentType,
+    garmentError,
+    selectGarment,
     loading,
     requestCreate,
     confirm,
@@ -70,34 +73,57 @@ export default function CreatePost() {
             }}
           />
 
-          <View className="gap-1.5">
-            <Text className="text-xs font-semibold uppercase text-[#6E6B68]">Categoría</Text>
+          <View className="gap-2">
+            <Text className="text-xs font-semibold uppercase text-[#6E6B68]">Estilos</Text>
+            <Text className="text-xs text-[#A39E9A]">Elige uno o varios estilos para este outfit</Text>
 
-            <Pressable
-              onPress={toggleCategories}
-              className="h-12 flex-row items-center justify-between rounded-lg border border-[#EAE6E1] bg-white px-4">
-              <Text className="text-sm text-[#292724]">
-                {category ? category.name : 'Selecciona una categoría'}
-              </Text>
-
-              <Text className="text-[#6E6B68]">{showCategories ? '▲' : '▼'}</Text>
-            </Pressable>
-
-            {showCategories && (
-              <View className="overflow-hidden rounded-lg border border-[#EAE6E1] bg-white">
-                {categories.map((item) => (
+            <View className="flex-row flex-wrap gap-2.5">
+              {categories.map((style) => {
+                const selected = categoryIds.includes(style.id);
+                return (
                   <Pressable
-                    key={item.id}
-                    onPress={() => selectCategory(item)}
-                    className="border-b border-[#EAE6E1] px-4 py-3 last:border-b-0">
-                    <Text className="text-sm text-[#292724]">{item.name}</Text>
+                    key={style.id}
+                    onPress={() => toggleCategory(style.id)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected }}
+                    className="active:opacity-80"
+                    style={{
+                      borderRadius: 999,
+                      shadowColor: selected ? '#A81245' : '#5C4B36',
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: selected ? 0.22 : 0.1,
+                      shadowRadius: 8,
+                      elevation: 2,
+                    }}>
+                    <GlassSurface
+                      intensity={30}
+                      tintColor={selected ? 'rgba(168, 18, 69, 0.16)' : 'rgba(255, 255, 255, 0.55)'}
+                      style={{
+                        height: 38,
+                        paddingHorizontal: 16,
+                        borderRadius: 999,
+                        overflow: 'hidden',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderWidth: 1,
+                        borderColor: selected ? 'rgba(168, 18, 69, 0.55)' : 'rgba(255, 255, 255, 0.9)',
+                      }}>
+                      <Text
+                        className={`text-[13px] font-semibold ${
+                          selected ? 'text-[#A81245]' : 'text-[#6E6B68]'
+                        }`}>
+                        {style.name}
+                      </Text>
+                    </GlassSurface>
                   </Pressable>
-                ))}
-              </View>
-            )}
+                );
+              })}
+            </View>
 
             {categoryError && <Text className="text-xs text-red-600">{categoryError}</Text>}
           </View>
+
+          <GarmentPicker value={garmentType} onChange={selectGarment} error={garmentError} />
 
           <View className="gap-1.5">
             <Text className="text-xs font-semibold uppercase text-[#6E6B68]">Foto del outfit</Text>

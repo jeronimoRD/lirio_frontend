@@ -3,6 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
 
 import Field from '../Field';
+import GarmentPicker from './GarmentPicker';
 import GlassIconButton from '@/components/LiquidGlass/GlassIconButton';
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
 import { cardShadow } from '../../constants/theme';
@@ -18,7 +19,17 @@ const imageShadow = {
 
 export default function EditPost() {
   const insets = useSafeAreaInsets();
-  const { control, image, loading, saving, goBack, requestUpdate } = useEditPost();
+  const {
+    control,
+    image,
+    loading,
+    saving,
+    goBack,
+    requestUpdate,
+    garmentType,
+    garmentError,
+    selectGarment,
+  } = useEditPost();
 
   if (loading) {
     return (
@@ -103,6 +114,8 @@ export default function EditPost() {
               inputWrapperClassName="min-h-[120px] flex-row items-start rounded-lg border border-[#EAE6E1] bg-[#FCFAF8] p-4"
               inputClassName="flex-1 text-sm text-[#292724]"
             />
+
+            <GarmentPicker value={garmentType} onChange={selectGarment} error={garmentError} />
           </View>
         </View>
 

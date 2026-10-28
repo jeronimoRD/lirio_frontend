@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { ArrowLeft, Bookmark, Flag, Heart } from 'lucide-react-native';
 
@@ -8,6 +8,7 @@ import { initialsOf } from '../../utils/strings';
 import { formatLikeCount } from '../../utils/format';
 import { usePostDetail } from './../../hooks/upload/usePostDetail';
 import { toggleSave as toggleSaveApi } from '../../api/posts';
+import { garmentLabel } from './GarmentPicker';
 import { useSession } from '../../session/context';
 
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#3D6B52'];
@@ -23,6 +24,7 @@ const imageShadow = {
 export default function PostDetail() {
   const {
     post,
+    styleNames,
     author,
     loading,
     goBack,
@@ -38,31 +40,23 @@ export default function PostDetail() {
 
   const lastTapRef = useRef<number>(0);
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
-  const heartScale = useRef(new Animated.Value(0)).current;
-  const [saved, setSaved] = useState(
-    !!(
-      post?.isSavedByMe ??
-      (post?.savedBy && me ? post.savedBy.includes(me.id) : false)
-    ),
+  const [heartScale] = useState(() => new Animated.Value(0));
+  const serverSaved = !!(
+    post?.isSavedByMe ??
+    (post?.savedBy && me ? post.savedBy.includes(me.id) : false)
   );
-
-  useEffect(() => {
-    if (post) {
-      setSaved(
-        !!(post.isSavedByMe ?? (post.savedBy && me ? post.savedBy.includes(me.id) : false)),
-      );
-    }
-  }, [post, me?.id]);
+  const [savedOverride, setSavedOverride] = useState<boolean | null>(null);
+  const saved = savedOverride ?? serverSaved;
 
   const handleToggleSave = async () => {
     if (!post || !me) return;
     const prev = saved;
-    setSaved(!saved);
+    setSavedOverride(!saved);
     try {
       const res = await toggleSaveApi(post.id);
-      setSaved(res.saved);
-    } catch (e) {
-      setSaved(prev);
+      setSavedOverride(res.saved);
+    } catch {
+      setSavedOverride(prev);
     }
   };
 
@@ -178,6 +172,16 @@ export default function PostDetail() {
 
           <Text className="text-[15px] leading-6 text-[#6E6B68]">{post.description}</Text>
 
+          {styleNames.length > 0 && (
+            <View className="flex-row flex-wrap gap-2">
+              {styleNames.map((name) => (
+                <View key={name} className="rounded-full border border-[#EAE6E1] bg-white px-3 py-1.5">
+                  <Text className="text-xs font-semibold text-[#6E6B68]">{name}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+
           <Pressable
             onPress={toggleLike}
             hitSlop={12}
@@ -207,6 +211,16 @@ export default function PostDetail() {
                 />
               ))}
             </View>
+            {post.garmentType && (
+              <View className="gap-1 pt-2">
+                <Text className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#A09B95]">
+                  Tipo de prenda
+                </Text>
+                <Text className="text-sm font-semibold text-[#292724]">
+                  {garmentLabel(post.garmentType)}
+                </Text>
+              </View>
+            )}
           </View>
         </View>
       </ScrollView>
