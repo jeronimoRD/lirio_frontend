@@ -7,9 +7,9 @@ import {
   Text,
   View,
 } from 'react-native';
+
 import {
   Check,
-  ChevronDown,
   ImagePlus,
   RefreshCw,
   Sparkles,
@@ -23,13 +23,9 @@ import GlassSurface from '@/components/LiquidGlass/GlassSurface';
 import { useCreatePost } from '../../hooks/upload/useCreatePost';
 
 const COLORS = {
-  background: '#FCFAF8',
   burgundy: '#A81245',
-  text: '#292724',
   secondary: '#6E6B68',
-  border: '#EAE6E1',
   champagne: '#DCC7A8',
-  botanical: '#3D6B52',
 };
 
 function EditorialMark() {
@@ -104,7 +100,6 @@ export default function CreatePost() {
         showsVerticalScrollIndicator={false}
         contentContainerClassName="flex-grow pb-5"
         keyboardShouldPersistTaps="handled">
-
         {/* Cabecera */}
         <View className="px-[18px] pt-2">
           <ScreenHeader
@@ -134,54 +129,8 @@ export default function CreatePost() {
               </View>
             </View>
 
-            <View className="mt-5 flex-row items-center gap-2">
+            <View className="mt-5 flex-row items-center gap-3">
               <EditorialMark />
-          <View className="gap-2">
-            <Text className="text-xs font-semibold uppercase text-[#6E6B68]">Estilos</Text>
-            <Text className="text-xs text-[#A39E9A]">Elige uno o varios estilos para este outfit</Text>
-
-            <View className="flex-row flex-wrap gap-2.5">
-              {categories.map((style) => {
-                const selected = categoryIds.includes(style.id);
-                return (
-                  <Pressable
-                    key={style.id}
-                    onPress={() => toggleCategory(style.id)}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected }}
-                    className="active:opacity-80"
-                    style={{
-                      borderRadius: 999,
-                      shadowColor: selected ? '#A81245' : '#5C4B36',
-                      shadowOffset: { width: 0, height: 4 },
-                      shadowOpacity: selected ? 0.22 : 0.1,
-                      shadowRadius: 8,
-                      elevation: 2,
-                    }}>
-                    <GlassSurface
-                      intensity={30}
-                      tintColor={selected ? 'rgba(168, 18, 69, 0.16)' : 'rgba(255, 255, 255, 0.55)'}
-                      style={{
-                        height: 38,
-                        paddingHorizontal: 16,
-                        borderRadius: 999,
-                        overflow: 'hidden',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderWidth: 1,
-                        borderColor: selected ? 'rgba(168, 18, 69, 0.55)' : 'rgba(255, 255, 255, 0.9)',
-                      }}>
-                      <Text
-                        className={`text-[13px] font-semibold ${
-                          selected ? 'text-[#A81245]' : 'text-[#6E6B68]'
-                        }`}>
-                        {style.name}
-                      </Text>
-                    </GlassSurface>
-                  </Pressable>
-                );
-              })}
-            </View>
 
               <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#6E6B68]">
                 HIBIRIO · EL EDITORIAL
@@ -193,136 +142,133 @@ export default function CreatePost() {
         </View>
 
         <View className="gap-7 px-[18px]">
-
-          {/* 01 — Imagen */}
+          {/* 01 — Fotografía */}
           <View>
             <SectionHeading
               number="01"
               title="La fotografía"
               subtitle="Elige la imagen protagonista de tu outfit."
             />
-          <GarmentPicker value={garmentType} onChange={selectGarment} error={garmentError} />
 
-          <View className="gap-1.5">
-            <Text className="text-xs font-semibold uppercase text-[#6E6B68]">Foto del outfit</Text>
+            <View className="gap-1.5">
+              <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
+                Foto del outfit
+              </Text>
 
-            {image ? (
-              <View
-                className="overflow-hidden rounded-[22px] bg-[#EAE6E1]"
-                style={{
-                  shadowColor: '#292724',
-                  shadowOffset: { width: 0, height: 6 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 12,
-                  elevation: 3,
-                }}>
-                <Image
-                  source={{ uri: image }}
-                  className="h-[350px] w-full"
-                  resizeMode="cover"
-                />
-
-                {/* Cristal sobre la fotografía */}
-                <GlassSurface
-                  intensity={35}
-                  tintColor="rgba(41, 39, 36, 0.34)"
+              {image ? (
+                <View
+                  className="overflow-hidden rounded-[22px] bg-[#EAE6E1]"
                   style={{
-                    position: 'absolute',
-                    top: 12,
-                    left: 12,
-                    right: 12,
-                    borderRadius: 999,
-                    paddingHorizontal: 13,
-                    paddingVertical: 10,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
+                    shadowColor: '#292724',
+                    shadowOffset: { width: 0, height: 6 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 12,
+                    elevation: 3,
                   }}>
-                  <View className="flex-row items-center gap-2">
-                    <View className="h-7 w-7 items-center justify-center rounded-full bg-white/20">
-                      <Check size={14} color="#FFFFFF" />
-                    </View>
+                  <Image
+                    source={{ uri: image }}
+                    className="h-[350px] w-full"
+                    resizeMode="cover"
+                  />
 
-                    <Text className="text-[11px] font-semibold text-white">
-                      Imagen seleccionada
-                    </Text>
-                  </View>
-
-                  <Pressable
-                    onPress={selectImage}
-                    hitSlop={8}
-                    accessibilityRole="button"
-                    accessibilityLabel="Cambiar fotografía"
-                    className="flex-row items-center gap-1.5">
-                    <RefreshCw size={13} color="#FFFFFF" />
-
-                    <Text className="text-[11px] font-semibold text-white">
-                      Cambiar
-                    </Text>
-                  </Pressable>
-                </GlassSurface>
-
-                <View className="absolute bottom-3 left-3">
                   <GlassSurface
-                    intensity={25}
-                    tintColor="rgba(41, 39, 36, 0.35)"
+                    intensity={35}
+                    tintColor="rgba(41, 39, 36, 0.34)"
                     style={{
+                      position: 'absolute',
+                      top: 12,
+                      left: 12,
+                      right: 12,
                       borderRadius: 999,
-                      paddingHorizontal: 11,
-                      paddingVertical: 7,
+                      paddingHorizontal: 13,
+                      paddingVertical: 10,
                       flexDirection: 'row',
                       alignItems: 'center',
-                      gap: 6,
+                      justifyContent: 'space-between',
                     }}>
-                    <View className="h-1.5 w-1.5 rounded-full bg-[#DCC7A8]" />
+                    <View className="flex-row items-center gap-2">
+                      <View className="h-7 w-7 items-center justify-center rounded-full bg-white/20">
+                        <Check size={14} color="#FFFFFF" />
+                      </View>
 
-                    <Text className="text-[9px] font-semibold uppercase tracking-[0.12em] text-white">
-                      Hibirio · Preview
-                    </Text>
+                      <Text className="text-[11px] font-semibold text-white">
+                        Imagen seleccionada
+                      </Text>
+                    </View>
+
+                    <Pressable
+                      onPress={selectImage}
+                      hitSlop={8}
+                      accessibilityRole="button"
+                      accessibilityLabel="Cambiar fotografía"
+                      className="flex-row items-center gap-1.5">
+                      <RefreshCw size={13} color="#FFFFFF" />
+                      <Text className="text-[11px] font-semibold text-white">
+                        Cambiar
+                      </Text>
+                    </Pressable>
                   </GlassSurface>
-                </View>
-              </View>
-            ) : (
-              <Pressable
-                onPress={selectImage}
-                accessibilityRole="button"
-                accessibilityLabel="Seleccionar fotografía del outfit"
-                className="overflow-hidden rounded-[22px] border border-dashed border-[#DCC7A8] bg-white">
-                <View className="items-center justify-center px-6 py-10">
-                  <View className="mb-4 h-[68px] w-[68px] items-center justify-center rounded-full bg-[#FCFAF8]">
-                    <ImagePlus
-                      size={29}
-                      color={COLORS.burgundy}
-                      strokeWidth={1.4}
-                    />
+
+                  <View className="absolute bottom-3 left-3">
+                    <GlassSurface
+                      intensity={25}
+                      tintColor="rgba(41, 39, 36, 0.35)"
+                      style={{
+                        borderRadius: 999,
+                        paddingHorizontal: 11,
+                        paddingVertical: 7,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 6,
+                      }}>
+                      <View className="h-1.5 w-1.5 rounded-full bg-[#DCC7A8]" />
+                      <Text className="text-[9px] font-semibold uppercase tracking-[0.12em] text-white">
+                        Hibirio · Preview
+                      </Text>
+                    </GlassSurface>
                   </View>
+                </View>
+              ) : (
+                <Pressable
+                  onPress={selectImage}
+                  accessibilityRole="button"
+                  accessibilityLabel="Seleccionar fotografía del outfit"
+                  className="overflow-hidden rounded-[22px] border border-dashed border-[#DCC7A8] bg-white">
+                  <View className="items-center justify-center px-6 py-10">
+                    <View className="mb-4 h-[68px] w-[68px] items-center justify-center rounded-full bg-[#FCFAF8]">
+                      <ImagePlus
+                        size={29}
+                        color={COLORS.burgundy}
+                        strokeWidth={1.4}
+                      />
+                    </View>
 
-                  <EditorialMark />
+                    <EditorialMark />
 
-                  <Text className="mt-4 font-['Lora-Italic'] text-[21px] text-[#292724]">
-                    Tu look, en primer plano
-                  </Text>
-
-                  <Text className="mt-2 text-center text-[12px] leading-5 text-[#6E6B68]">
-                    Selecciona una fotografía para comenzar tu publicación.
-                  </Text>
-
-                  <View className="mt-5 flex-row items-center gap-2 rounded-full bg-[#A81245] px-5 py-3">
-                    <ImagePlus size={15} color="#FFFFFF" />
-
-                    <Text className="text-[11px] font-semibold text-white">
-                      Elegir fotografía
+                    <Text className="mt-4 font-['Lora-Italic'] text-[21px] text-[#292724]">
+                      Tu look, en primer plano
                     </Text>
-                  </View>
-                </View>
-              </Pressable>
-            )}
 
-            {!!imageError && (
-              <Text className="mt-2 text-[12px] leading-5 text-red-600">
-                {imageError}
-              </Text>
-            )}
+                    <Text className="mt-2 text-center text-[12px] leading-5 text-[#6E6B68]">
+                      Selecciona una fotografía para comenzar tu publicación.
+                    </Text>
+
+                    <View className="mt-5 flex-row items-center gap-2 rounded-full bg-[#A81245] px-5 py-3">
+                      <ImagePlus size={15} color="#FFFFFF" />
+                      <Text className="text-[11px] font-semibold text-white">
+                        Elegir fotografía
+                      </Text>
+                    </View>
+                  </View>
+                </Pressable>
+              )}
+
+              {!!imageError && (
+                <Text className="mt-2 text-[12px] leading-5 text-red-600">
+                  {imageError}
+                </Text>
+              )}
+            </View>
           </View>
 
           {/* 02 — Información */}
@@ -374,98 +320,92 @@ export default function CreatePost() {
             </View>
           </View>
 
-          {/* 03 — Categoría */}
+          {/* 03 — Tipo de prenda */}
           <View>
             <SectionHeading
               number="03"
-              title="El universo del outfit"
-              subtitle="Organiza tu publicación para que otros descubran tu estilo."
+              title="El tipo de prenda"
+              subtitle="Indica qué tipo de prenda protagoniza tu publicación."
             />
 
-            <View className="gap-2">
-              <Text className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#6E6B68]">
-                Categoría
+            <GarmentPicker
+              value={garmentType}
+              onChange={selectGarment}
+              error={garmentError}
+            />
+          </View>
+
+          {/* 04 — Estilos */}
+          <View>
+            <SectionHeading
+              number="04"
+              title="Tu identidad visual"
+              subtitle="Elige uno o varios estilos que representen tu outfit."
+            />
+
+            <View className="gap-3">
+              <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
+                Estilos
               </Text>
 
-              <Pressable
-                onPress={toggleCategories}
-                accessibilityRole="button"
-                accessibilityLabel="Seleccionar categoría"
-                accessibilityState={{ expanded: showCategories }}
-                className="min-h-[58px] flex-row items-center justify-between rounded-[15px] border border-[#EAE6E1] bg-white px-4 py-3">
-                <View className="flex-1 flex-row items-center gap-3 pr-3">
-                  <View className="h-9 w-9 items-center justify-center rounded-full bg-[#FCFAF8]">
-                    <Sparkles
-                      size={16}
-                      color={COLORS.burgundy}
-                      strokeWidth={1.5}
-                    />
-                  </View>
+              <Text className="text-xs text-[#A39E9A]">
+                Puedes seleccionar varios estilos.
+              </Text>
 
-                  <View className="flex-1">
-                    <Text
-                      className={`text-[13px] ${
-                        category
-                          ? 'font-semibold text-[#292724]'
-                          : 'text-[#6E6B68]'
-                      }`}>
-                      {category
-                        ? category.name
-                        : 'Selecciona una categoría'}
-                    </Text>
+              <View className="flex-row flex-wrap gap-2.5">
+                {categories.map((style) => {
+                  const selected = categoryIds.includes(style.id);
 
-                    <Text className="mt-0.5 text-[10px] text-[#A09B95]">
-                      {category
-                        ? 'Categoría seleccionada'
-                        : 'Elige la que mejor represente tu look'}
-                    </Text>
-                  </View>
-                </View>
-
-                <ChevronDown
-                  size={18}
-                  color={COLORS.secondary}
-                  style={{
-                    transform: [
-                      { rotate: showCategories ? '180deg' : '0deg' },
-                    ],
-                  }}
-                />
-              </Pressable>
-
-              {showCategories && (
-                <View className="overflow-hidden rounded-[15px] border border-[#EAE6E1] bg-white">
-                  {categories.map((item, index) => {
-                    const selected = category?.id === item.id;
-
-                    return (
-                      <Pressable
-                        key={item.id}
-                        onPress={() => selectCategory(item)}
-                        accessibilityRole="button"
-                        accessibilityState={{ selected }}
-                        className={`flex-row items-center justify-between px-4 py-4 ${
-                          index < categories.length - 1
-                            ? 'border-b border-[#EAE6E1]'
-                            : ''
-                        }`}>
+                  return (
+                    <Pressable
+                      key={style.id}
+                      onPress={() => toggleCategory(style.id)}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected }}
+                      accessibilityLabel={style.name}
+                      className="active:opacity-80"
+                      style={{
+                        borderRadius: 999,
+                        shadowColor: selected
+                          ? COLORS.burgundy
+                          : '#5C4B36',
+                        shadowOffset: { width: 0, height: 4 },
+                        shadowOpacity: selected ? 0.22 : 0.1,
+                        shadowRadius: 8,
+                        elevation: 2,
+                      }}>
+                      <GlassSurface
+                        intensity={30}
+                        tintColor={
+                          selected
+                            ? 'rgba(168, 18, 69, 0.16)'
+                            : 'rgba(255, 255, 255, 0.55)'
+                        }
+                        style={{
+                          minHeight: 38,
+                          paddingHorizontal: 16,
+                          borderRadius: 999,
+                          overflow: 'hidden',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderWidth: 1,
+                          borderColor: selected
+                            ? 'rgba(168, 18, 69, 0.55)'
+                            : 'rgba(255, 255, 255, 0.9)',
+                        }}>
                         <Text
-                          className={`flex-1 text-[13px] ${
+                          className={`text-[13px] font-semibold ${
                             selected
-                              ? 'font-semibold text-[#A81245]'
-                              : 'text-[#292724]'
+                              ? 'text-[#A81245]'
+                              : 'text-[#6E6B68]'
                           }`}>
-                          {item.name}
+                          {style.name}
                         </Text>
-
-                        {selected && (
-                          <Check size={17} color={COLORS.burgundy} />
-                        )}
-                      </Pressable>
-                    );
-                  })}
-                </View>
-              )}
+                      </GlassSurface>
+                    </Pressable>
+                  );
+                })}
+              </View>
 
               {!!categoryError && (
                 <Text className="text-[12px] leading-5 text-red-600">
@@ -508,7 +448,7 @@ export default function CreatePost() {
               accessibilityLabel="Publicar outfit"
               className="min-h-[54px] flex-row items-center justify-center gap-2 rounded-full bg-[#A81245] px-5 disabled:opacity-50"
               style={{
-                shadowColor: '#A81245',
+                shadowColor: COLORS.burgundy,
                 shadowOffset: { width: 0, height: 5 },
                 shadowOpacity: 0.18,
                 shadowRadius: 10,
@@ -519,7 +459,6 @@ export default function CreatePost() {
               ) : (
                 <>
                   <Sparkles size={16} color="#FFFFFF" />
-
                   <Text className="text-[12px] font-semibold tracking-[0.04em] text-white">
                     Publicar mi outfit
                   </Text>

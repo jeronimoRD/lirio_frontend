@@ -40,7 +40,8 @@ function EditorialMark() {
     <View
       className="flex-row items-center gap-2"
       accessibilityElementsHidden
-      importantForAccessibility="no-hide-descendants">
+      importantForAccessibility="no-hide-descendants"
+    >
       <View className="h-px w-7 bg-[#DCC7A8]" />
       <View className="h-1 w-1 rounded-full bg-[#A81245]" />
       <View className="h-px w-7 bg-[#DCC7A8]" />
@@ -66,7 +67,10 @@ function LoadingState() {
   );
 }
 
-function EmptyState({ activeFilter, activeCategoryId }: {
+function EmptyState({
+  activeFilter,
+  activeCategoryId,
+}: {
   activeFilter: string;
   activeCategoryId: string | number | null | undefined;
 }) {
@@ -111,8 +115,8 @@ export default function Home() {
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerClassName="pb-32">
-
+        contentContainerClassName="pb-32"
+      >
         {/* Encabezado editorial */}
         <View className="px-[18px] pt-2">
           <ScreenHeader title="Hibirio" />
@@ -142,7 +146,7 @@ export default function Home() {
               <EditorialMark />
 
               <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#6E6B68]">
-                LIRIO · THE EDIT
+                HIBIRIO · THE EDIT
               </Text>
 
               <View className="h-px flex-1 bg-[#EAE6E1]" />
@@ -154,7 +158,8 @@ export default function Home() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerClassName="gap-2 px-[18px] pb-5 pt-1">
+          contentContainerClassName="gap-2 px-[18px] pb-5 pt-1"
+        >
           {filters.map((filter) => {
             const active = filter === activeFilter;
 
@@ -168,11 +173,13 @@ export default function Home() {
                   active
                     ? 'bg-[#A81245]'
                     : 'border border-[#EAE6E1] bg-white'
-                }`}>
+                }`}
+              >
                 <Text
                   className={`text-[12px] font-semibold ${
                     active ? 'text-white' : 'text-[#6E6B68]'
-                  }`}>
+                  }`}
+                >
                   {filter}
                 </Text>
               </Pressable>
@@ -242,9 +249,7 @@ export default function Home() {
             </View>
 
             {/* Selección editorial */}
-            {featuredPost && (
-              <EditorialSpread post={featuredPost} />
-            )}
+            {featuredPost && <EditorialSpread post={featuredPost} />}
           </View>
         )}
       </ScrollView>
@@ -266,7 +271,8 @@ function FeedCard({
       onPress={openPost}
       accessibilityRole="button"
       accessibilityLabel={`Abrir outfit: ${post.title}`}
-      className="mb-1">
+      style={{ marginBottom: 4 }}
+    >
       <View
         className="overflow-hidden rounded-[16px] bg-[#EAE6E1]"
         style={{
@@ -275,17 +281,16 @@ function FeedCard({
           shadowOpacity: 0.09,
           shadowRadius: 10,
           elevation: 3,
-        }}>
+        }}
+      >
         <Image
           source={{ uri: post.image }}
           className="h-[220px] w-full"
           resizeMode="cover"
         />
 
-        {/* Liquid Glass: se conserva como superficie real */}
-        <GlassSurface
-          intensity={30}
-          tintColor="rgba(41, 39, 36, 0.28)"
+        {/* Superficie translúcida compatible con web */}
+        <View
           style={{
             position: 'absolute',
             bottom: 8,
@@ -297,10 +302,19 @@ function FeedCard({
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-          }}>
+            backgroundColor: 'rgba(41, 39, 36, 0.78)',
+          }}
+        >
           <Text
             numberOfLines={1}
-            className="flex-1 pr-2 text-[11px] font-semibold text-white">
+            style={{
+              flex: 1,
+              paddingRight: 8,
+              fontSize: 11,
+              fontWeight: '600',
+              color: '#FFFFFF',
+            }}
+          >
             {post.title}
           </Text>
 
@@ -312,7 +326,12 @@ function FeedCard({
             hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel={liked ? 'Quitar me gusta' : 'Dar me gusta'}
-            className="flex-row items-center gap-1">
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 4,
+            }}
+          >
             <Heart
               size={14}
               color="#FFFFFF"
@@ -320,17 +339,30 @@ function FeedCard({
               strokeWidth={1.8}
             />
 
-            <Text className="text-[10px] font-semibold text-white">
+            <Text
+              style={{
+                fontSize: 10,
+                fontWeight: '600',
+                color: '#FFFFFF',
+              }}
+            >
               {formatLikeCount(likesCount)}
             </Text>
           </Pressable>
-        </GlassSurface>
+        </View>
       </View>
 
       {/* Muestra de color decorativa */}
       <View
-        className="absolute -bottom-1.5 left-[-5px] h-[22px] w-[22px] rounded-full border-2 border-white"
         style={{
+          position: 'absolute',
+          bottom: -6,
+          left: -5,
+          width: 22,
+          height: 22,
+          borderRadius: 11,
+          borderWidth: 2,
+          borderColor: '#FFFFFF',
           backgroundColor: swatchColor,
           shadowColor: '#292724',
           shadowOffset: { width: 0, height: 2 },
@@ -369,7 +401,8 @@ function EditorialSpread({ post }: { post: Post }) {
           shadowOpacity: 0.12,
           shadowRadius: 14,
           elevation: 4,
-        }}>
+        }}
+      >
         <Image
           source={{ uri: post.image }}
           className="h-[280px] w-full"
@@ -378,7 +411,7 @@ function EditorialSpread({ post }: { post: Post }) {
 
         <View className="absolute inset-0 bg-black/20" />
 
-        {/* Liquid Glass en el bloque editorial */}
+        {/* Liquid Glass se conserva en la selección editorial */}
         <GlassSurface
           intensity={35}
           tintColor="rgba(41, 39, 36, 0.52)"
@@ -390,7 +423,8 @@ function EditorialSpread({ post }: { post: Post }) {
             borderRadius: 16,
             paddingHorizontal: 15,
             paddingVertical: 14,
-          }}>
+          }}
+        >
           <Text className="mb-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#DCC7A8]">
             La mirada de Hibirio
           </Text>
@@ -402,7 +436,8 @@ function EditorialSpread({ post }: { post: Post }) {
           <View className="mt-3 flex-row items-center justify-between">
             <Text
               numberOfLines={1}
-              className="flex-1 pr-3 text-[12px] font-semibold text-white">
+              className="flex-1 pr-3 text-[12px] font-semibold text-white"
+            >
               {post.title}
             </Text>
 

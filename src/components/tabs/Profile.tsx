@@ -179,7 +179,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
 
           <View className="flex-row rounded-full border border-[#EAE6E1] bg-white p-1.5">
             <GalleryTab
-              label="Mis outfits"
+              label="Mis publicaciones"
               icon="outfits"
               active={activeTab === 'outfits'}
               onPress={() => setActiveTab('outfits')}
