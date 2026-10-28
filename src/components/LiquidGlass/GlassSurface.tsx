@@ -22,6 +22,7 @@ import {
 // Propiedad del componente GlassSurface
 //  que permite personalizar su apariencia y comportamiento.
 // y futuros cambios en la interfaz de usuario si se desean a futuro.
+// se utiliza para crear un efecto de vidrio líquido en la interfaz de usuario, compatible con iOS y Android.
 interface Props {
     children?: ReactNode;
     style?: StyleProp<ViewStyle>;

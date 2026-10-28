@@ -1,3 +1,4 @@
+
 import { Pressable, Text, View } from 'react-native';
 
 import type { GarmentType } from '../../types';
@@ -23,11 +24,14 @@ export default function GarmentPicker({
 }) {
   return (
     <View className="gap-1.5">
-      <Text className="text-xs font-semibold uppercase text-[#6E6B68]">Tipo de prenda</Text>
+      <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
+        Tipo de prenda
+      </Text>
 
       <View className="flex-row gap-2">
         {OPTIONS.map((option) => {
           const selected = value === option.value;
+
           return (
             <Pressable
               key={option.value}
@@ -36,7 +40,9 @@ export default function GarmentPicker({
               accessibilityState={{ selected }}
               accessibilityLabel={option.label}
               className={`h-12 flex-1 items-center justify-center rounded-lg border ${
-                selected ? 'border-[#A81245] bg-[#A81245]/10' : 'border-[#EAE6E1] bg-white'
+                selected
+                  ? 'border-[#A81245] bg-[#A81245]/10'
+                  : 'border-[#EAE6E1] bg-white'
               }`}>
               <Text
                 className={`text-sm font-semibold ${
@@ -49,7 +55,11 @@ export default function GarmentPicker({
         })}
       </View>
 
-      {error && <Text className="text-xs text-red-600">{error}</Text>}
+      {!!error && (
+        <Text className="text-xs text-red-600">
+          {error}
+        </Text>
+      )}
     </View>
   );
 }
