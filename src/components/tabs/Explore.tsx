@@ -20,6 +20,7 @@ import {
 
 import ScreenHeader from '../ScreenHeader';
 import FeedCard from '../FeedCard';
+import OutfitCard from '../outfits/OutfitCard';
 import type { User } from '../../types';
 import { cardShadowLg } from '../../constants/theme';
 import { initialsOf } from '../../utils/strings';
@@ -57,6 +58,9 @@ export default function Explore() {
     results,
     leftColumn,
     rightColumn,
+    outfitResults,
+    outfitLeftColumn,
+    outfitRightColumn,
     suggestions,
     users,
     usersLoading,
@@ -198,6 +202,11 @@ export default function Explore() {
           <View className="px-4 pt-4">
             <View className="flex-row rounded-full border border-[#EAE6E1] bg-white p-1">
               <TabButton
+                label="Prendas"
+                active={activeTab === 'prendas'}
+                onPress={() => setActiveTab('prendas')}
+              />
+              <TabButton
                 label="Outfits"
                 active={activeTab === 'outfits'}
                 onPress={() => setActiveTab('outfits')}
@@ -300,8 +309,8 @@ export default function Explore() {
           </View>
         )}
 
-        {/* Resultados de outfits */}
-        {!loading && !error && searchActive && activeTab === 'outfits' && (
+        {/* Resultados de prendas */}
+        {!loading && !error && searchActive && activeTab === 'prendas' && (
           <View className="mt-5">
             {results.length > 0 ? (
               <View className="flex-row gap-3 px-4">
@@ -318,6 +327,33 @@ export default function Explore() {
                 message={
                   hasQuery
                     ? `Sin resultados para "${query}"`
+                    : 'Sin prendas en esas categorías todavía.'
+                }
+              />
+            ) : (
+              <EmptyState message="Escribe para buscar prendas." />
+            )}
+          </View>
+        )}
+
+        {/* Resultados de outfits */}
+        {!loading && !error && searchActive && activeTab === 'outfits' && (
+          <View className="mt-5">
+            {outfitResults.length > 0 ? (
+              <View className="flex-row gap-3 px-4">
+                {[outfitLeftColumn, outfitRightColumn].map((column, index) => (
+                  <View key={index} className="flex-1 gap-3">
+                    {column.map((outfit) => (
+                      <OutfitCard key={outfit.id} outfit={outfit} />
+                    ))}
+                  </View>
+                ))}
+              </View>
+            ) : hasQuery || hasCategoryFilter ? (
+              <EmptyState
+                message={
+                  hasQuery
+                    ? `Sin outfits para "${query}"`
                     : 'Sin outfits en esas categorías todavía.'
                 }
               />

@@ -1,6 +1,6 @@
 
 import {
-  Image,
+  ActivityIndicator,
   Pressable,
   ScrollView,
   Text,
@@ -14,34 +14,37 @@ import {
 } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import ConfirmModal from '../ConfirmModal';
 import ScreenHeader from '../ScreenHeader';
-import { useHome } from '../../hooks/tabs/useHome';
+import NewOutfitCard from '../outfits/NewOutfitCard';
+import OutfitCard from '../outfits/OutfitCard';
+import { useWardrobe } from '../../hooks/tabs/useWardrobe';
 
 const COLORS = {
   burgundy: '#A81245',
-  text: '#292724',
-  secondary: '#6E6B68',
-  border: '#EAE6E1',
-  champagne: '#DCC7A8',
-  background: '#FCFAF8',
 };
 
 export default function Favorites() {
-  const { displayedPosts, loading, error } = useHome();
+  const {
+    outfits,
+    loading,
+    error,
+    editOutfit,
+    deleteTarget,
+    deleting,
+    askDelete,
+    cancelDelete,
+    onDeleteConfirmed,
+  } = useWardrobe();
 
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const goToPost = (id: string) => {
-    router.push({
-      pathname: '/(upload)/[id]',
-      params: { id },
-    });
-  };
-
   const goExplore = () => {
     router.replace('/(tabs)/explore');
   };
+
+  const showSpinner = loading && outfits.length === 0;
 
   return (
     <View className="flex-1 bg-[#FCFAF8]">
@@ -62,8 +65,7 @@ export default function Favorites() {
               </Text>
 
               <Text className="mt-2 text-[13px] leading-5 text-[#6E6B68]">
-                Un espacio para descubrir, guardar y organizar tus próximos
-                looks.
+                Tus outfits en un solo lugar, listos para cuando los necesites.
               </Text>
             </View>
 
@@ -89,88 +91,57 @@ export default function Favorites() {
           </View>
         </View>
 
-        {/* Presentación del futuro ropero */}
-        <View className="mb-7 overflow-hidden rounded-[24px] border border-[#EAE6E1] bg-white">
-          <View className="px-5 pb-5 pt-6">
-            <View className="mb-4 flex-row items-center gap-2">
-              <Sparkles
-                size={15}
-                color={COLORS.burgundy}
-                strokeWidth={1.5}
-              />
-
-              <Text className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#A81245]">
-                Tu próximo capítulo
-              </Text>
-            </View>
-
-            <Text className="font-['Lora-Italic'] text-[25px] leading-8 text-[#292724]">
-              Un ropero hecho a tu medida.
-            </Text>
-
-            <Text className="mt-3 text-[13px] leading-6 text-[#6E6B68]">
-              Estamos preparando un espacio donde tus prendas, combinaciones
-              e inspiraciones puedan convivir. Tu estilo merece un lugar
-              propio.
-            </Text>
-
-            <View className="mt-6 flex-row items-center gap-3 rounded-[18px] bg-[#FCFAF8] p-4">
-              <View className="h-11 w-11 items-center justify-center rounded-full border border-[#DCC7A8] bg-white">
-                <Shirt
-                  size={20}
-                  color={COLORS.burgundy}
-                  strokeWidth={1.3}
-                />
-              </View>
-
-              <View className="flex-1">
-                <Text className="font-['Lora-Italic'] text-[16px] text-[#292724]">
-                  Tu colección personal
-                </Text>
-
-                <Text className="mt-1 text-[11px] leading-4 text-[#6E6B68]">
-                  Prendas, ideas y looks por descubrir.
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          <View className="h-1 bg-[#A81245]" />
-        </View>
-
-        {/* Inspiración de la comunidad */}
+        {/* Colección de outfits */}
         <View className="mb-4">
           <Text className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#A81245]">
-            Inspírate
+            Tu colección
           </Text>
 
           <Text className="mt-1 font-['Lora-Italic'] text-[22px] text-[#292724]">
-            Looks de la comunidad
+            Outfits que has armado
           </Text>
 
           <Text className="mt-1 text-[12px] leading-5 text-[#6E6B68]">
-            Descubre nuevas ideas mientras preparas tu ropero.
+            Combina una prenda de cada tipo y decide si los compartes.
           </Text>
         </View>
 
-        {loading && (
-          <View className="items-center py-12">
-            <Text className="font-['Lora-Italic'] text-[17px] text-[#6E6B68]">
-              Buscando inspiración…
-            </Text>
-          </View>
-        )}
-
-        {!loading && !!error && (
-          <View className="rounded-[20px] border border-[#E8C9CE] bg-[#FBF0F1] p-5">
+        {!!error && (
+          <View className="mb-4 rounded-[20px] border border-[#E8C9CE] bg-[#FBF0F1] p-5">
             <Text className="text-[13px] leading-5 text-[#A81245]">
               {error}
             </Text>
           </View>
         )}
 
-        {!loading && !error && displayedPosts.length === 0 && (
-          <View className="items-center rounded-[22px] border border-[#EAE6E1] bg-white px-6 py-9">
+        <View className="flex-row flex-wrap justify-between gap-y-4">
+          <View className="w-[48%]">
+            <NewOutfitCard />
+          </View>
+
+          {outfits.map((outfit) => (
+            <View key={outfit.id} className="w-[48%]">
+              <OutfitCard
+                outfit={outfit}
+                onEdit={() => editOutfit(outfit)}
+                onDelete={() => askDelete(outfit)}
+              />
+            </View>
+          ))}
+        </View>
+
+        {showSpinner && (
+          <View className="items-center py-12">
+            <ActivityIndicator color={COLORS.burgundy} />
+
+            <Text className="mt-3 font-['Lora-Italic'] text-[15px] text-[#6E6B68]">
+              Cargando tu ropero…
+            </Text>
+          </View>
+        )}
+
+        {!loading && !error && outfits.length === 0 && (
+          <View className="mt-4 items-center rounded-[22px] border border-[#EAE6E1] bg-white px-6 py-9">
             <View className="mb-4 h-16 w-16 items-center justify-center rounded-full bg-[#F4EEE7]">
               <Sparkles
                 size={25}
@@ -180,50 +151,12 @@ export default function Favorites() {
             </View>
 
             <Text className="text-center font-['Lora-Italic'] text-[22px] text-[#292724]">
-              La inspiración está por llegar.
+              Tu primer outfit está por nacer.
             </Text>
 
             <Text className="mt-2 text-center text-[12px] leading-5 text-[#6E6B68]">
-              Cuando haya publicaciones disponibles, podrás descubrir nuevos
-              estilos desde aquí.
+              Todavía no tienes outfits en tu ropero.
             </Text>
-          </View>
-        )}
-
-        {!loading && !error && displayedPosts.length > 0 && (
-          <View className="flex-row flex-wrap justify-between gap-y-4">
-            {displayedPosts.slice(0, 6).map((post) => (
-              <Pressable
-                key={post.id}
-                onPress={() => goToPost(post.id)}
-                accessibilityRole="button"
-                accessibilityLabel={`Ver outfit: ${post.title || 'Inspiración de estilo'}`}
-                className="w-[48%] overflow-hidden rounded-[18px] border border-[#EAE6E1] bg-white active:opacity-80">
-                <View className="overflow-hidden bg-[#F4EEE7]">
-                  <Image
-                    source={{ uri: post.image }}
-                    resizeMode="cover"
-                    className="aspect-[3/4] w-full"
-                  />
-                </View>
-
-                <View className="px-3 py-3">
-                  <Text
-                    numberOfLines={2}
-                    className="font-['Lora-Italic'] text-[15px] leading-5 text-[#292724]">
-                    {post.title || 'Inspiración de estilo'}
-                  </Text>
-
-                  <View className="mt-2 flex-row items-center gap-1">
-                    <Sparkles size={11} color={COLORS.champagne} />
-
-                    <Text className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#6E6B68]">
-                      Descubrir look
-                    </Text>
-                  </View>
-                </View>
-              </Pressable>
-            ))}
           </View>
         )}
 
@@ -243,6 +176,21 @@ export default function Favorites() {
           Tu estilo, tus reglas. Hibirio te acompaña.
         </Text>
       </ScrollView>
+
+      <ConfirmModal
+        visible={deleteTarget !== null}
+        title="¿Eliminar outfit?"
+        message={
+          deleteTarget
+            ? `Se eliminará el outfit "${deleteTarget.name}". Las prendas no se borran.`
+            : undefined
+        }
+        confirmLabel="Eliminar"
+        danger
+        loading={deleting}
+        onConfirm={onDeleteConfirmed}
+        onCancel={cancelDelete}
+      />
     </View>
   );
 }

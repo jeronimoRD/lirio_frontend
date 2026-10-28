@@ -18,6 +18,7 @@ import {
 import ScreenHeader from '../ScreenHeader';
 import ConfirmModal from '../ConfirmModal';
 import Field from '../Field';
+import GlassSurface from '../LiquidGlass/GlassSurface';
 import GarmentPicker from './GarmentPicker';
 import StylePicker from './StylePicker';
 import { useCreatePost } from '../../hooks/upload/useCreatePost';

@@ -1,20 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { getPosts } from '../../api/posts';
+import { getPublicOutfits } from '../../api/outfits';
 import { getCategories } from '../../api/categories';
 import { searchUsers, suggestUsers } from '../../api/users';
-import type { Post, Category, User } from '../../types';
+import type { Post, Outfit, Category, User } from '../../types';
 
-export type SearchTab = 'outfits' | 'cuentas';
+export type SearchTab = 'prendas' | 'outfits' | 'cuentas';
 
 export function useExplore() {
     const [posts, setPosts] = useState<Post[]>([]);
+    const [outfits, setOutfits] = useState<Outfit[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [query, setQuery] = useState('');
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
-    const [activeTab, setActiveTab] = useState<SearchTab>('outfits');
+    const [activeTab, setActiveTab] = useState<SearchTab>('prendas');
     const [suggestions, setSuggestions] = useState<User[]>([]);
     const [users, setUsers] = useState<User[]>([]);
     const [usersLoading, setUsersLoading] = useState(false);
@@ -42,6 +44,12 @@ export function useExplore() {
         .finally(() => {
             if (active) setLoading(false);
         });
+
+        getPublicOutfits()
+        .then((all) => {
+            if (active) setOutfits(all);
+        })
+        .catch(() => {});
 
         suggestUsers(10)
         .then((all) => {
@@ -103,7 +111,7 @@ export function useExplore() {
 
     const handleBlur = () => {
         setFocused(false);
-        if (!query.trim()) setActiveTab('outfits');
+        if (!query.trim()) setActiveTab('prendas');
     };
 
     const clearQuery = () => setQuery('');
@@ -143,6 +151,25 @@ export function useExplore() {
     });
     }, [posts, query, activeCategoryIds, categoryNameById]);
 
+    const outfitResults = useMemo(() => {
+        const q = query.trim().toLowerCase();
+
+        return outfits.filter((outfit) => {
+            const categoryNames = outfit.categoryIds
+                .map((id) => categoryNameById.get(id) ?? '')
+                .join(' ');
+            const haystack = `${outfit.name} ${categoryNames}`.toLowerCase();
+
+            const matchesQuery = !q || haystack.includes(q);
+
+            const matchesCategory =
+                activeCategoryIds.length === 0 ||
+                outfit.categoryIds.some((id) => activeCategoryIds.includes(id));
+
+            return matchesQuery && matchesCategory;
+        });
+    }, [outfits, query, activeCategoryIds, categoryNameById]);
+
     const outfitCountByUser = useMemo(() => {
     const counts = new Map<string, number>();
     for (const post of posts) {
@@ -158,6 +185,9 @@ export function useExplore() {
 
     const leftColumn = results.filter((_, i) => i % 2 === 0);
     const rightColumn = results.filter((_, i) => i % 2 === 1);
+
+    const outfitLeftColumn = outfitResults.filter((_, i) => i % 2 === 0);
+    const outfitRightColumn = outfitResults.filter((_, i) => i % 2 === 1);
 
     return {
     // carga general
@@ -183,10 +213,15 @@ export function useExplore() {
     toggleFilter,
     hasCategoryFilter,
 
-    // outfits
+    // prendas (posts)
     results,
     leftColumn,
     rightColumn,
+
+    // outfits
+    outfitResults,
+    outfitLeftColumn,
+    outfitRightColumn,
 
     // cuentas
     suggestions,

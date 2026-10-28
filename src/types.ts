@@ -56,6 +56,32 @@ export interface Post {
   garmentType?: GarmentType;
 }
 
+/** Pieza de un outfit: un post elegido para un tipo de prenda. */
+export interface OutfitItem {
+  postId: string;
+  garmentType: GarmentType;
+  /** Null si el post ya no existe. */
+  title: string | null;
+  /** Null si el post ya no existe. */
+  image: string | null;
+  /** Falso si el dueño ya no puede usar esta prenda. */
+  isAvailable: boolean;
+}
+
+/** Combinación de hasta una prenda por tipo, creada por un usuario. */
+export interface Outfit {
+  id: string;
+  name: string;
+  userId: string;
+  isPublic: boolean;
+  /** Falso si alguna pieza ya no está disponible. */
+  isAvailable: boolean;
+  /** Categorías de las piezas disponibles, para filtrar en explorar. */
+  categoryIds: string[];
+  items: OutfitItem[];
+  createdAt?: string;
+}
+
 /** Categoría de los posts (outfits). La gestiona el admin. */
 export interface Category {
   id: string;
