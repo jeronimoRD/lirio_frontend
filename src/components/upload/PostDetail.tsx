@@ -1,9 +1,11 @@
-import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { ActivityIndicator, Animated, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { ArrowLeft, Flag, Heart } from 'lucide-react-native';
 
 import ReportModal from '../ReportModal';
 import GlassIconButton from '@/components/LiquidGlass/GlassIconButton';
 import { initialsOf } from '../../utils/strings';
+import { formatLikeCount } from '../../utils/format';
 import { usePostDetail } from './../../hooks/upload/usePostDetail';
 
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#3D6B52'];
@@ -23,12 +25,43 @@ export default function PostDetail() {
     loading,
     goBack,
     liked,
+    likesCount,
     toggleLike,
     canReport,
     reportVisible,
     openReport,
     closeReport,
   } = usePostDetail();
+
+  const lastTapRef = useRef<number>(0);
+  const [showHeartAnimation, setShowHeartAnimation] = useState(false);
+  const heartScale = useRef(new Animated.Value(0)).current;
+
+  const handleDoubleTap = () => {
+    const now = Date.now();
+    if (now - lastTapRef.current < 300) {
+      if (!liked) {
+        toggleLike();
+      }
+      setShowHeartAnimation(true);
+      heartScale.setValue(0);
+      Animated.spring(heartScale, {
+        toValue: 1,
+        friction: 4,
+        tension: 40,
+        useNativeDriver: true,
+      }).start(() => {
+        setTimeout(() => {
+          Animated.timing(heartScale, {
+            toValue: 0,
+            duration: 250,
+            useNativeDriver: true,
+          }).start(() => setShowHeartAnimation(false));
+        }, 400);
+      });
+    }
+    lastTapRef.current = now;
+  };
 
   if (loading) {
     return (
@@ -59,23 +92,27 @@ export default function PostDetail() {
         {/* Imagen como tarjeta flotante, con margen y sombra — no pegada al borde */}
         <View className="px-5">
           <View className="overflow-hidden rounded-[24px]" style={imageShadow}>
-            <Image
-              source={{ uri: post.image }}
-              className="aspect-[4/5] w-full"
-              resizeMode="cover"
-            />
+            <Pressable onPress={handleDoubleTap} activeOpacity={1}>
+              <Image
+                source={{ uri: post.image }}
+                className="aspect-[4/5] w-full"
+                resizeMode="cover"
+              />
 
-            <GlassIconButton
-              onPress={goBack}
-              style={{ position: 'absolute', left: 16, top: 16 }}>
-              <ArrowLeft size={20} color="#292724" />
-            </GlassIconButton>
+              <GlassIconButton
+                onPress={goBack}
+                style={{ position: 'absolute', left: 16, top: 16 }}>
+                <ArrowLeft size={20} color="#292724" />
+              </GlassIconButton>
 
-            <GlassIconButton
-              onPress={toggleLike}
-              style={{ position: 'absolute', right: 16, top: 16 }}>
-              <Heart size={18} color="#A81245" fill={liked ? '#A81245' : 'none'} />
-            </GlassIconButton>
+              {showHeartAnimation && (
+                <View className="absolute inset-0 items-center justify-center">
+                  <Animated.View style={{ transform: [{ scale: heartScale }] }}>
+                    <Heart size={90} color="white" fill="white" />
+                  </Animated.View>
+                </View>
+              )}
+            </Pressable>
           </View>
         </View>
 
@@ -108,7 +145,15 @@ export default function PostDetail() {
 
           <Text className="text-[15px] leading-6 text-[#6E6B68]">{post.description}</Text>
 
-          <Text className="text-sm font-semibold text-[#292724]">{liked ? '1' : '0'} Me gusta</Text>
+          <Pressable
+            onPress={toggleLike}
+            hitSlop={12}
+            className="flex-row items-center gap-2 self-start">
+            <Heart size={22} color="#A81245" fill={liked ? '#A81245' : 'none'} />
+            <Text className="text-lg font-semibold text-[#292724]">
+              {formatLikeCount(likesCount)} Me gusta
+            </Text>
+          </Pressable>
 
           <View className="gap-2">
             <Text className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#A09B95]">

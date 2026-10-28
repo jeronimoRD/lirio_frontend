@@ -11,9 +11,11 @@ interface PostResponse {
   category_id?: string;
   createdAt: string;
   updatedAt: string;
+  liked_by?: string[];
 }
 
 function toPost(data: PostResponse): Post {
+  const likedBy = data.liked_by ?? [];
   return {
     id: data._id,
     title: data.title,
@@ -22,6 +24,8 @@ function toPost(data: PostResponse): Post {
     userId: data.user_id,
     categoryId: data.category_id,
     createdAt: data.createdAt,
+    likesCount: likedBy.length,
+    likedBy: likedBy,
   };
 }
 
@@ -44,6 +48,24 @@ export async function getPost(id: string): Promise<Post> {
   const data = await request<PostResponse>(`/posts/${id}`);
 
   return toPost(data);
+}
+
+export async function toggleLike(postId: string): Promise<{
+  message: string;
+  liked: boolean;
+  likesCount: number;
+}> {
+  const data = await request<{
+    message: string;
+    liked: boolean;
+    likesCount: number;
+  }>(`/posts/${postId}/like`, undefined, 'POST');
+  return data;
+}
+
+export async function getLikedPosts(): Promise<Post[]> {
+  const data = await request<PostResponse[]>('/posts/liked/me');
+  return data.map(toPost);
 }
 
 export async function createPost(

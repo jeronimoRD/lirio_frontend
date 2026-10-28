@@ -6,6 +6,7 @@ import type { Post } from '../../types';
 import { useHome } from '../../hooks/tabs/useHome';
 import { usePostCard } from '../../hooks/tabs/usePostCard';
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
+import { formatLikeCount } from '../../utils/format';
 
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#292724', '#6E6B68', '#EAE6E1', '#A09B95'];
 
@@ -102,7 +103,7 @@ export default function Home() {
 }
 
 function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
-  const { favorited, toggleFavorite, openPost } = usePostCard(post);
+  const { openPost, liked, likesCount, toggleLike } = usePostCard(post);
 
   return (
     <Pressable onPress={openPost}>
@@ -134,10 +135,12 @@ function FeedCard({ post, swatchColor }: { post: Post; swatchColor: string }) {
         <Pressable
           onPress={(event) => {
             event.stopPropagation();
-            toggleFavorite();
+            toggleLike();
           }}
-          hitSlop={8}>
-          <Heart size={14} color="#FFFFFF" fill={favorited ? '#FFFFFF' : 'none'} />
+          hitSlop={8}
+          className="flex-row items-center gap-1">
+          <Heart size={14} color="#FFFFFF" fill={liked ? '#FFFFFF' : 'none'} />
+          <Text className="text-[10px] font-semibold text-white">{formatLikeCount(likesCount)}</Text>
         </Pressable>
       </GlassSurface>
 

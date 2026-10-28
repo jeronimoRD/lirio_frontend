@@ -38,6 +38,12 @@ export interface Post {
   createdAt: string;
   /** ID de la categoría del outfit (opcional hasta que todos los posts la tengan). */
   categoryId?: string;
+  /** Número total de likes */
+  likesCount?: number;
+  /** Indica si el usuario actual ha dado like */
+  isLikedByMe?: boolean;
+  /** Lista de usuarios que han dado like (opcional) */
+  likedBy?: string[];
 }
 
 /** Categoría de los posts (outfits). La gestiona el admin. */
