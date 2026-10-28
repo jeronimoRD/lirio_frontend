@@ -1,16 +1,67 @@
+
 import { Redirect } from 'expo-router';
-import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
-import { UserRound } from 'lucide-react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import {
+  Check,
+  ChevronRight,
+  Sparkles,
+  UserRound,
+} from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import ScreenHeader from '../ScreenHeader';
 import Field from '../Field';
-import { SectionCard, SectionHeaderRow, SectionLabel } from '../SettingsSections';
+import GlassSurface from '@/components/LiquidGlass/GlassSurface';
+import {
+  SectionCard,
+  SectionHeaderRow,
+  SectionLabel,
+} from '../SettingsSections';
 import { useEditProfile } from '../../hooks/settings/useEditProfile';
+
+const COLORS = {
+  background: '#FCFAF8',
+  burgundy: '#A81245',
+  text: '#292724',
+  secondary: '#6E6B68',
+  border: '#EAE6E1',
+  champagne: '#DCC7A8',
+  muted: '#A09B95',
+};
+
+function EditorialMark() {
+  return (
+    <View
+      className="flex-row items-center gap-2"
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants">
+      <View className="h-px w-7 bg-[#DCC7A8]" />
+      <View className="h-1 w-1 rounded-full bg-[#A81245]" />
+      <View className="h-px w-7 bg-[#DCC7A8]" />
+    </View>
+  );
+}
 
 export default function EditProfile() {
   const insets = useSafeAreaInsets();
-  const { user, control, bio, setBio, saving, message, submit, goBack } = useEditProfile();
+
+  const {
+    user,
+    control,
+    bio,
+    setBio,
+    saving,
+    message,
+    submit,
+    goBack,
+  } = useEditProfile();
 
   if (!user) {
     return <Redirect href="/(login)/login" />;
@@ -19,27 +70,114 @@ export default function EditProfile() {
   return (
     <ScrollView
       className="flex-1 bg-[#FCFAF8]"
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
       contentContainerClassName="items-center px-5"
-      contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: insets.bottom + 40 }}>
-      <View className="w-full max-w-[390px] gap-6">
-        <ScreenHeader title="Editar perfil" onBack={goBack} />
+      contentContainerStyle={{
+        paddingTop: insets.top + 12,
+        paddingBottom: insets.bottom + 40,
+      }}>
 
-        {/* Perfil */}
+      <View className="w-full max-w-[390px] gap-6">
+
+        {/* Encabezado editorial */}
+        <View>
+          <ScreenHeader title="Editar perfil" onBack={goBack} />
+
+          <View className="mt-5">
+            <View className="flex-row items-start justify-between">
+              <View className="flex-1 pr-3">
+                <Text className="font-['Lora-Italic'] text-[29px] leading-[37px] text-[#292724]">
+                  Tu esencia, tus palabras.
+                </Text>
+
+                <Text className="mt-2 text-[13px] leading-5 text-[#6E6B68]">
+                  Haz que tu perfil refleje quién eres y cómo expresas tu
+                  estilo.
+                </Text>
+              </View>
+
+              <View className="h-11 w-11 items-center justify-center rounded-full border border-[#EAE6E1] bg-white">
+                <Sparkles
+                  size={20}
+                  color={COLORS.burgundy}
+                  strokeWidth={1.4}
+                />
+              </View>
+            </View>
+
+            <View className="mt-5 flex-row items-center gap-2">
+              <EditorialMark />
+
+              <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#6E6B68]">
+                HIBIRIO · Tu estilo
+              </Text>
+
+              <View className="h-px flex-1 bg-[#EAE6E1]" />
+            </View>
+          </View>
+        </View>
+
+        {/* Vista previa del perfil */}
+        <View>
+          <SectionLabel text="TU IDENTIDAD" />
+
+          <View className="mt-2 overflow-hidden rounded-[22px] border border-[#EAE6E1] bg-white">
+            <View className="h-[70px] bg-[#A81245]" />
+
+            <View className="px-4 pb-5">
+              <View className="-mt-8 mb-3 h-[66px] w-[66px] items-center justify-center rounded-full border-[3px] border-white bg-[#FCFAF8]">
+                <UserRound
+                  size={30}
+                  color={COLORS.burgundy}
+                  strokeWidth={1.25}
+                />
+              </View>
+
+              <Text className="font-['Lora-Italic'] text-[23px] text-[#292724]">
+                {user.name || 'Tu nombre'}
+              </Text>
+
+              <Text className="mt-1 text-[12px] text-[#6E6B68]">
+                Tu perfil en la comunidad Hibirio refleja tu estilo y personalidad. Haz que cada palabra cuente.
+              </Text>
+
+              <View className="mt-4 flex-row items-center gap-2">
+                <View className="rounded-full border border-[#EAE6E1] bg-[#FCFAF8] px-3 py-1.5">
+                  <Text className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#6E6B68]">
+                    Mi espacio
+                  </Text>
+                </View>
+
+                <View className="h-1 w-1 rounded-full bg-[#DCC7A8]" />
+
+                <Text className="text-[10px] text-[#A09B95]">
+                  Tu historia comienza aquí
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Formulario */}
         <View className="gap-2.5">
           <SectionLabel text="PERFIL" />
+
           <SectionCard>
             <SectionHeaderRow
-              icon={<UserRound size={18} color="#A81245" />}
-              label="Nombre y bibliografía"
+              icon={<UserRound size={18} color={COLORS.burgundy} />}
+              label="Nombre y biografía"
             />
 
-            <View className="gap-4">
+            <View className="gap-5">
+
+              {/* Nombre */}
               <Field
                 control={control}
                 name="name"
                 label="Nombre"
-                labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
-                inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
+                labelClassName="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#6E6B68]"
+                inputWrapperClassName="h-[52px] flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
                 inputClassName="flex-1 text-sm text-[#292724]"
                 maxLength={50}
                 rules={{
@@ -48,50 +186,167 @@ export default function EditProfile() {
                     value: 3,
                     message: 'El nombre debe tener al menos 3 caracteres',
                   },
-                  maxLength: { value: 50, message: 'Máximo 50 caracteres' },
+                  maxLength: {
+                    value: 50,
+                    message: 'Máximo 50 caracteres',
+                  },
                 }}
               />
 
-              <View className="gap-1">
-                <Text className="text-xs font-semibold uppercase text-[#6E6B68]">Bibliografía</Text>
-                <TextInput
-                  className="min-h-24 rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] p-3 text-sm text-[#292724]"
-                  placeholder="Cuéntanos algo sobre ti..."
-                  placeholderTextColor="#A09B95"
-                  value={bio}
-                  onChangeText={setBio}
-                  maxLength={200}
-                  multiline
-                  textAlignVertical="top"
-                />
+              {/* Biografía */}
+              <View className="gap-2">
+                <View className="flex-row items-center justify-between">
+                  <Text className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#6E6B68]">
+                    Biografía
+                  </Text>
+
+                  <Text className="text-[10px] text-[#A09B95]">
+                    Hasta 200 caracteres
+                  </Text>
+                </View>
+
+                <View className="overflow-hidden rounded-xl border border-[#EAE6E1] bg-[#FCFAF8]">
+                  <TextInput
+                    className="min-h-[125px] p-4 text-sm leading-[22px] text-[#292724]"
+                    placeholder="Cuéntanos algo sobre ti, tus gustos o tu forma de vivir la moda..."
+                    placeholderTextColor={COLORS.muted}
+                    value={bio}
+                    onChangeText={setBio}
+                    maxLength={200}
+                    multiline
+                    textAlignVertical="top"
+                    accessibilityLabel="Biografía"
+                  />
+
+                  <View className="flex-row items-center justify-between border-t border-[#EAE6E1] px-4 py-3">
+                    <View className="flex-row items-center gap-2">
+                      <View className="h-1.5 w-1.5 rounded-full bg-[#DCC7A8]" />
+
+                      <Text className="text-[10px] text-[#6E6B68]">
+                        Tu historia, a tu manera
+                      </Text>
+                    </View>
+
+                    <Text className="text-[10px] text-[#A09B95]">
+                      {bio.length}/200
+                    </Text>
+                  </View>
+                </View>
               </View>
 
+              {/* Mensaje de estado */}
+              {message && (
+                <View
+                  className={`overflow-hidden rounded-2xl ${
+                    message.kind === 'ok'
+                      ? 'border border-green-200 bg-green-50'
+                      : 'border border-red-200 bg-red-50'
+                  }`}>
+                  <View className="flex-row items-start gap-3 p-4">
+                    <View className="mt-0.5">
+                      {message.kind === 'ok' ? (
+                        <Check size={17} color="#15803D" />
+                      ) : (
+                        <Sparkles size={17} color="#B91C1C" />
+                      )}
+                    </View>
+
+                    <Text
+                      className={`flex-1 text-[12px] leading-5 ${
+                        message.kind === 'ok'
+                          ? 'text-green-700'
+                          : 'text-red-700'
+                      }`}>
+                      {message.text}
+                    </Text>
+                  </View>
+                </View>
+              )}
+
+              {/* Guardar cambios */}
               <Pressable
                 onPress={submit}
                 disabled={saving}
-                className="h-11 items-center justify-center rounded-xl bg-[#A81245] disabled:opacity-50">
-                <Text className="text-sm font-semibold text-white">
-                  {saving ? 'Guardando...' : 'Guardar cambios'}
-                </Text>
+                accessibilityRole="button"
+                accessibilityLabel="Guardar cambios del perfil"
+                className="overflow-hidden rounded-full bg-[#A81245] disabled:opacity-50"
+                style={{
+                  shadowColor: '#A81245',
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.16,
+                  shadowRadius: 9,
+                  elevation: 3,
+                }}>
+                <View className="min-h-[50px] flex-row items-center justify-center gap-2 px-5">
+                  {saving ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <>
+                      <Check size={16} color="#FFFFFF" />
+
+                      <Text className="text-[12px] font-semibold tracking-[0.04em] text-white">
+                        Guardar cambios
+                      </Text>
+
+                      <ChevronRight size={15} color="#FFFFFF" />
+                    </>
+                  )}
+                </View>
               </Pressable>
 
-              {message && (
-                <View
-                  className={`rounded-2xl border p-4 ${
-                    message.kind === 'ok'
-                      ? 'border-green-200 bg-green-50'
-                      : 'border-red-200 bg-red-50'
-                  }`}>
-                  <Text
-                    className={`text-center text-sm font-medium ${
-                      message.kind === 'ok' ? 'text-green-700' : 'text-red-700'
-                    }`}>
-                    {message.text}
-                  </Text>
-                </View>
-              )}
+              <Text className="text-center text-[10px] leading-4 text-[#A09B95]">
+                Un pequeño cambio puede decir mucho de ti.
+              </Text>
             </View>
           </SectionCard>
+        </View>
+
+        {/* Detalle Liquid Glass */}
+        <View className="overflow-hidden rounded-[20px]">
+          <View className="h-[108px] overflow-hidden rounded-[20px] bg-[#292724]">
+            <View className="absolute -right-5 -top-9 h-32 w-32 rounded-full border border-white/10" />
+            <View className="absolute -right-1 -top-5 h-24 w-24 rounded-full border border-white/10" />
+            <View className="absolute -bottom-12 -left-5 h-32 w-32 rounded-full border border-white/10" />
+
+            <GlassSurface
+              intensity={35}
+              tintColor="rgba(252, 250, 248, 0.10)"
+              style={{
+                flex: 1,
+                paddingHorizontal: 16,
+                paddingVertical: 15,
+                justifyContent: 'center',
+                borderRadius: 20,
+              }}>
+              <View className="flex-row items-center gap-3">
+                <View className="h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10">
+                  <Sparkles
+                    size={19}
+                    color={COLORS.champagne}
+                    strokeWidth={1.4}
+                  />
+                </View>
+
+                <View className="flex-1">
+                  <Text className="font-['Lora-Italic'] text-[18px] text-white">
+                    Tu perfil, tu universo.
+                  </Text>
+
+                  <Text className="mt-1 text-[11px] leading-4 text-white/70">
+                    La moda también es una forma de contar tu historia.
+                  </Text>
+                </View>
+              </View>
+            </GlassSurface>
+          </View>
+        </View>
+
+        <View className="items-center pb-2">
+          <EditorialMark />
+
+          <Text className="mt-3 text-[9px] font-semibold uppercase tracking-[0.2em] text-[#A09B95]">
+            HIBIRIO
+          </Text>
         </View>
       </View>
     </ScrollView>

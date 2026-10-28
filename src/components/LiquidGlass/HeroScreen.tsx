@@ -21,6 +21,10 @@ import { ArrowLeft } from 'lucide-react-native';
 
 import GlassIconButton from '@/components/LiquidGlass/GlassIconButton';
 
+
+// Se utiliza para crear una pantalla de héroe con un efecto de vidrio líquido en la interfaz de usuario,
+//  compatible con iOS y Android. Que se ve en la parte superior de la pantalla y contiene una imagen, un título, un subtítulo y un botón de retroceso opcional.
+// en las pantallas de la aplicación, como la pantalla de inicio.
 interface Props {
     image: ImageSourcePropType;
     title: string;
