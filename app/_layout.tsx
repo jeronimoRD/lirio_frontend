@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import '../global.css';
 import { SessionProvider } from '../src/session/context';
 import { LikesProvider } from '../src/likes/context';
+import { MyContentProvider } from '../src/content/context';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,7 +29,9 @@ export default function RootLayout() {
   return (
     <SessionProvider>
       <LikesProvider>
-        <Stack screenOptions={{ headerShown: false }} />
+        <MyContentProvider>
+          <Stack screenOptions={{ headerShown: false }} />
+        </MyContentProvider>
       </LikesProvider>
     </SessionProvider>
   );

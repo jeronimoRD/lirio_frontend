@@ -1,37 +1,13 @@
 import { useEffect, useState } from 'react';
 
-import { getLikedPosts, getSavedPosts } from '../../api/posts';
+import { getLikedPosts } from '../../api/posts';
+import { useMyContent } from '../../content/context';
 import type { Post } from '../../types';
 
 export function useSaved() {
-  const [savedPosts, setSavedPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { savedPosts, loaded, error } = useMyContent();
 
-  useEffect(() => {
-    let active = true;
-    setLoading(true);
-    setError(null);
-
-    getSavedPosts()
-      .then((posts) => {
-        if (active) setSavedPosts(posts);
-      })
-      .catch((err) => {
-        if (active) {
-          setError(err instanceof Error ? err.message : 'No se pudo cargar tus guardados');
-        }
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  return { savedPosts, loading, error };
+  return { savedPosts, loading: !loaded, error };
 }
 
 export function useLikedPosts() {

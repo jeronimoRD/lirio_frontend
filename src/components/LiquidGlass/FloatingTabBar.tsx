@@ -68,7 +68,7 @@ export default function FloatingTabBar({ index, onChange, blurTarget, onClearanc
     const target = BAR_PADDING + slot * slotWidth + (slotWidth - pillWidth) / 2;
 
     if (!initialized.current) {
-      pillX.value = target; // primera vez: sin animar
+        pillX.value = target; // primera vez: sin animar
         initialized.current = true;
     } else {
         pillX.value = withSpring(target, SPRING);

@@ -1,10 +1,12 @@
 
 import { Redirect, useRouter } from 'expo-router';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
   Image,
   Pressable,
+  ScrollView,
   Text,
   View,
 } from 'react-native';
@@ -15,7 +17,8 @@ import { Bookmark, Shirt, Settings2, LogOut, Sparkles } from 'lucide-react-nativ
 import ConfirmModal from '../ConfirmModal';
 import FeedCard from '../FeedCard';
 import ProfileCover from '@/components/LiquidGlass/ProfileCover';
-import type { Post, Role } from '../../types';
+import { garmentLabel } from '../upload/GarmentPicker';
+import { GARMENT_TYPES, type GarmentType, type Post, type Role } from '../../types';
 import { cardShadowLg } from '../../constants/theme';
 import { initialsOf } from '../../utils/strings';
 import { useProfile } from '../../hooks/tabs/useProfile';
@@ -63,12 +66,23 @@ export default function Profile({ active = true }: { active?: boolean }) {
   } = useProfile(active);
 
   const { savedPosts, loading: savedLoading, error: savedError } = useSaved();
+  const [garmentType, setGarmentType] = useState<GarmentType | null>(null);
 
   if (!user) {
     return active ? <Redirect href="/(login)/login" /> : null;
   }
 
   const isOutfits = activeTab === 'outfits';
+
+  const currentPosts = isOutfits ? posts : savedPosts;
+  const availableTypes = GARMENT_TYPES.filter((type) =>
+    currentPosts.some((post) => post.garmentType === type)
+  );
+  const activeType = garmentType && availableTypes.includes(garmentType) ? garmentType : null;
+  const filterPosts = (items: Post[]) =>
+    activeType ? items.filter((post) => post.garmentType === activeType) : items;
+
+  const showTypeFilter = !error && !showSpinner && !savedLoading && !savedError && availableTypes.length > 0;
 
   const goToPost = (id: string) => {
     router.push({
@@ -82,10 +96,10 @@ export default function Profile({ active = true }: { active?: boolean }) {
     : isOutfits
       ? showSpinner
         ? []
-        : posts
+        : filterPosts(posts)
       : savedLoading || savedError
         ? []
-        : savedPosts;
+        : filterPosts(savedPosts);
 
   const listEmpty = error
     ? null
@@ -289,6 +303,37 @@ export default function Profile({ active = true }: { active?: boolean }) {
                 />
               </View>
             </View>
+
+            {showTypeFilter && (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ gap: 8, paddingHorizontal: 20, paddingTop: 16 }}
+                accessibilityRole="radiogroup">
+                {availableTypes.map((type) => {
+                  const selected = activeType === type;
+
+                  return (
+                    <Pressable
+                      key={type}
+                      onPress={() => setGarmentType(selected ? null : type)}
+                      accessibilityRole="radio"
+                      accessibilityState={{ selected }}
+                      accessibilityLabel={garmentLabel(type)}
+                      className={`h-10 justify-center rounded-full border px-4 ${
+                        selected ? 'border-[#A81245] bg-[#A81245]/10' : 'border-[#EAE6E1] bg-white'
+                      }`}>
+                      <Text
+                        className={`text-[12px] font-semibold ${
+                          selected ? 'text-[#A81245]' : 'text-[#6E6B68]'
+                        }`}>
+                        {garmentLabel(type)}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            )}
 
             {/* Error */}
             <View className="px-5">

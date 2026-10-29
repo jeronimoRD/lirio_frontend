@@ -4,34 +4,43 @@ import {
   FlatList,
   Pressable,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import {
   ArrowRight,
+  Plus,
+  Search,
   Shirt,
   Sparkles,
+  X,
 } from 'lucide-react-native';
 import { useTabBarClearance } from '../LiquidGlass/TabBarClearance';
 
 import ConfirmModal from '../ConfirmModal';
 import ScreenHeader from '../ScreenHeader';
-import NewOutfitCard from '../outfits/NewOutfitCard';
 import OutfitCard from '../outfits/OutfitCard';
+import GarmentFilter from '../wardrobe/GarmentFilter';
 import { useWardrobe } from '../../hooks/tabs/useWardrobe';
-import type { Outfit } from '../../types';
 
 const COLORS = {
   burgundy: '#A81245',
 };
 
-type GridItem = { kind: 'new' } | { kind: 'outfit'; outfit: Outfit };
-
 export default function Favorites() {
   const {
     outfits,
+    totalOutfits,
     loading,
     error,
+    garmentType,
+    selectGarmentType,
+    piecesOfType,
+    selectedPostId,
+    togglePiece,
+    query,
+    setQuery,
     editOutfit,
     deleteTarget,
     deleting,
@@ -47,19 +56,15 @@ export default function Favorites() {
     router.replace('/(tabs)/explore');
   };
 
-  const showSpinner = loading && outfits.length === 0;
-
-  const gridItems: GridItem[] = [
-    { kind: 'new' },
-    ...outfits.map((outfit): GridItem => ({ kind: 'outfit', outfit })),
-  ];
+  const showSpinner = loading && totalOutfits === 0;
+  const filtering = !!garmentType || query.trim().length > 0;
 
   return (
     <View className="flex-1 bg-[#FCFAF8]">
       <FlatList
-        data={gridItems}
+        data={outfits}
         numColumns={2}
-        keyExtractor={(item) => (item.kind === 'new' ? 'new' : item.outfit.id)}
+        keyExtractor={(outfit) => outfit.id}
         columnWrapperStyle={{ gap: 16 }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -69,15 +74,11 @@ export default function Favorites() {
         }}
         renderItem={({ item }) => (
           <View className="flex-1">
-            {item.kind === 'new' ? (
-              <NewOutfitCard />
-            ) : (
-              <OutfitCard
-                outfit={item.outfit}
-                onEdit={() => editOutfit(item.outfit)}
-                onDelete={() => askDelete(item.outfit)}
-              />
-            )}
+            <OutfitCard
+              outfit={item}
+              onEdit={() => editOutfit(item)}
+              onDelete={() => askDelete(item)}
+            />
           </View>
         )}
         ListHeaderComponent={
@@ -116,14 +117,59 @@ export default function Favorites() {
             </View>
 
             {/* Colección de outfits */}
-            <View>
-              <Text className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#A81245]">
-                Tu colección
-              </Text>
+            <View className="flex-row items-end justify-between gap-3">
+              <View className="flex-1">
+                <Text className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#A81245]">
+                  Tu colección
+                </Text>
 
-              <Text className="mt-1 font-['Lora-Italic'] text-[22px] text-[#292724]">
-                Outfits que has armado
-              </Text>
+                <Text className="mt-1 font-['Lora-Italic'] text-[22px] text-[#292724]">
+                  Outfits que has armado
+                </Text>
+              </View>
+
+              <Pressable
+                onPress={() => router.push('/outfit/new')}
+                accessibilityRole="button"
+                accessibilityLabel="Crear outfit"
+                className="min-h-[48px] flex-row items-center gap-1.5 rounded-full bg-[#A81245] px-4 active:opacity-80">
+                <Plus size={16} color="#FFFFFF" />
+                <Text className="text-[12px] font-semibold text-white">Crear outfit</Text>
+              </Pressable>
+            </View>
+
+            <View className="mt-5 gap-4">
+              <GarmentFilter
+                value={garmentType}
+                onChange={selectGarmentType}
+                pieces={piecesOfType}
+                selectedPostId={selectedPostId}
+                onSelectPiece={togglePiece}
+              />
+
+              <View className="h-[50px] flex-row items-center gap-2 rounded-full border border-[#EAE6E1] bg-white px-4">
+                <Search size={18} color="#A09B95" />
+
+                <TextInput
+                  value={query}
+                  onChangeText={setQuery}
+                  placeholder="Buscar outfits por nombre..."
+                  placeholderTextColor="#A09B95"
+                  className="flex-1 text-sm text-[#292724]"
+                  autoCapitalize="none"
+                  returnKeyType="search"
+                />
+
+                {query.length > 0 && (
+                  <Pressable
+                    onPress={() => setQuery('')}
+                    hitSlop={8}
+                    accessibilityLabel="Limpiar búsqueda"
+                  >
+                    <X size={16} color="#A09B95" />
+                  </Pressable>
+                )}
+              </View>
             </View>
 
             {!!error && (
@@ -147,7 +193,19 @@ export default function Favorites() {
               </View>
             )}
 
-            {!loading && !error && outfits.length === 0 && (
+            {!loading && !error && filtering && outfits.length === 0 && totalOutfits > 0 && (
+              <View className="items-center rounded-[22px] border border-[#EAE6E1] bg-white px-6 py-9">
+                <Text className="text-center font-['Lora-Italic'] text-[20px] text-[#292724]">
+                  Ningún outfit coincide.
+                </Text>
+
+                <Text className="mt-2 text-center text-[12px] leading-5 text-[#6E6B68]">
+                  Prueba con otra prenda o cambia el nombre de la búsqueda.
+                </Text>
+              </View>
+            )}
+
+            {!loading && !error && totalOutfits === 0 && (
               <View className="items-center rounded-[22px] border border-[#EAE6E1] bg-white px-6 py-9">
                 <View className="mb-4 h-16 w-16 items-center justify-center rounded-full bg-[#F4EEE7]">
                   <Sparkles

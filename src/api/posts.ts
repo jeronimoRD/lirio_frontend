@@ -91,6 +91,11 @@ export async function getSavedPosts(): Promise<Post[]> {
   return data.map(toPost);
 }
 
+export async function getMyPosts(): Promise<Post[]> {
+  const data = await request<PostResponse[]>('/posts/mine');
+  return data.map(toPost);
+}
+
 export async function createPost(
   title: string,
   description: string,

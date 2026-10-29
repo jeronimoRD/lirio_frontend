@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { createOutfit, getOutfit, updateOutfit } from '../../api/outfits';
-import { getPosts, getSavedPosts } from '../../api/posts';
+import { getMyPosts, getSavedPosts } from '../../api/posts';
 import { useSession } from '../../session/context';
 import {
   GARMENT_TYPES,
@@ -55,7 +55,7 @@ export function useOutfitForm({
     setLoadError(null);
 
     Promise.all([
-      getPosts(),
+      getMyPosts(),
       getSavedPosts(),
       outfitId ? getOutfit(outfitId) : Promise.resolve(null),
     ])
@@ -64,7 +64,7 @@ export function useOutfitForm({
 
         const byId = new Map<string, Post>();
 
-        for (const post of [...all.filter((item) => item.userId === user.id), ...saved]) {
+        for (const post of [...all, ...saved]) {
           byId.set(post.id, post);
         }
 
