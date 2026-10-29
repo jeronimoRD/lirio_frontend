@@ -23,6 +23,7 @@ const colors = {
   'admin-danger': '#C2391F',
   'admin-danger-bg': '#FBE6E1',
   'admin-danger-line': '#E9AFA6',
+  'admin-faint': '#A09B95',
 };
 
 const radius = {
@@ -38,6 +39,8 @@ const glass = {
   edge: 'rgba(255, 255, 255, 0.5)',
   brandFill: 'rgba(168, 18, 69, 0.10)',
   brandEdge: 'rgba(168, 18, 69, 0.18)',
+  garmentFill: 'rgba(252, 250, 248, 0.4)',
+  outfitFill: 'rgba(168, 18, 69, 0.78)',
   toast: 'rgba(41, 39, 36, 0.88)',
 };
 

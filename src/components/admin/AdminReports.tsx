@@ -7,7 +7,7 @@ import Button from '../Button';
 import ConfirmModal from '../ConfirmModal';
 import type { ReportStatus } from '../../types';
 import { REPORT_REASON_LABELS, REPORT_STATUS_LABELS } from '../../types';
-import { cardShadow } from '../../constants/theme';
+import { adminColors, cardShadow } from '../../constants/theme';
 import { useAdminReports, type StatusFilter } from '../../hooks/admin/useAdminReports';
 
 const FILTERS: { label: string; value: StatusFilter }[] = [
@@ -43,7 +43,7 @@ export default function AdminReports() {
 
   return (
     <View className="flex-1 bg-screen">
-      <AdminBrandHeader />
+      <AdminBrandHeader title="Reportes" />
       <FlatList
         className="flex-1"
         data={loading ? [] : filteredReports}
@@ -59,7 +59,7 @@ export default function AdminReports() {
                 onPress={goBack}
                 className="mb-3 h-8 w-8 items-center justify-center rounded-full bg-icon-well"
                 hitSlop={8}>
-                <ArrowLeft size={16} color="#4A3728" />
+                <ArrowLeft size={16} color={adminColors.brown} />
               </Pressable>
               <Text className="font-['Lora-Italic'] text-[28px] leading-9 text-admin-ink">
                 Reportes
@@ -95,7 +95,7 @@ export default function AdminReports() {
 
             {loading && (
               <View className="items-center py-10">
-                <ActivityIndicator color="#4A3728" />
+                <ActivityIndicator color={adminColors.brown} />
               </View>
             )}
           </View>
@@ -128,7 +128,7 @@ export default function AdminReports() {
               <View className="flex-row items-center justify-between gap-2">
                 <View className="flex-row items-center gap-2">
                   <View className="h-8 w-8 items-center justify-center rounded-full bg-icon-well">
-                    <Flag size={14} color="#4A3728" />
+                    <Flag size={14} color={adminColors.brown} />
                   </View>
                   <Text className="text-sm font-semibold text-ink">
                     {report.targetType === 'POST' ? 'Publicación' : 'Usuario'}

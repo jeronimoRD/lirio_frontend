@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { router } from 'expo-router';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View, type ViewInstance } from 'react-native';
+import { BlurTargetView } from 'expo-blur';
 import { AlertTriangle, MoreVertical } from 'lucide-react-native';
 
 import type { Outfit } from '../../types';
 import { cardShadowLg } from '../../constants/theme';
+import PressableCard from '../PressableCard';
+import GlassBadge from '../LiquidGlass/GlassBadge';
 import OutfitCollage from './OutfitCollage';
 
 type OutfitCardProps = {
@@ -15,6 +18,7 @@ type OutfitCardProps = {
 
 export default function OutfitCard({ outfit, onEdit, onDelete }: OutfitCardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const imageRef = useRef<ViewInstance | null>(null);
 
   const openOutfit = () =>
     router.push({
@@ -25,13 +29,15 @@ export default function OutfitCard({ outfit, onEdit, onDelete }: OutfitCardProps
   const hasMenu = !!onEdit || !!onDelete;
 
   return (
-    <Pressable
+    <PressableCard
       onPress={openOutfit}
       accessibilityRole="button"
       accessibilityLabel={`Abrir outfit ${outfit.name}`}
-      className="aspect-[3/5] overflow-hidden rounded-card border border-brand/25 bg-white active:opacity-80"
+      className="aspect-[3/5] overflow-hidden rounded-card border border-brand/25 bg-white"
       style={cardShadowLg}>
-      <OutfitCollage items={outfit.items} />
+      <BlurTargetView ref={imageRef} style={{ flex: 1 }}>
+        <OutfitCollage items={outfit.items} />
+      </BlurTargetView>
 
       {!outfit.isAvailable && (
         <View
@@ -46,10 +52,8 @@ export default function OutfitCard({ outfit, onEdit, onDelete }: OutfitCardProps
         </View>
       )}
 
-      <View className="absolute left-2.5 top-2.5 rounded-full bg-brand px-2.5 py-1">
-        <Text className="text-[9px] font-bold uppercase tracking-[1.5px] text-white">
-          Outfit
-        </Text>
+      <View className="absolute left-2.5 top-2.5">
+        <GlassBadge label="Outfit" variant="outfit" blurTarget={imageRef} />
       </View>
 
       {hasMenu && (
@@ -100,6 +104,6 @@ export default function OutfitCard({ outfit, onEdit, onDelete }: OutfitCardProps
         </Text>
       </View>
 
-    </Pressable>
+    </PressableCard>
   );
 }

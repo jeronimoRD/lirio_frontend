@@ -1,8 +1,8 @@
 import { FlatList, Image, Pressable, Text, View } from 'react-native';
 import { Check } from 'lucide-react-native';
 
-import { garmentLabel } from '../upload/GarmentPicker';
-import { GARMENT_TYPES, type GarmentType, type Post } from '../../types';
+import { useGarmentTypes } from '../../garment-types/context';
+import type { Post } from '../../types';
 
 export default function GarmentFilter({
   value,
@@ -11,33 +11,35 @@ export default function GarmentFilter({
   selectedPostId,
   onSelectPiece,
 }: {
-  value: GarmentType | null;
-  onChange: (type: GarmentType) => void;
+  value: string | null;
+  onChange: (typeId: string) => void;
   pieces: Post[];
   selectedPostId: string | null;
   onSelectPiece: (post: Post) => void;
 }) {
+  const { types, labelOf } = useGarmentTypes();
+
   return (
     <View className="gap-4">
-      <View className="flex-row gap-2">
-        {GARMENT_TYPES.map((type) => {
-          const selected = value === type;
+      <View className="flex-row flex-wrap gap-2">
+        {types.map((type) => {
+          const selected = value === type.id;
 
           return (
             <Pressable
-              key={type}
-              onPress={() => onChange(type)}
+              key={type.id}
+              onPress={() => onChange(type.id)}
               accessibilityRole="radio"
               accessibilityState={{ selected }}
-              accessibilityLabel={garmentLabel(type)}
-              className={`h-12 flex-1 items-center justify-center rounded-full border ${
+              accessibilityLabel={type.name}
+              className={`h-12 flex-1 items-center justify-center rounded-full border px-3 ${
                 selected ? 'border-brand bg-brand/10' : 'border-line bg-white'
               }`}>
               <Text
                 className={`text-sm font-semibold ${
                   selected ? 'text-brand' : 'text-ink-secondary'
                 }`}>
-                {garmentLabel(type)}
+                {type.name}
               </Text>
             </Pressable>
           );
@@ -65,7 +67,7 @@ export default function GarmentFilter({
                     onPress={() => onSelectPiece(item)}
                     accessibilityRole="button"
                     accessibilityState={{ selected }}
-                    accessibilityLabel={`${garmentLabel(value)}: ${item.title}`}
+                    accessibilityLabel={`${labelOf(value)}: ${item.title}`}
                     className={`w-[64px] overflow-hidden rounded-[12px] border-2 bg-white ${
                       selected ? 'border-brand' : 'border-transparent'
                     }`}>

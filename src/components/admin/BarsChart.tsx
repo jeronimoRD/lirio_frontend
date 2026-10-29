@@ -1,5 +1,7 @@
 import { Text, View } from 'react-native';
 
+import { adminColors } from '../../constants/theme';
+
 const MAX_BAR_HEIGHT = 88;
 
 /**
@@ -26,7 +28,7 @@ export default function BarsChart({
               className="w-6 rounded-t"
               style={{
                 height,
-                backgroundColor: highlighted ? '#A91243' : '#F8E7ED',
+                backgroundColor: highlighted ? adminColors.brand : adminColors.tint,
               }}
             />
             <Text className="text-[11px] font-semibold text-admin-muted">

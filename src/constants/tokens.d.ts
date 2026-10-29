@@ -14,6 +14,7 @@ export declare const colors: {
   readonly 'admin-ink': string;
   readonly 'admin-brown': string;
   readonly 'admin-muted': string;
+  readonly 'admin-faint': string;
   readonly 'admin-line': string;
   readonly 'admin-screen': string;
   readonly 'admin-tint': string;
@@ -37,5 +38,7 @@ export declare const glass: {
   readonly edge: string;
   readonly brandFill: string;
   readonly brandEdge: string;
+  readonly garmentFill: string;
+  readonly outfitFill: string;
   readonly toast: string;
 };

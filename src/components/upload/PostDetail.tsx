@@ -28,7 +28,7 @@ import { initialsOf } from '../../utils/strings';
 import { formatLikeCount } from '../../utils/format';
 import { usePostDetail } from '../../hooks/upload/usePostDetail';
 import { toggleSave as toggleSaveApi } from '../../api/posts';
-import { garmentLabel } from './GarmentPicker';
+import { useGarmentTypes } from '../../garment-types/context';
 import { useSession } from '../../session/context';
 
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#3D6B52'];
@@ -75,6 +75,7 @@ function LoadingState() {
 }
 
 export default function PostDetail() {
+  const { labelOf } = useGarmentTypes();
   const {
     post,
     styleNames,
@@ -507,13 +508,13 @@ export default function PostDetail() {
                 </Text>
               </View>
             </View>
-            {post.garmentType && (
+            {post.garmentTypeId && (
               <View className="gap-1 pt-2">
                 <Text className="text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-muted">
                   Tipo de prenda
                 </Text>
                 <Text className="text-sm font-semibold text-ink">
-                  {garmentLabel(post.garmentType)}
+                  {labelOf(post.garmentTypeId)}
                 </Text>
               </View>
             )}

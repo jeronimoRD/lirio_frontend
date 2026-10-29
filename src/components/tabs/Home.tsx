@@ -7,7 +7,10 @@ import {
   ScrollView,
   Text,
   View,
+  type ViewInstance,
 } from 'react-native';
+import { useRef } from 'react';
+import { BlurTargetView } from 'expo-blur';
 import { Heart, Sparkles } from 'lucide-react-native';
 
 import ScreenHeader from '../ScreenHeader';
@@ -15,7 +18,10 @@ import type { Post } from '../../types';
 import { useHome } from '../../hooks/tabs/useHome';
 import { usePostCard } from '../../hooks/tabs/usePostCard';
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
+import GlassBadge from '@/components/LiquidGlass/GlassBadge';
+import PressableCard from '@/components/PressableCard';
 import { useTabBarClearance } from '@/components/LiquidGlass/TabBarClearance';
+import { useGarmentTypes } from '../../garment-types/context';
 import { formatLikeCount } from '../../utils/format';
 
 const COLORS = {
@@ -260,9 +266,12 @@ function FeedCard({
   swatchColor: string;
 }) {
   const { openPost, liked, likesCount, toggleLike } = usePostCard(post);
+  const { labelOf } = useGarmentTypes();
+  const imageRef = useRef<ViewInstance | null>(null);
+  const garmentType = labelOf(post.garmentTypeId);
 
   return (
-    <Pressable
+    <PressableCard
       onPress={openPost}
       accessibilityRole="button"
       accessibilityLabel={`Abrir outfit: ${post.title}`}
@@ -278,11 +287,23 @@ function FeedCard({
           elevation: 3,
         }}
       >
-        <Image
-          source={{ uri: post.image }}
-          className="h-[220px] w-full"
-          resizeMode="cover"
-        />
+        <BlurTargetView ref={imageRef} style={{ height: 220, width: '100%' }}>
+          <Image
+            source={{ uri: post.image }}
+            className="h-full w-full"
+            resizeMode="cover"
+          />
+        </BlurTargetView>
+
+        {!!garmentType && (
+          <View className="absolute left-2.5 top-2.5">
+            <GlassBadge
+              label={garmentType}
+              variant="garment"
+              blurTarget={imageRef}
+            />
+          </View>
+        )}
 
         {/* Superficie translúcida compatible con web */}
         <View
@@ -366,12 +387,15 @@ function FeedCard({
           elevation: 2,
         }}
       />
-    </Pressable>
+    </PressableCard>
   );
 }
 
 function EditorialSpread({ post }: { post: Post }) {
   const { openPost } = usePostCard(post);
+  const { labelOf } = useGarmentTypes();
+  const imageRef = useRef<ViewInstance | null>(null);
+  const garmentType = labelOf(post.garmentTypeId);
 
   return (
     <View>
@@ -385,7 +409,7 @@ function EditorialSpread({ post }: { post: Post }) {
         <View className="h-px flex-1 bg-line" />
       </View>
 
-      <Pressable
+      <PressableCard
         onPress={openPost}
         accessibilityRole="button"
         accessibilityLabel={`Ver selección editorial: ${post.title}`}
@@ -398,13 +422,25 @@ function EditorialSpread({ post }: { post: Post }) {
           elevation: 4,
         }}
       >
-        <Image
-          source={{ uri: post.image }}
-          className="h-[280px] w-full"
-          resizeMode="cover"
-        />
+        <BlurTargetView ref={imageRef} style={{ height: 280, width: '100%' }}>
+          <Image
+            source={{ uri: post.image }}
+            className="h-full w-full"
+            resizeMode="cover"
+          />
+        </BlurTargetView>
 
         <View className="absolute inset-0 bg-black/20" />
+
+        {!!garmentType && (
+          <View className="absolute left-3 top-3">
+            <GlassBadge
+              label={garmentType}
+              variant="garment"
+              blurTarget={imageRef}
+            />
+          </View>
+        )}
 
         {/* Liquid Glass se conserva en la selección editorial */}
         <GlassSurface
@@ -443,7 +479,7 @@ function EditorialSpread({ post }: { post: Post }) {
             </View>
           </View>
         </GlassSurface>
-      </Pressable>
+      </PressableCard>
     </View>
   );
 }

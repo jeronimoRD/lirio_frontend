@@ -31,7 +31,7 @@ export default function EditPost() {
     categoryIds,
     categoryError,
     toggleCategory,
-    garmentType,
+    garmentTypeId,
     garmentError,
     selectGarment,
   } = useEditPost();
@@ -127,7 +127,7 @@ export default function EditPost() {
               error={categoryError}
             />
 
-            <GarmentPicker value={garmentType} onChange={selectGarment} error={garmentError} />
+            <GarmentPicker value={garmentTypeId} onChange={selectGarment} error={garmentError} />
           </View>
         </View>
 

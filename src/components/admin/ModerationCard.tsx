@@ -2,6 +2,7 @@ import { Shirt } from 'lucide-react-native';
 import { Image, Pressable, Text, View } from 'react-native';
 
 import Button from '../Button';
+import { adminColors } from '../../constants/theme';
 
 type ModerationCardProps = {
   title: string;
@@ -33,7 +34,7 @@ export default function ModerationCard({
               resizeMode="cover"
             />
           ) : (
-            <Shirt size={20} color="#A91243" />
+            <Shirt size={20} color={adminColors.brand} />
           )}
         </View>
 

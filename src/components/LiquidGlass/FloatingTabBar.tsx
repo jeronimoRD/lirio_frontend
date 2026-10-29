@@ -1,11 +1,13 @@
-import { useEffect, useRef, useState, type ComponentType, type Ref } from 'react';
+import { useRef, useState, type ComponentType, type Ref } from 'react';
 import { Pressable, StyleSheet, View, type LayoutChangeEvent, type ViewInstance } from 'react-native';
 import Animated, {
     interpolate,
     interpolateColor,
     useAnimatedStyle,
+    useDerivedValue,
     useSharedValue,
     withSpring,
+    type SharedValue,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Heart, House, Plus, Search, Shirt, UserRound } from 'lucide-react-native';
@@ -48,36 +50,32 @@ const barShadow = {
 
 interface Props {
     index: number;
+    scrollPosition: SharedValue<number>;
     onChange: (index: number) => void;
     blurTarget?: Ref<View> | any;
     onClearanceChange?: (px: number) => void;
 }
 
-export default function FloatingTabBar({ index, onChange, blurTarget, onClearanceChange }: Props) {
+export default function FloatingTabBar({ index, scrollPosition, onChange, blurTarget, onClearanceChange }: Props) {
     const insets = useSafeAreaInsets();
     const [barWidth, setBarWidth] = useState(0);
-    const pillX = useSharedValue(0);
-    const initialized = useRef(false);
 
     const slotWidth = barWidth > 0 ? (barWidth - BAR_PADDING * 2) / SLOTS : 0;
     const pillWidth = Math.max(slotWidth - 6, 0);
-    const slot = TABS[index]?.slot ?? 0;
+    const pillCenters = TABS.map((tab) => BAR_PADDING + tab.slot * slotWidth + slotWidth / 2);
+    const pillExtras = pillCenters.slice(1).map((center, i) => Math.max(center - pillCenters[i] - slotWidth, 0));
 
-    useEffect(() => {
-    if (!slotWidth) return;
-    const target = BAR_PADDING + slot * slotWidth + (slotWidth - pillWidth) / 2;
-
-    if (!initialized.current) {
-        pillX.value = target; // primera vez: sin animar
-        initialized.current = true;
-    } else {
-        pillX.value = withSpring(target, SPRING);
-    }
-    }, [slot, slotWidth, pillWidth, pillX]);
-
-    const pillStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: pillX.value }],
-    }));
+    const pillStyle = useAnimatedStyle(
+    () => {
+        const last = pillCenters.length - 1;
+        const p = Math.min(Math.max(scrollPosition.value, 0), last);
+        const i = Math.min(Math.floor(p), last - 1);
+        const f = p - i;
+        const eased = f * f * (3 - 2 * f);
+        const center = pillCenters[i] + (pillCenters[i + 1] - pillCenters[i]) * eased;
+        const width = pillWidth + pillExtras[i] * Math.sin(Math.PI * f);
+        return { left: center - width / 2, width };
+    });
 
     const onLayout = (event: LayoutChangeEvent) => setBarWidth(event.nativeEvent.layout.width);
 
@@ -134,6 +132,8 @@ export default function FloatingTabBar({ index, onChange, blurTarget, onClearanc
                     label={tab.label}
                     icon={tab.icon}
                     active={index === i}
+                    position={i}
+                    scrollPosition={scrollPosition}
                     onPress={() => onChange(i)}
                 />
                 </View>
@@ -166,21 +166,18 @@ function TabItem({
     label,
     icon: Icon,
     active,
+    position,
+    scrollPosition,
     onPress,
 }: {
     label: string;
     icon: ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
     active: boolean;
+    position: number;
+    scrollPosition: SharedValue<number>;
     onPress: () => void;
 }) {
-    const progress = useSharedValue(active ? 1 : 0);
-
-useEffect(() => {
-    // Al activarse usa un resorte con rebote; al desactivarse, uno más calmado
-    // Esto hace que la animación de activación sea más llamativa y divertida, 
-    // mientras que la desactivación es más sutil y elegante.
-    progress.value = withSpring(active ? 1 : 0, active ? BOUNCE : SPRING);
-    }, [active, progress]);
+    const progress = useDerivedValue(() => Math.max(0, 1 - Math.abs(scrollPosition.value - position)));
 
     const iconWrap = useAnimatedStyle(() => ({
     transform: [

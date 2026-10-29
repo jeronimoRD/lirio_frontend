@@ -6,7 +6,7 @@ import { ArrowLeft, Search, X } from 'lucide-react-native';
 import AdminBrandHeader from './AdminBrandHeader';
 import Button from '../Button';
 import ConfirmModal from '../ConfirmModal';
-import { cardShadow } from '../../constants/theme';
+import { adminColors, cardShadow } from '../../constants/theme';
 import { useAdminCategories } from '../../hooks/admin/useAdminCategories';
 
 export default function AdminCategories() {
@@ -45,7 +45,7 @@ export default function AdminCategories() {
 
   return (
     <View className="flex-1 bg-screen">
-      <AdminBrandHeader />
+      <AdminBrandHeader title="Categorías" />
       <FlatList
         className="flex-1"
         data={loading ? [] : filteredCategories}
@@ -61,7 +61,7 @@ export default function AdminCategories() {
                 onPress={goBack}
                 className="mb-3 h-8 w-8 items-center justify-center rounded-full bg-icon-well"
                 hitSlop={8}>
-                <ArrowLeft size={16} color="#4A3728" />
+                <ArrowLeft size={16} color={adminColors.brown} />
               </Pressable>
               <Text className="font-['Lora-Italic'] text-[28px] leading-9 text-admin-ink">
                 Categorías
@@ -78,14 +78,14 @@ export default function AdminCategories() {
               <View className="flex-1">
                 <TextInput
                   className="h-12 w-full rounded-xl border border-line bg-white px-4 text-sm text-ink"
-                  style={focusedField === 'new' ? { borderColor: '#A81245' } : undefined}
+                  style={focusedField === 'new' ? { borderColor: adminColors.brand } : undefined}
                   onFocus={() => setFocusedField('new')}
                   onBlur={() => setFocusedField(null)}
                   value={newName}
                   onChangeText={changeNewName}
                   maxLength={maxNameLength}
                   placeholder="Nueva categoría"
-                  placeholderTextColor="#A09B95"
+                  placeholderTextColor={adminColors.faint}
                   autoCapitalize="words"
                   onSubmitEditing={requestCreate}
                 />
@@ -109,29 +109,29 @@ export default function AdminCategories() {
 
             <View
               className="mt-4 h-12 flex-row items-center gap-2 rounded-full border border-line bg-white px-4"
-              style={focusedField === 'search' ? { borderColor: '#A81245' } : undefined}>
-              <Search size={18} color="#A09B95" />
+              style={focusedField === 'search' ? { borderColor: adminColors.brand } : undefined}>
+              <Search size={18} color={adminColors.faint} />
               <TextInput
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 onFocus={() => setFocusedField('search')}
                 onBlur={() => setFocusedField(null)}
                 placeholder="Buscar categoría..."
-                placeholderTextColor="#A09B95"
+                placeholderTextColor={adminColors.faint}
                 className="flex-1 text-sm text-ink"
                 autoCapitalize="none"
                 returnKeyType="search"
               />
               {searchQuery.length > 0 && (
                 <Pressable onPress={clearSearch} hitSlop={8}>
-                  <X size={16} color="#A09B95" />
+                  <X size={16} color={adminColors.faint} />
                 </Pressable>
               )}
             </View>
 
             {loading && (
               <View className="items-center py-10">
-                <ActivityIndicator color="#4A3728" />
+                <ActivityIndicator color={adminColors.brown} />
               </View>
             )}
           </View>
@@ -165,14 +165,14 @@ export default function AdminCategories() {
                   <>
                     <TextInput
                       className="h-12 rounded-xl border border-line bg-screen px-4 text-sm text-ink"
-                      style={focusedField === 'edit' ? { borderColor: '#A81245' } : undefined}
+                      style={focusedField === 'edit' ? { borderColor: adminColors.brand } : undefined}
                       onFocus={() => setFocusedField('edit')}
                       onBlur={() => setFocusedField(null)}
                       value={editName}
                       onChangeText={setEditName}
                       maxLength={maxNameLength}
                       placeholder="Nombre de la categoría"
-                      placeholderTextColor="#A09B95"
+                      placeholderTextColor={adminColors.faint}
                       autoCapitalize="words"
                       onSubmitEditing={saveEdit}
                     />

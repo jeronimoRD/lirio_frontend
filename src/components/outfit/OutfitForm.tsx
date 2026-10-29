@@ -17,9 +17,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Field from '../Field';
 import ScreenHeader from '../ScreenHeader';
 import OutfitCollage from '../outfits/OutfitCollage';
-import { garmentLabel } from '../upload/GarmentPicker';
+import { useGarmentTypes } from '../../garment-types/context';
 import { useOutfitForm, type OutfitSection } from '../../hooks/outfit/useOutfitForm';
-import { GARMENT_TYPES, type GarmentType, type Post } from '../../types';
+import type { GarmentType, Post } from '../../types';
 
 const VISIBILITY_OPTIONS = [
   {
@@ -36,6 +36,7 @@ const VISIBILITY_OPTIONS = [
 
 export default function OutfitForm() {
   const insets = useSafeAreaInsets();
+  const { types } = useGarmentTypes();
 
   const scrollRef = useRef<ScrollViewInstance>(null);
   const contentRef = useRef<ViewInstance>(null);
@@ -153,12 +154,12 @@ export default function OutfitForm() {
                 subtitle="Una por tipo. Toca otra para cambiarla."
               />
 
-              {GARMENT_TYPES.map((type) => (
+              {types.map((type) => (
                 <GarmentRow
-                  key={type}
+                  key={type.id}
                   type={type}
-                  options={options.filter((post) => post.garmentType === type)}
-                  selectedId={selected[type]}
+                  options={options.filter((post) => post.garmentTypeId === type.id)}
+                  selectedId={selected[type.id]}
                   onSelect={togglePiece}
                 />
               ))}
@@ -281,7 +282,7 @@ function GarmentRow({
 }) {
   return (
     <View className="gap-2">
-      <Text className="text-[12px] font-semibold text-ink">{garmentLabel(type)}</Text>
+      <Text className="text-[12px] font-semibold text-ink">{type.name}</Text>
 
       {options.length === 0 ? (
         <Text className="text-[12px] leading-5 text-ink-muted">
@@ -302,7 +303,7 @@ function GarmentRow({
                 onPress={() => onSelect(item)}
                 accessibilityRole="button"
                 accessibilityState={{ selected }}
-                accessibilityLabel={`${garmentLabel(type)}: ${item.title}`}
+                accessibilityLabel={`${type.name}: ${item.title}`}
                 className={`w-[84px] overflow-hidden rounded-[14px] border-2 bg-white ${
                   selected ? 'border-brand' : 'border-transparent'
                 }`}>
