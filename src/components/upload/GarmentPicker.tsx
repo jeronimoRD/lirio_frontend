@@ -1,45 +1,37 @@
 
 import { Pressable, Text, View } from 'react-native';
 
-import type { GarmentType } from '../../types';
-
-const OPTIONS: { value: GarmentType; label: string }[] = [
-  { value: 'SHIRT', label: 'Camiseta' },
-  { value: 'PANTS', label: 'Pantalón' },
-  { value: 'SHOES', label: 'Zapato' },
-];
-
-export function garmentLabel(type: GarmentType): string {
-  return OPTIONS.find((option) => option.value === type)?.label ?? '';
-}
+import { useGarmentTypes } from '../../garment-types/context';
 
 export default function GarmentPicker({
   value,
   onChange,
   error,
 }: {
-  value: GarmentType | null;
-  onChange: (value: GarmentType) => void;
+  value: string | null;
+  onChange: (value: string) => void;
   error?: string | null;
 }) {
+  const { types } = useGarmentTypes();
+
   return (
     <View className="gap-1.5">
       <Text className="text-xs font-semibold uppercase text-ink-secondary">
         Tipo de prenda
       </Text>
 
-      <View className="flex-row gap-2">
-        {OPTIONS.map((option) => {
-          const selected = value === option.value;
+      <View className="flex-row flex-wrap gap-2">
+        {types.map((type) => {
+          const selected = value === type.id;
 
           return (
             <Pressable
-              key={option.value}
-              onPress={() => onChange(option.value)}
+              key={type.id}
+              onPress={() => onChange(type.id)}
               accessibilityRole="radio"
               accessibilityState={{ selected }}
-              accessibilityLabel={option.label}
-              className={`h-12 flex-1 items-center justify-center rounded-lg border ${
+              accessibilityLabel={type.name}
+              className={`h-12 flex-1 items-center justify-center rounded-lg border px-3 ${
                 selected
                   ? 'border-brand bg-brand/10'
                   : 'border-line bg-white'
@@ -48,7 +40,7 @@ export default function GarmentPicker({
                 className={`text-sm font-semibold ${
                   selected ? 'text-brand' : 'text-ink-secondary'
                 }`}>
-                {option.label}
+                {type.name}
               </Text>
             </Pressable>
           );

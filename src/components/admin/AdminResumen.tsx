@@ -1,5 +1,13 @@
 import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native';
-import { ChevronRight, Image as ImageIcon, Tag, TriangleAlert, Users } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  ChevronRight,
+  Image as ImageIcon,
+  Shirt,
+  Tag,
+  TriangleAlert,
+  Users,
+} from 'lucide-react-native';
 
 import AdminBrandHeader from './AdminBrandHeader';
 import BarsChart from './BarsChart';
@@ -7,12 +15,15 @@ import ModerationCard from './ModerationCard';
 import StatCard from './StatCard';
 import ConfirmModal from '../ConfirmModal';
 import { REPORT_REASON_LABELS } from '../../types';
+import { adminColors } from '../../constants/theme';
 import { useAdminResumen } from '../../hooks/admin/useAdminResumen';
 
-export default function AdminResumen() {
+export default function AdminResumen({ showHeader = true }: { showHeader?: boolean }) {
+  const insets = useSafeAreaInsets();
   const {
     users,
     posts,
+    outfitCount,
     categories,
     loading,
     error,
@@ -33,19 +44,25 @@ export default function AdminResumen() {
 
   return (
     <View className="flex-1 bg-admin-screen">
-      <AdminBrandHeader />
+      {showHeader && <AdminBrandHeader title="Resumen" />}
 
       <FlatList
         className="flex-1"
         contentContainerClassName="px-4 pb-6"
-        contentContainerStyle={{ gap: 20, paddingTop: 24 }}
+        contentContainerStyle={{
+          gap: 20,
+          paddingTop: 24,
+          paddingBottom: 94 + insets.bottom,
+        }}
         showsVerticalScrollIndicator={false}
         data={loading ? [] : modGroups}
         keyExtractor={(group) => group.key}
         ListHeaderComponent={
           <View className="gap-5">
             <View>
-              <Text className="font-['Lora-Italic'] text-[28px] leading-9 text-admin-ink">Resumen</Text>
+              <Text className="font-['Lora-Italic'] text-[28px] leading-9 text-admin-ink">
+                Resumen
+              </Text>
               <Text className="mt-1 text-[13px] leading-4 text-admin-muted">
                 Visión general del panel
               </Text>
@@ -53,56 +70,72 @@ export default function AdminResumen() {
 
             {error && (
               <View className="flex-row items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3">
-                <TriangleAlert size={16} color="#C2391F" />
+                <TriangleAlert size={16} color={adminColors.danger} />
                 <Text className="flex-1 text-[13px] font-medium text-red-700">{error}</Text>
               </View>
             )}
 
             {loading ? (
               <View className="items-center py-12">
-                <ActivityIndicator color="#A91243" />
+                <ActivityIndicator color={adminColors.brand} />
               </View>
             ) : (
               <>
-                <View className="flex-row gap-2">
-                  <StatCard
-                    title="Usuarios"
-                    icon={<Users size={14} color="#7A6E65" />}
-                    value={users.length}
-                    badge={
-                      <View className="self-start rounded bg-admin-success-bg px-1.5 py-0.5">
-                        <Text className="text-[10px] font-semibold leading-3 text-admin-success">
-                          {usersThisWeek} nuevos esta semana
-                        </Text>
-                      </View>
-                    }
-                  />
+                <View className="gap-2">
+                  <View className="flex-row gap-2">
+                    <StatCard
+                      title="Posts"
+                      icon={<ImageIcon size={14} color={adminColors.muted} />}
+                      value={posts.length}
+                      badge={
+                        <View className="self-start rounded bg-admin-success-bg px-1.5 py-0.5">
+                          <Text className="text-[10px] font-semibold leading-3 text-admin-success">
+                            {postsThisWeek} esta semana
+                          </Text>
+                        </View>
+                      }
+                    />
 
-                  <StatCard
-                    title="Posts"
-                    icon={<ImageIcon size={14} color="#7A6E65" />}
-                    value={posts.length}
-                    badge={
-                      <View className="self-start rounded bg-admin-success-bg px-1.5 py-0.5">
-                        <Text className="text-[10px] font-semibold leading-3 text-admin-success">
-                          {postsThisWeek} esta semana
-                        </Text>
-                      </View>
-                    }
-                  />
+                    <StatCard
+                      title="Outfits"
+                      icon={<Shirt size={14} color={adminColors.muted} />}
+                      value={outfitCount}
+                      badge={
+                        <View className="self-start rounded bg-admin-tint px-1.5 py-0.5">
+                          <Text className="text-[10px] font-semibold leading-3 text-admin-muted">
+                            Públicos y privados
+                          </Text>
+                        </View>
+                      }
+                    />
+                  </View>
 
-                  <StatCard
-                    title="Categorías"
-                    icon={<Tag size={14} color="#7A6E65" />}
-                    value={categories.length}
-                    badge={
-                      <View className="self-start rounded bg-admin-tint px-1.5 py-0.5">
-                        <Text className="text-[10px] font-semibold leading-3 text-admin-muted">
-                          {categories.length} totales
-                        </Text>
-                      </View>
-                    }
-                  />
+                  <View className="flex-row gap-2">
+                    <StatCard
+                      title="Usuarios"
+                      icon={<Users size={14} color={adminColors.muted} />}
+                      value={users.length}
+                      badge={
+                        <View className="self-start rounded bg-admin-success-bg px-1.5 py-0.5">
+                          <Text className="text-[10px] font-semibold leading-3 text-admin-success">
+                            {usersThisWeek} nuevos esta semana
+                          </Text>
+                        </View>
+                      }
+                    />
+                    <StatCard
+                      title="Categorías"
+                      icon={<Tag size={14} color={adminColors.muted} />}
+                      value={categories.length}
+                      badge={
+                        <View className="self-start rounded bg-admin-tint px-1.5 py-0.5">
+                          <Text className="text-[10px] font-semibold leading-3 text-admin-muted">
+                            {categories.length} totales
+                          </Text>
+                        </View>
+                      }
+                    />
+                  </View>
                 </View>
 
                 <View className="gap-4 rounded-xl border border-admin-line bg-white p-4">
@@ -127,7 +160,7 @@ export default function AdminResumen() {
                     className="flex-row items-center gap-1"
                     hitSlop={8}>
                     <Text className="text-xs font-semibold text-admin-brand">Ver todo</Text>
-                    <ChevronRight size={12} color="#A91243" />
+                    <ChevronRight size={12} color={adminColors.brand} />
                   </Pressable>
                 </View>
               </>

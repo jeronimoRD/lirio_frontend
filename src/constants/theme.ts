@@ -13,6 +13,16 @@ export const colors = {
   textFaint: palette['ink-muted'],
 } as const;
 
+export const adminColors = {
+  brand: palette['admin-brand'],
+  brown: palette['admin-brown'],
+  ink: palette['admin-ink'],
+  muted: palette['admin-muted'],
+  faint: palette['admin-faint'],
+  tint: palette['admin-tint'],
+  danger: palette['admin-danger'],
+} as const;
+
 export const glass = glassTokens;
 
 export const cardShadow: ViewStyle = {

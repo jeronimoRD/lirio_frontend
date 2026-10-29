@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 
 import { getAdminUsers } from '../../api/admin';
 import { getCategories } from '../../api/categories';
+import { getAdminOutfits } from '../../api/outfits';
 import { getPosts } from '../../api/posts';
 import { getReports, updateReport } from '../../api/reports';
 import type { Category, Post, Report, ReportReason, User } from '../../types';
@@ -94,6 +95,7 @@ export function useAdminResumen() {
 
   const [users, setUsers] = useState<User[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [outfitCount, setOutfitCount] = useState(0);
   const [categories, setCategories] = useState<Category[]>([]);
   const [pendingReports, setPendingReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
@@ -104,10 +106,17 @@ export function useAdminResumen() {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    Promise.all([getAdminUsers(), getPosts(), getCategories(), getReports('PENDING')])
-      .then(([loadedUsers, loadedPosts, loadedCategories, loadedReports]) => {
+    Promise.all([
+      getAdminUsers(),
+      getPosts(),
+      getAdminOutfits(),
+      getCategories(),
+      getReports('PENDING'),
+    ])
+      .then(([loadedUsers, loadedPosts, loadedOutfits, loadedCategories, loadedReports]) => {
         setUsers(loadedUsers);
         setPosts(loadedPosts);
+        setOutfitCount(loadedOutfits.length);
         setCategories(loadedCategories);
         setPendingReports(loadedReports);
         setError(null);
@@ -174,6 +183,7 @@ export function useAdminResumen() {
   return {
     users,
     posts,
+    outfitCount,
     categories,
     loading,
     error,

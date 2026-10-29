@@ -1,4 +1,4 @@
-import type { GarmentType, Post } from '../types';
+import type { Post } from '../types';
 import { request } from './client';
 import { File } from 'expo-file-system';
 
@@ -13,7 +13,7 @@ interface PostResponse {
   updatedAt: string;
   liked_by?: string[];
   saved_by?: string[];
-  garment_type?: GarmentType;
+  garment_type_id?: string;
 }
 
 function toPost(data: PostResponse): Post {
@@ -30,7 +30,7 @@ function toPost(data: PostResponse): Post {
     likesCount: likedBy.length,
     likedBy: likedBy,
     savedBy: savedBy,
-    garmentType: data.garment_type,
+    garmentTypeId: data.garment_type_id,
   };
 }
 
@@ -101,7 +101,7 @@ export async function createPost(
   description: string,
   imageUri: string,
   categoryIds: string[],
-  garmentType: GarmentType,
+  garmentTypeId: string,
 ) {
   const formData = new FormData();
 
@@ -110,7 +110,7 @@ export async function createPost(
   for (const categoryId of categoryIds) {
     formData.append('category_ids', categoryId);
   }
-  formData.append('garment_type', garmentType);
+  formData.append('garment_type_id', garmentTypeId);
 
   const file = new File(imageUri);
 
@@ -124,7 +124,7 @@ export async function updatePost(
   title: string,
   description: string,
   categoryIds: string[],
-  garmentType: GarmentType,
+  garmentTypeId: string,
   image?: string,
 ): Promise<Post> {
   const data = await request<{ post: PostResponse }>(
@@ -133,7 +133,7 @@ export async function updatePost(
       title,
       description,
       category_ids: categoryIds,
-      garment_type: garmentType,
+      garment_type_id: garmentTypeId,
       ...(image ? { image } : {}),
     },
     'PATCH',

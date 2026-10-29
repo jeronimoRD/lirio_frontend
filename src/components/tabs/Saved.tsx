@@ -35,7 +35,7 @@ export default function Favorites() {
     totalOutfits,
     loading,
     error,
-    garmentType,
+    garmentTypeId,
     selectGarmentType,
     piecesOfType,
     selectedPostId,
@@ -60,8 +60,8 @@ export default function Favorites() {
   const [focused, setFocused] = useState(false);
 
   const showSpinner = loading && totalOutfits === 0;
-  const filtering = !!garmentType || query.trim().length > 0;
-  const showGarmentFilter = focused || query.length > 0 || !!garmentType;
+  const filtering = !!garmentTypeId || query.trim().length > 0;
+  const showGarmentFilter = focused || query.length > 0 || !!garmentTypeId;
 
   return (
     <View className="flex-1 bg-screen">
@@ -174,7 +174,7 @@ export default function Favorites() {
 
               {showGarmentFilter && (
                 <GarmentFilter
-                  value={garmentType}
+                  value={garmentTypeId}
                   onChange={selectGarmentType}
                   pieces={piecesOfType}
                   selectedPostId={selectedPostId}

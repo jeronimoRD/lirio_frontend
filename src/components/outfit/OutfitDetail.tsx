@@ -12,12 +12,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ConfirmModal from '../ConfirmModal';
 import ScreenHeader from '../ScreenHeader';
 import OutfitCollage from '../outfits/OutfitCollage';
-import { garmentLabel } from '../upload/GarmentPicker';
 import { cardShadowLg } from '../../constants/theme';
+import { useGarmentTypes } from '../../garment-types/context';
 import { useOutfitDetail } from '../../hooks/outfit/useOutfitDetail';
 
 export default function OutfitDetail() {
   const insets = useSafeAreaInsets();
+  const { labelOf } = useGarmentTypes();
 
   const {
     outfit,
@@ -113,7 +114,7 @@ export default function OutfitDetail() {
                     onPress={() => openPiece(item.postId)}
                     disabled={!item.image}
                     accessibilityRole="button"
-                    accessibilityLabel={`Ver prenda ${garmentLabel(item.garmentType)}`}
+                    accessibilityLabel={`Ver prenda ${labelOf(item.garmentTypeId)}`}
                     className="flex-row items-center gap-3 rounded-row border border-line bg-white p-3 active:opacity-80">
                     <View className="h-[72px] w-[56px] items-center justify-center overflow-hidden rounded-[12px] bg-icon-well">
                       {uri ? (
@@ -129,7 +130,7 @@ export default function OutfitDetail() {
 
                     <View className="flex-1">
                       <Text className="text-[10px] font-bold uppercase tracking-[1.5px] text-brand">
-                        {garmentLabel(item.garmentType)}
+                        {labelOf(item.garmentTypeId)}
                       </Text>
 
                       <Text

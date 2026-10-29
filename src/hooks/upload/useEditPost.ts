@@ -5,7 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { getPost, updatePost } from '../../api/posts';
 import { getCategories } from '../../api/categories';
-import type { Category, GarmentType } from '../../types';
+import type { Category } from '../../types';
 
 export type EditPostForm = {
     title: string;
@@ -26,11 +26,11 @@ export function useEditPost() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [categoryIds, setCategoryIds] = useState<string[]>([]);
     const [categoryError, setCategoryError] = useState<string | null>(null);
-    const [garmentType, setGarmentType] = useState<GarmentType | null>(null);
+    const [garmentTypeId, setGarmentTypeId] = useState<string | null>(null);
     const [garmentError, setGarmentError] = useState<string | null>(null);
 
-    const selectGarment = (type: GarmentType) => {
-        setGarmentType(type);
+    const selectGarment = (typeId: string) => {
+        setGarmentTypeId(typeId);
         setGarmentError(null);
     };
 
@@ -58,7 +58,7 @@ export function useEditPost() {
 
         reset({ title: post.title ?? '', description: post.description ?? '' });
         setImage(post.image);
-        setGarmentType(post.garmentType ?? null);
+        setGarmentTypeId(post.garmentTypeId ?? null);
         setCategoryIds(post.categoryIds);
         } catch (error) {
             Alert.alert('Error', error instanceof Error ? error.message : 'No se pudo cargar el post.');
@@ -88,7 +88,7 @@ export function useEditPost() {
         return;
     }
 
-    if (!garmentType) {
+    if (!garmentTypeId) {
         setGarmentError('Selecciona el tipo de prenda.');
         return;
     }
@@ -96,7 +96,7 @@ export function useEditPost() {
     try {
         setSaving(true);
 
-        await updatePost(id, title.trim(), description.trim(), categoryIds, garmentType);
+        await updatePost(id, title.trim(), description.trim(), categoryIds, garmentTypeId);
 
         router.replace('/(tabs)/profile');
         } catch (error) {
@@ -120,7 +120,7 @@ export function useEditPost() {
         categoryIds,
         categoryError,
         toggleCategory,
-        garmentType,
+        garmentTypeId,
         garmentError,
         selectGarment,
     };
