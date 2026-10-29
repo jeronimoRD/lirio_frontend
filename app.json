@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
-    "scheme": "your-app-scheme",
+    "name": "Hibirio",
+    "slug": "lirio-hibisco",
+    "scheme": "hibirio",
     "version": "1.0.0",
     "web": {
       "bundler": "metro"
@@ -25,16 +25,25 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#FCFAF8"
       },
-      "package": "com.anonymous.frontend"
-    }
+      "package": "com.hibirio.app"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "dc1dc5a7-0a14-4ee0-97a6-b7a19d28b0c6"
+      }
+    },
+    "owner": "korezz"
   }
 }

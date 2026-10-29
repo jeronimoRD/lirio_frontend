@@ -1,17 +1,15 @@
 import { useState } from 'react';
 import { Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
-import { createReport } from '../api/reports';
-import { REPORT_REASONS, REPORT_REASON_LABELS, type NewReport, type ReportReason } from '../types';
+import { REPORT_REASONS, REPORT_REASON_LABELS } from '../types';
 import Button from './Button';
+import { useReportModal } from '../hooks/general/useReportModal';
 
 interface Props {
   visible: boolean;
-  /** Qué se reporta. Hoy la app solo expone posts; el tipo se pasa por si mañana cambia. */
   targetType: 'POST' | 'USER';
   targetId: string;
   onClose: () => void;
-  /** Se llama cuando el servidor aceptó el reporte. */
   onSuccess?: () => void;
 }
 
@@ -24,43 +22,16 @@ const cardShadow = {
 };
 
 export default function ReportModal({ visible, targetType, targetId, onClose, onSuccess }: Props) {
-  const [reason, setReason] = useState<ReportReason | null>(null);
-  const [description, setDescription] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const reset = () => {
-    setReason(null);
-    setDescription('');
-    setError(null);
-    setSubmitting(false);
-  };
-
-  const submit = async () => {
-    if (!reason || submitting) return;
-
-    setSubmitting(true);
-    setError(null);
-
-    const report: NewReport = {
+  const { reason, description, submitting, error, setDescription, selectReason, submit } =
+    useReportModal({
       targetType,
       targetId,
-      reason,
-      ...(description.trim() ? { description: description.trim() } : {}),
-    };
-
-    try {
-      await createReport(report);
-      reset();
-      onClose();
-      onSuccess?.();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo enviar el reporte');
-      setSubmitting(false);
-    }
-  };
+      onClose,
+      onSuccess,
+    });
 
   const title = targetType === 'POST' ? 'Reportar publicación' : 'Reportar usuario';
+  const [descriptionFocused, setDescriptionFocused] = useState(false);
 
   return (
     <Modal
@@ -69,15 +40,14 @@ export default function ReportModal({ visible, targetType, targetId, onClose, on
       animationType="fade"
       statusBarTranslucent={Platform.OS === 'android'}
       onRequestClose={onClose}>
-      <Pressable
-        className="flex-1 justify-end"
-        style={{ backgroundColor: 'rgba(41, 39, 36, 0.45)' }}
-        onPress={onClose}>
+      <Pressable className="flex-1 justify-end bg-ink/45" onPress={onClose}>
         <Pressable className="max-h-[85%] w-full rounded-t-3xl bg-white p-6" style={cardShadow}>
           <View className="mb-1 items-center">
-            <View className="mb-4 h-1 w-10 rounded-full bg-[#EAE6E1]" />
-            <Text className="text-center text-lg font-bold text-[#292724]">{title}</Text>
-            <Text className="mt-1 text-center text-sm text-[#6E6B68]">
+            <View className="mb-4 h-1 w-10 rounded-full bg-line" />
+
+            <Text className="text-center text-lg font-bold text-ink">{title}</Text>
+
+            <Text className="mt-1 text-center text-sm text-ink-secondary">
               Elige un motivo. Nuestro equipo lo revisará.
             </Text>
           </View>
@@ -86,25 +56,24 @@ export default function ReportModal({ visible, targetType, targetId, onClose, on
             <View className="gap-2">
               {REPORT_REASONS.map((option) => {
                 const selected = option === reason;
+
                 return (
                   <Pressable
                     key={option}
-                    onPress={() => {
-                      setReason(option);
-                      setError(null);
-                    }}
+                    onPress={() => selectReason(option)}
                     className={`flex-row items-center rounded-xl border px-4 py-3 active:opacity-80 ${
-                      selected ? 'border-[#A81245] bg-[#A81245]/5' : 'border-[#EAE6E1] bg-white'
+                      selected ? 'border-brand bg-brand/5' : 'border-line bg-white'
                     }`}>
                     <View
                       className={`mr-3 h-5 w-5 items-center justify-center rounded-full border-2 ${
-                        selected ? 'border-[#A81245]' : 'border-[#EAE6E1]'
+                        selected ? 'border-brand' : 'border-line'
                       }`}>
-                      {selected && <View className="h-2.5 w-2.5 rounded-full bg-[#A81245]" />}
+                      {selected && <View className="h-2.5 w-2.5 rounded-full bg-brand" />}
                     </View>
+
                     <Text
                       className={`text-sm font-medium ${
-                        selected ? 'text-[#A81245]' : 'text-[#292724]'
+                        selected ? 'text-brand' : 'text-ink'
                       }`}>
                       {REPORT_REASON_LABELS[option]}
                     </Text>
@@ -123,7 +92,10 @@ export default function ReportModal({ visible, targetType, targetId, onClose, on
               multiline
               numberOfLines={3}
               maxLength={500}
-              className="mt-4 min-h-[96px] rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] p-4 text-sm text-[#292724]"
+              className="mt-4 min-h-[96px] rounded-xl border border-line bg-screen p-4 text-sm text-ink"
+              style={descriptionFocused ? { borderColor: '#A81245' } : undefined}
+              onFocus={() => setDescriptionFocused(true)}
+              onBlur={() => setDescriptionFocused(false)}
               textAlignVertical="top"
             />
 
@@ -138,6 +110,7 @@ export default function ReportModal({ visible, targetType, targetId, onClose, on
             <View className="flex-1">
               <Button text="Cancelar" secondary onPress={onClose} disabled={submitting} />
             </View>
+
             <View className="flex-1">
               <Button
                 text={submitting ? 'Enviando...' : 'Enviar reporte'}

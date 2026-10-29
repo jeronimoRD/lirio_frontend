@@ -5,7 +5,7 @@ import { cardShadow } from '../constants/theme';
 
 export function IconWell({ children }: { children: ReactNode }) {
   return (
-    <View className="h-10 w-10 items-center justify-center rounded-full bg-[#F4EEE7]">
+    <View className="h-10 w-10 items-center justify-center rounded-full bg-icon-well">
       {children}
     </View>
   );
@@ -13,7 +13,7 @@ export function IconWell({ children }: { children: ReactNode }) {
 
 export function SectionLabel({ text }: { text: string }) {
   return (
-    <Text className="px-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#A09B95]">
+    <Text className="px-1 text-[10px] font-bold uppercase tracking-[0.12em] text-ink-muted">
       {text}
     </Text>
   );
@@ -31,7 +31,7 @@ export function SectionHeaderRow({ icon, label }: { icon: ReactNode; label: stri
   return (
     <View className="flex-row items-center gap-3">
       <IconWell>{icon}</IconWell>
-      <Text className="flex-1 text-sm font-semibold text-[#292724]">{label}</Text>
+      <Text className="flex-1 text-sm font-semibold text-ink">{label}</Text>
     </View>
   );
 }

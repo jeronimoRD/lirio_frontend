@@ -75,6 +75,10 @@ tipografías distintas.
 
 ## 3. Paleta de colores (diccionario de tokens)
 
+Los valores de esta tabla están centralizados en `src/constants/tokens.js`
+(clases como `bg-screen`, `text-ink`, `border-line`). Los nombres de la
+columna "Token" son conceptuales; la clase real está en `tokens.js`.
+
 Cada color tiene un rol único. No se mezclan roles: el beige decorativo,
 por ejemplo, nunca sustituye al rosa en un botón, aunque visualmente
 "combine".

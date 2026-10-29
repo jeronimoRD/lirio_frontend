@@ -21,16 +21,8 @@ export default function AdminTabBar({ active, onChange }: AdminTabBarProps) {
 
   return (
     <View
-      style={{
-        backgroundColor: '#FFFFFF',
-        borderTopColor: '#EDE7E1',
-        borderTopWidth: 1,
-        height: 64 + insets.bottom,
-        paddingHorizontal: 12,
-        paddingBottom: insets.bottom,
-        flexDirection: 'row',
-        alignItems: 'center',
-      }}>
+      className="flex-row items-center border-t border-admin-line bg-white px-3"
+      style={{ height: 64 + insets.bottom, paddingBottom: insets.bottom }}>
       {TABS.map((tab, index) => {
         const Icon = tab.icon;
         const selected = index === active;
@@ -42,15 +34,11 @@ export default function AdminTabBar({ active, onChange }: AdminTabBarProps) {
             onPress={() => onChange(index)}
             accessibilityRole="tab"
             accessibilityState={{ selected }}
-            style={{
-              flex: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 4,
-              paddingVertical: 6,
-            }}>
+            className="flex-1 items-center justify-center gap-1 py-1.5">
             <Icon size={20} color={color} strokeWidth={selected ? 2 : 1.8} />
-            <Text style={{ fontSize: 10, fontWeight: '600', color }}>{tab.label}</Text>
+            <Text className="text-[10px] font-semibold" style={{ color }}>
+              {tab.label}
+            </Text>
           </Pressable>
         );
       })}

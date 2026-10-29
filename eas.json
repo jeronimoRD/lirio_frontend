@@ -1,0 +1,20 @@
+{
+  "build": {
+    "preview": {
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://lirio-backend.vercel.app"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://lirio-backend.vercel.app"
+      },
+      "android": {
+        "buildType": "app-bundle"
+      }
+    }
+  }
+}
