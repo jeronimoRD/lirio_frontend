@@ -8,12 +8,12 @@ import { useLogin } from '@/hooks/auth/useLogin';
 
 const HERO_IMAGE = require('../../../assets/Romantic Hibiscus and Stargazer Lily Arrangement.png');
 
-const LABEL = 'text-xs font-semibold uppercase text-[#6E6B68]';
+const LABEL = 'text-xs font-semibold uppercase text-ink-secondary';
 
 const INPUT_WRAPPER =
-  'h-12 flex-row items-center rounded-lg border border-[#EAE6E1] bg-white px-4';
+  'h-12 flex-row items-center rounded-lg border border-line bg-white px-4';
 
-const INPUT = 'flex-1 text-sm text-[#292724]';
+const INPUT = 'flex-1 text-sm text-ink';
 
 export default function Login() {
   const {
@@ -71,7 +71,7 @@ export default function Login() {
                   showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
                 }
               >
-                <Text className="text-xs font-medium text-[#A81245]">
+                <Text className="text-xs font-medium text-brand">
                   {showPassword ? 'Ocultar' : 'Mostrar'}
                 </Text>
               </Pressable>
@@ -80,7 +80,7 @@ export default function Login() {
 
           {/* TODO: conectar cuando exista el flujo de recuperación */}
           <Pressable accessibilityRole="button">
-            <Text className="text-right text-xs font-medium text-[#A81245]">
+            <Text className="text-right text-xs font-medium text-brand">
               ¿Olvidaste tu contraseña?
             </Text>
           </Pressable>
@@ -99,10 +99,10 @@ export default function Login() {
       {/* Botón y accesos sociales */}
       <View className="items-center gap-4 px-6 pt-6">
         <Pressable
-          onPress={submit}
+          onPress={() => submit()}
           disabled={isSubmitting}
           accessibilityRole="button"
-          className="h-12 w-full items-center justify-center rounded-full bg-[#A81245] disabled:opacity-50"
+          className="h-12 w-full items-center justify-center rounded-full bg-brand disabled:opacity-50"
         >
           {isSubmitting ? (
             <ActivityIndicator color="white" />
@@ -115,29 +115,29 @@ export default function Login() {
 
         {/* Divisor */}
         <View className="w-full flex-row items-center gap-3">
-          <View className="h-px flex-1 bg-[#EAE6E1]" />
-          <Text className="text-[11px] font-medium uppercase text-[#A39E9A]">O</Text>
-          <View className="h-px flex-1 bg-[#EAE6E1]" />
+          <View className="h-px flex-1 bg-line" />
+          <Text className="text-[11px] font-medium uppercase text-ink-muted">O</Text>
+          <View className="h-px flex-1 bg-line" />
         </View>
 
         {/* TODO: conectar auth social */}
         <View className="w-full gap-2">
           <Pressable
             accessibilityRole="button"
-            className="h-12 flex-row items-center justify-center gap-3 rounded-full border border-[#EAE6E1] bg-white"
+            className="h-12 flex-row items-center justify-center gap-3 rounded-full border border-line bg-white"
           >
             <Ionicons name="logo-google" size={18} color="#292724" />
-            <Text className="text-[13px] font-medium text-[#292724]">
+            <Text className="text-[13px] font-medium text-ink">
               Continuar con Google
             </Text>
           </Pressable>
 
           <Pressable
             accessibilityRole="button"
-            className="h-12 flex-row items-center justify-center gap-3 rounded-full border border-[#EAE6E1] bg-white"
+            className="h-12 flex-row items-center justify-center gap-3 rounded-full border border-line bg-white"
           >
             <Ionicons name="logo-apple" size={18} color="#292724" />
-            <Text className="text-[13px] font-medium text-[#292724]">
+            <Text className="text-[13px] font-medium text-ink">
               Continuar con Apple
             </Text>
           </Pressable>
@@ -145,9 +145,9 @@ export default function Login() {
 
         <Link href="/register" asChild>
           <Pressable accessibilityRole="link" className="pb-8 pt-2">
-            <Text className="text-[13px] text-[#6E6B68]">
+            <Text className="text-[13px] text-ink-secondary">
               ¿No tienes una cuenta?{' '}
-              <Text className="font-semibold text-[#A81245]">Crear cuenta</Text>
+              <Text className="font-semibold text-brand">Crear cuenta</Text>
             </Text>
           </Pressable>
         </Link>

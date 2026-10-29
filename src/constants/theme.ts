@@ -1,15 +1,19 @@
 import type { ViewStyle } from 'react-native';
 
+import { colors as palette, glass as glassTokens } from './tokens';
+
 export const colors = {
-  background: '#FCFAF8',
-  primary: '#A81245',
-  accent: '#DCC7A8',
-  iconWell: '#F4EEE7',
-  border: '#EAE6E1',
-  textStrong: '#292724',
-  textMuted: '#6E6B68',
-  textFaint: '#A09B95',
+  background: palette.screen,
+  primary: palette.brand,
+  accent: palette.beige,
+  iconWell: palette['icon-well'],
+  border: palette.line,
+  textStrong: palette.ink,
+  textMuted: palette['ink-secondary'],
+  textFaint: palette['ink-muted'],
 } as const;
+
+export const glass = glassTokens;
 
 export const cardShadow: ViewStyle = {
   shadowColor: 'rgba(92, 75, 54, 0.10)',

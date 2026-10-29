@@ -16,8 +16,11 @@ import {
     StyleSheet,
     View,
     type StyleProp,
+    type ViewInstance,
     type ViewStyle,
 } from 'react-native';
+
+import { glass } from '@/constants/theme';
 
 // Propiedad del componente GlassSurface
 //  que permite personalizar su apariencia y comportamiento.
@@ -28,10 +31,10 @@ interface Props {
     style?: StyleProp<ViewStyle>;
     intensity?: number;
     tintColor?: string;
-    blurTarget?: RefObject<View | null>;
+    blurTarget?: RefObject<ViewInstance | null>;
 }
 
-const DEFAULT_TINT = 'rgba(252, 250, 248, 0.55)';
+const DEFAULT_TINT = glass.fill;
 
 export default function GlassSurface({
     children,
@@ -76,5 +79,5 @@ export default function GlassSurface({
 
 const styles = StyleSheet.create({
     clip: { overflow: 'hidden' },
-    edge: { borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.5)' },
+    edge: { borderWidth: 1, borderColor: glass.edge },
 });

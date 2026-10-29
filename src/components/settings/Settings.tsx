@@ -89,10 +89,10 @@ function ToggleRow({
       <IconWell>{icon}</IconWell>
 
       <View className="flex-1 gap-1">
-        <Text className="text-sm font-semibold text-[#292724]">
+        <Text className="text-sm font-semibold text-ink">
           {label}
         </Text>
-        <Text className="text-xs leading-[18px] text-[#6E6B68]">
+        <Text className="text-xs leading-[18px] text-ink-secondary">
           {description}
         </Text>
       </View>
@@ -128,13 +128,13 @@ function SettingsTab({
       accessibilityState={{ selected: active }}
       onPress={onPress}
       className={`flex-1 flex-row items-center justify-center gap-2 rounded-xl px-3 py-3 ${
-        active ? 'bg-[#A81245]' : 'bg-transparent'
+        active ? 'bg-brand' : 'bg-transparent'
       }`}
     >
       {icon}
       <Text
         className={`text-[13px] font-semibold ${
-          active ? 'text-white' : 'text-[#6E6B68]'
+          active ? 'text-white' : 'text-ink-secondary'
         }`}
       >
         {title}
@@ -195,7 +195,7 @@ export default function Settings() {
   const historyData = showHistory && !likedLoading ? likedPosts : [];
 
   return (
-    <View className="flex-1 bg-[#FCFAF8]">
+    <View className="flex-1 bg-screen">
       <FlatList
         className="flex-1"
         data={historyData}
@@ -212,7 +212,7 @@ export default function Settings() {
               onPress={() => goToPost(item.id)}
               accessibilityRole="button"
               accessibilityLabel={`Ver publicación ${item.title}`}
-              className="flex-row items-center gap-3 rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] p-2.5 active:opacity-80"
+              className="flex-row items-center gap-3 rounded-xl border border-line bg-screen p-2.5 active:opacity-80"
             >
               <Image
                 source={{ uri: item.image }}
@@ -223,7 +223,7 @@ export default function Settings() {
               <View className="flex-1 gap-2">
                 <Text
                   numberOfLines={2}
-                  className="font-['Lora-Italic'] text-base leading-5 text-[#292724]"
+                  className="font-['Lora-Italic'] text-base leading-5 text-ink"
                 >
                   {item.title}
                 </Text>
@@ -234,7 +234,7 @@ export default function Settings() {
                     color={COLORS.burgundy}
                     fill={COLORS.burgundy}
                   />
-                  <Text className="text-xs text-[#6E6B68]">
+                  <Text className="text-xs text-ink-secondary">
                     {formatLikeCount(item.likesCount ?? 0)} Me gusta
                   </Text>
                 </View>
@@ -250,24 +250,24 @@ export default function Settings() {
 
             {/* Encabezado editorial */}
             <View className="mb-6 mt-5">
-              <Text className="mb-2 text-[10px] font-bold uppercase tracking-[3px] text-[#A81245]">
+              <Text className="mb-2 text-[10px] font-bold uppercase tracking-[3px] text-brand">
                 TU ESPACIO PERSONAL
               </Text>
 
-              <Text className="font-['Lora-Italic'] text-[32px] leading-[40px] text-[#292724]">
+              <Text className="font-['Lora-Italic'] text-[32px] leading-[40px] text-ink">
                 Un lugar solo tuyo.
               </Text>
 
-              <Text className="mt-2 max-w-[320px] text-sm leading-6 text-[#6E6B68]">
+              <Text className="mt-2 max-w-[320px] text-sm leading-6 text-ink-secondary">
                 Cuida tu cuenta, ajusta tus preferencias y vuelve a descubrir
                 los looks que te inspiran.
               </Text>
 
-              <View className="mt-5 h-px w-full bg-[#EAE6E1]" />
+              <View className="mt-5 h-px w-full bg-line" />
 
               <View className="mt-3 flex-row items-center gap-2">
-                <View className="h-1.5 w-1.5 rounded-full bg-[#A81245]" />
-                <Text className="text-[10px] font-medium uppercase tracking-[1.5px] text-[#A09B95]">
+                <View className="h-1.5 w-1.5 rounded-full bg-brand" />
+                <Text className="text-[10px] font-medium uppercase tracking-[1.5px] text-ink-muted">
                   HIBIRIO - TU BIENESTAR
                 </Text>
               </View>
@@ -276,7 +276,7 @@ export default function Settings() {
             {/* Navegación superior */}
             <View
               accessibilityRole="tablist"
-              className="mb-7 flex-row rounded-2xl border border-[#EAE6E1] bg-white p-1.5"
+              className="mb-7 flex-row rounded-2xl border border-line bg-white p-1.5"
             >
               <SettingsTab
                 active={activeTab === 'config'}
@@ -315,7 +315,7 @@ export default function Settings() {
                       label="Correo electrónico"
                     />
 
-                    <Text className="mb-4 mt-2 text-xs leading-5 text-[#6E6B68]">
+                    <Text className="mb-4 mt-2 text-xs leading-5 text-ink-secondary">
                       Gestiona el correo asociado a tu cuenta de Hibirio.
                     </Text>
 
@@ -325,9 +325,9 @@ export default function Settings() {
                         name="email"
                         label="Correo electrónico"
                         keyboardType="email-address"
-                        labelClassName="text-xs font-semibold uppercase tracking-wide text-[#6E6B68]"
-                        inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
-                        inputClassName="flex-1 text-sm text-[#292724]"
+                        labelClassName="text-xs font-semibold uppercase tracking-wide text-ink-secondary"
+                        inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-line bg-screen px-4"
+                        inputClassName="flex-1 text-sm text-ink"
                         maxLength={100}
                         rules={{
                           required: 'El correo es obligatorio',
@@ -343,9 +343,9 @@ export default function Settings() {
                       />
 
                       <Pressable
-                        onPress={submitProfile}
+                        onPress={() => submitProfile()}
                         disabled={savingProfile}
-                        className="h-12 flex-row items-center justify-center rounded-xl bg-[#A81245] active:opacity-80 disabled:opacity-50"
+                        className="h-12 flex-row items-center justify-center rounded-xl bg-brand active:opacity-80 disabled:opacity-50"
                       >
                         {savingProfile ? (
                           <ActivityIndicator color="#FFFFFF" />
@@ -371,7 +371,7 @@ export default function Settings() {
                       label="Contraseña"
                     />
 
-                    <Text className="mb-4 mt-2 text-xs leading-5 text-[#6E6B68]">
+                    <Text className="mb-4 mt-2 text-xs leading-5 text-ink-secondary">
                       Mantén tu cuenta protegida con una contraseña segura.
                     </Text>
 
@@ -381,9 +381,9 @@ export default function Settings() {
                         name="password"
                         label="Contraseña nueva"
                         secureTextEntry
-                        labelClassName="text-xs font-semibold uppercase tracking-wide text-[#6E6B68]"
-                        inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
-                        inputClassName="flex-1 text-sm text-[#292724]"
+                        labelClassName="text-xs font-semibold uppercase tracking-wide text-ink-secondary"
+                        inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-line bg-screen px-4"
+                        inputClassName="flex-1 text-sm text-ink"
                         maxLength={128}
                         rules={{
                           required: 'La contraseña es obligatoria',
@@ -403,9 +403,9 @@ export default function Settings() {
                         name="confirm"
                         label="Confirmar contraseña"
                         secureTextEntry
-                        labelClassName="text-xs font-semibold uppercase tracking-wide text-[#6E6B68]"
-                        inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
-                        inputClassName="flex-1 text-sm text-[#292724]"
+                        labelClassName="text-xs font-semibold uppercase tracking-wide text-ink-secondary"
+                        inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-line bg-screen px-4"
+                        inputClassName="flex-1 text-sm text-ink"
                         maxLength={128}
                         rules={{
                           required: 'Confirma la contraseña',
@@ -414,9 +414,9 @@ export default function Settings() {
                       />
 
                       <Pressable
-                        onPress={submitPassword}
+                        onPress={() => submitPassword()}
                         disabled={savingPassword}
-                        className="h-12 flex-row items-center justify-center rounded-xl bg-[#A81245] active:opacity-80 disabled:opacity-50"
+                        className="h-12 flex-row items-center justify-center rounded-xl bg-brand active:opacity-80 disabled:opacity-50"
                       >
                         {savingPassword ? (
                           <ActivityIndicator color="#FFFFFF" />
@@ -442,7 +442,7 @@ export default function Settings() {
                       label="Notificaciones"
                     />
 
-                    <Text className="mb-3 mt-2 text-xs leading-5 text-[#6E6B68]">
+                    <Text className="mb-3 mt-2 text-xs leading-5 text-ink-secondary">
                       Decide cómo quieres recibir novedades de Hibirio.
                     </Text>
 
@@ -454,7 +454,7 @@ export default function Settings() {
                       onChange={setPushEnabled}
                     />
 
-                    <View className="my-3 h-px bg-[#EAE6E1]" />
+                    <View className="my-3 h-px bg-line" />
 
                     <ToggleRow
                       icon={<Mail size={18} color={COLORS.burgundy} />}
@@ -472,7 +472,7 @@ export default function Settings() {
 
                   <View className="gap-4 rounded-2xl border border-[#F0D6D1] bg-[#FFF8F6] p-5">
                     <View className="flex-row items-center gap-3">
-                      <View className="h-11 w-11 items-center justify-center rounded-full bg-[#FBE6E1]">
+                      <View className="h-11 w-11 items-center justify-center rounded-full bg-admin-danger-bg">
                         <TriangleAlert size={19} color="#C2391F" />
                       </View>
 
@@ -486,7 +486,7 @@ export default function Settings() {
                       </View>
                     </View>
 
-                    <Text className="text-sm leading-6 text-[#6E6B68]">
+                    <Text className="text-sm leading-6 text-ink-secondary">
                       Al eliminar tu cuenta se borrarán también tus publicaciones.
                       Esta acción no se puede deshacer.
                     </Text>
@@ -494,14 +494,14 @@ export default function Settings() {
                     <Pressable
                       onPress={askDeleteConfirmation}
                       disabled={deleting}
-                      className="h-11 flex-row items-center justify-center gap-2 rounded-xl border border-[#E9AFA6] bg-[#FBE6E1] active:opacity-80 disabled:opacity-50"
+                      className="h-11 flex-row items-center justify-center gap-2 rounded-xl border border-admin-danger-line bg-admin-danger-bg active:opacity-80 disabled:opacity-50"
                     >
                       {deleting ? (
                         <ActivityIndicator color="#C2391F" />
                       ) : (
                         <>
                           <TriangleAlert size={15} color="#C2391F" />
-                          <Text className="text-sm font-semibold text-[#C2391F]">
+                          <Text className="text-sm font-semibold text-admin-danger">
                             Eliminar cuenta
                           </Text>
                         </>
@@ -518,11 +518,11 @@ export default function Settings() {
                 <View className="gap-2">
                   <SectionLabel text="TU ARCHIVO PERSONAL" />
 
-                  <Text className="font-['Lora-Italic'] text-[27px] leading-9 text-[#292724]">
+                  <Text className="font-['Lora-Italic'] text-[27px] leading-9 text-ink">
                     Looks que te inspiran.
                   </Text>
 
-                  <Text className="text-sm leading-6 text-[#6E6B68]">
+                  <Text className="text-sm leading-6 text-ink-secondary">
                     Una colección de publicaciones a las que les has dado me gusta.
                   </Text>
                 </View>
@@ -542,21 +542,21 @@ export default function Settings() {
             likedLoading ? (
               <View className="items-center py-12">
                 <ActivityIndicator color={COLORS.burgundy} />
-                <Text className="mt-3 text-xs text-[#6E6B68]">
+                <Text className="mt-3 text-xs text-ink-secondary">
                   Cargando tu colección...
                 </Text>
               </View>
             ) : (
-              <View className="items-center rounded-2xl border border-[#EAE6E1] bg-[#FCFAF8] px-5 py-9">
+              <View className="items-center rounded-2xl border border-line bg-screen px-5 py-9">
                 <View className="mb-4 h-14 w-14 items-center justify-center rounded-full bg-[#F4E8EC]">
                   <Heart size={25} color={COLORS.burgundy} />
                 </View>
 
-                <Text className="text-center font-['Lora-Italic'] text-xl text-[#292724]">
+                <Text className="text-center font-['Lora-Italic'] text-xl text-ink">
                   Tu colección comienza aquí.
                 </Text>
 
-                <Text className="mt-2 text-center text-sm leading-6 text-[#6E6B68]">
+                <Text className="mt-2 text-center text-sm leading-6 text-ink-secondary">
                   Cuando marques un outfit con el corazón, aparecerá en
                   este espacio para que puedas volver a él.
                 </Text>
@@ -566,7 +566,7 @@ export default function Settings() {
         }
         ListFooterComponent={
           <View className="mt-8 items-center">
-            <Text className="font-['Lora-Italic'] text-sm text-[#A09B95]">
+            <Text className="font-['Lora-Italic'] text-sm text-ink-muted">
               HIBIRIO · Tu estilo, tu historia.
             </Text>
           </View>

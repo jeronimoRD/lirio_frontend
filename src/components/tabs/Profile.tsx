@@ -117,7 +117,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
         ? (
           <View className="items-center py-12">
             <ActivityIndicator color="#A81245" />
-            <Text className="mt-3 text-xs text-[#A09B95]">
+            <Text className="mt-3 text-xs text-ink-muted">
               Cargando tus favoritos...
             </Text>
           </View>
@@ -141,7 +141,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
   return (
     <>
       <FlatList
-        className="flex-1 bg-[#FCFAF8]"
+        className="flex-1 bg-screen"
         data={listData}
         numColumns={2}
         keyExtractor={(post) => post.id}
@@ -189,7 +189,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
             {/* Identidad */}
             <View className="items-center px-5">
               <View
-                className="-mt-12 h-24 w-24 items-center justify-center rounded-full border-[4px] border-[#FCFAF8] bg-[#DCC7A8]"
+                className="-mt-12 h-24 w-24 items-center justify-center rounded-full border-[4px] border-screen bg-beige"
                 style={cardShadowLg}
               >
                 <Text className="text-[26px] font-bold text-white">
@@ -198,16 +198,16 @@ export default function Profile({ active = true }: { active?: boolean }) {
               </View>
 
               <View className="mt-3 w-full items-center">
-                <Text className="text-center font-['Lora-Regular'] text-[27px] leading-[35px] text-[#292724]">
+                <Text className="text-center font-['Lora-Regular'] text-[27px] leading-[35px] text-ink">
                   {user.name}
                 </Text>
 
-                <Text className="mt-1 text-center text-[11px] text-[#A09B95]">
+                <Text className="mt-1 text-center text-[11px] text-ink-muted">
                   {ROLE_LABEL[user.role]} · {user.email}
                 </Text>
 
                 {!!user.bio && (
-                  <Text className="mt-3 max-w-[310px] text-center text-[13px] leading-[21px] text-[#6E6B68]">
+                  <Text className="mt-3 max-w-[310px] text-center text-[13px] leading-[21px] text-ink-secondary">
                     {user.bio}
                   </Text>
                 )}
@@ -215,39 +215,39 @@ export default function Profile({ active = true }: { active?: boolean }) {
 
               {/* Estadística */}
               <View
-                className="mt-5 w-full max-w-[390px] rounded-[22px] border border-[#EAE6E1] bg-white px-5 py-4"
+                className="mt-5 w-full max-w-[390px] rounded-[22px] border border-line bg-white px-5 py-4"
                 style={cardShadowLg}
               >
                 <View className="flex-row items-center">
-                  <View className="h-11 w-11 items-center justify-center rounded-full bg-[#F4EEE7]">
+                  <View className="h-11 w-11 items-center justify-center rounded-full bg-icon-well">
                     <Shirt size={20} color={COLORS.burgundy} />
                   </View>
 
                   <View className="ml-3 flex-1">
-                    <Text className="font-['Lora-Italic'] text-base text-[#292724]">
+                    <Text className="font-['Lora-Italic'] text-base text-ink">
                       Tu colección
                     </Text>
-                    <Text className="mt-0.5 text-[11px] text-[#A09B95]">
+                    <Text className="mt-0.5 text-[11px] text-ink-muted">
                       Lo que compartes y lo que armas en tu ropero
                     </Text>
                   </View>
                 </View>
 
-                <View className="mt-4 flex-row border-t border-[#EAE6E1] pt-4">
+                <View className="mt-4 flex-row border-t border-line pt-4">
                   <View className="flex-1">
-                    <Text className="text-[23px] font-semibold text-[#A81245]">
+                    <Text className="text-[23px] font-semibold text-brand">
                       {posts.length}
                     </Text>
-                    <Text className="text-[9px] font-bold uppercase tracking-[1.5px] text-[#6E6B68]">
+                    <Text className="text-[9px] font-bold uppercase tracking-[1.5px] text-ink-secondary">
                       Publicaciones
                     </Text>
                   </View>
 
-                  <View className="flex-1 border-l border-[#EAE6E1] pl-4">
-                    <Text className="text-[23px] font-semibold text-[#A81245]">
+                  <View className="flex-1 border-l border-line pl-4">
+                    <Text className="text-[23px] font-semibold text-brand">
                       {outfitCount}
                     </Text>
-                    <Text className="text-[9px] font-bold uppercase tracking-[1.5px] text-[#6E6B68]">
+                    <Text className="text-[9px] font-bold uppercase tracking-[1.5px] text-ink-secondary">
                       Outfits
                     </Text>
                   </View>
@@ -259,7 +259,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
                 <Pressable
                   onPress={goToEditProfile}
                   accessibilityRole="button"
-                  className="h-[49px] flex-1 flex-row items-center justify-center gap-2 rounded-full bg-[#A81245]"
+                  className="h-[49px] flex-1 flex-row items-center justify-center gap-2 rounded-full bg-brand"
                   style={cardShadowLg}
                 >
                   <Settings2 size={16} color="#FFFFFF" />
@@ -272,22 +272,22 @@ export default function Profile({ active = true }: { active?: boolean }) {
 
             {/* Separador editorial */}
             <View className="mx-5 mb-5 mt-8 flex-row items-center gap-3">
-              <View className="h-px flex-1 bg-[#EAE6E1]" />
+              <View className="h-px flex-1 bg-line" />
               <Sparkles size={15} color={COLORS.champagne} />
-              <View className="h-px flex-1 bg-[#EAE6E1]" />
+              <View className="h-px flex-1 bg-line" />
             </View>
 
             {/* Selector de galerías */}
             <View className="px-5">
-              <Text className="text-[10px] font-bold uppercase tracking-[2.5px] text-[#A81245]">
+              <Text className="text-[10px] font-bold uppercase tracking-[2.5px] text-brand">
                 TU UNIVERSO
               </Text>
 
-              <Text className="mb-4 mt-1 font-['Lora-Italic'] text-[25px] text-[#292724]">
+              <Text className="mb-4 mt-1 font-['Lora-Italic'] text-[25px] text-ink">
                 Tu colección personal
               </Text>
 
-              <View className="flex-row rounded-full border border-[#EAE6E1] bg-white p-1.5">
+              <View className="flex-row rounded-full border border-line bg-white p-1.5">
                 <GalleryTab
                   label="Mis publicaciones"
                   icon="outfits"
@@ -321,11 +321,11 @@ export default function Profile({ active = true }: { active?: boolean }) {
                       accessibilityState={{ selected }}
                       accessibilityLabel={garmentLabel(type)}
                       className={`h-10 justify-center rounded-full border px-4 ${
-                        selected ? 'border-[#A81245] bg-[#A81245]/10' : 'border-[#EAE6E1] bg-white'
+                        selected ? 'border-brand bg-brand/10' : 'border-line bg-white'
                       }`}>
                       <Text
                         className={`text-[12px] font-semibold ${
-                          selected ? 'text-[#A81245]' : 'text-[#6E6B68]'
+                          selected ? 'text-brand' : 'text-ink-secondary'
                         }`}>
                         {garmentLabel(type)}
                       </Text>
@@ -348,7 +348,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
               {showSpinner && (
                 <View className="items-center py-12">
                   <ActivityIndicator color="#A81245" />
-                  <Text className="mt-3 text-xs text-[#A09B95]">
+                  <Text className="mt-3 text-xs text-ink-muted">
                     Preparando tu colección...
                   </Text>
                 </View>
@@ -359,13 +359,13 @@ export default function Profile({ active = true }: { active?: boolean }) {
               <View className="mt-5 px-5">
                 <View className="mb-4 flex-row items-end justify-between">
                   <View>
-                    <Text className="mt-1 text-[11px] text-[#6E6B68]">
+                    <Text className="mt-1 text-[11px] text-ink-secondary">
                       Tus favoritos, todos en un solo lugar.
                     </Text>
                   </View>
 
-                  <View className="rounded-full bg-[#F4EEE7] px-3 py-1.5">
-                    <Text className="text-[11px] font-semibold text-[#A81245]">
+                  <View className="rounded-full bg-icon-well px-3 py-1.5">
+                    <Text className="text-[11px] font-semibold text-brand">
                       {savedPosts.length} {savedPosts.length === 1 ? 'Atuendo' : 'Atuendos'}
                     </Text>
                   </View>
@@ -380,19 +380,19 @@ export default function Profile({ active = true }: { active?: boolean }) {
           listEmpty ? <View className="px-5">{listEmpty}</View> : undefined
         }
         ListFooterComponent={
-          <View className="mx-5 mt-9 border-t border-[#EAE6E1] pt-5">
+          <View className="mx-5 mt-9 border-t border-line pt-5">
             <Pressable
               onPress={signOut}
               accessibilityRole="button"
-              className="h-12 flex-row items-center justify-center gap-2 rounded-full border border-[#EAE6E1] bg-white"
+              className="h-12 flex-row items-center justify-center gap-2 rounded-full border border-line bg-white"
             >
               <LogOut size={16} color="#A81245" />
-              <Text className="text-[13px] font-semibold text-[#A81245]">
+              <Text className="text-[13px] font-semibold text-brand">
                 Cerrar sesión
               </Text>
             </Pressable>
 
-            <Text className="mt-3 text-center text-[10px] tracking-[1px] text-[#A09B95]">
+            <Text className="mt-3 text-center text-[10px] tracking-[1px] text-ink-muted">
               HECHO CON CARIÑO · HIBIRIO
             </Text>
           </View>
@@ -434,7 +434,7 @@ function GalleryTab({
       accessibilityRole="tab"
       accessibilityState={{ selected: active }}
       className={`min-h-[44px] flex-1 flex-row items-center justify-center gap-2 rounded-full ${
-        active ? 'bg-[#A81245]' : 'bg-transparent'
+        active ? 'bg-brand' : 'bg-transparent'
       }`}
     >
       {icon === 'outfits' ? (
@@ -449,7 +449,7 @@ function GalleryTab({
 
       <Text
         className={`text-[12px] font-semibold ${
-          active ? 'text-white' : 'text-[#6E6B68]'
+          active ? 'text-white' : 'text-ink-secondary'
         }`}
       >
         {label}
@@ -472,7 +472,7 @@ function SavedCard({
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`Abrir outfit guardado ${index + 1}`}
-      className="overflow-hidden rounded-[18px] border border-[#EAE6E1] bg-white"
+      className="overflow-hidden rounded-row border border-line bg-white"
       style={cardShadowLg}
     >
       <Image
@@ -488,7 +488,7 @@ function SavedCard({
       <View className="flex-row items-center justify-between px-3 py-2.5">
         <Text
           numberOfLines={1}
-          className="flex-1 pr-2 text-[11px] font-medium text-[#292724]"
+          className="flex-1 pr-2 text-[11px] font-medium text-ink"
         >
           {post.title || 'Inspiración de estilo'}
         </Text>
@@ -508,8 +508,8 @@ function EmptyGallery({
   message: string;
 }) {
   return (
-    <View className="items-center rounded-[24px] border border-[#EAE6E1] bg-white px-6 py-9">
-      <View className="mb-4 h-14 w-14 items-center justify-center rounded-full bg-[#F4EEE7]">
+    <View className="items-center rounded-tile border border-line bg-white px-6 py-9">
+      <View className="mb-4 h-14 w-14 items-center justify-center rounded-full bg-icon-well">
         {icon === 'saved' ? (
           <Bookmark size={23} color="#A81245" />
         ) : (
@@ -517,11 +517,11 @@ function EmptyGallery({
         )}
       </View>
 
-      <Text className="text-center font-['Lora-Italic'] text-xl text-[#292724]">
+      <Text className="text-center font-['Lora-Italic'] text-xl text-ink">
         {title}
       </Text>
 
-      <Text className="mt-2 max-w-[270px] text-center text-[12px] leading-[20px] text-[#6E6B68]">
+      <Text className="mt-2 max-w-[270px] text-center text-[12px] leading-[20px] text-ink-secondary">
         {message}
       </Text>
     </View>

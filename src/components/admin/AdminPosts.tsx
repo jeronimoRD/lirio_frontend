@@ -22,7 +22,7 @@ export default function AdminPosts() {
   } = useAdminPosts();
 
   return (
-    <View className="flex-1 bg-[#FAF8F6]">
+    <View className="flex-1 bg-admin-screen">
       <AdminBrandHeader />
       <FlatList
         data={loading ? [] : posts}
@@ -34,7 +34,7 @@ export default function AdminPosts() {
         ListHeaderComponent={
           <View className="mx-auto w-full max-w-md">
             <View className="mb-6">
-              <Text className="font-['Lora-Italic'] text-[28px] leading-9 text-[#241E1B]">Posts</Text>
+              <Text className="font-['Lora-Italic'] text-[28px] leading-9 text-admin-ink">Posts</Text>
             </View>
 
             {error && (
@@ -51,7 +51,7 @@ export default function AdminPosts() {
 
             {!loading && !error && posts.length === 0 && (
               <View className="rounded-2xl bg-white p-6" style={cardShadow}>
-                <Text className="text-center text-sm text-[#6E6B68]">Aún no hay publicaciones.</Text>
+                <Text className="text-center text-sm text-ink-secondary">Aún no hay publicaciones.</Text>
               </View>
             )}
           </View>
@@ -69,10 +69,10 @@ export default function AdminPosts() {
                   resizeMode="cover"
                 />
                 <View className="flex-1">
-                  <Text numberOfLines={1} className="text-sm font-semibold text-[#292724]">
+                  <Text numberOfLines={1} className="text-sm font-semibold text-ink">
                     {post.title}
                   </Text>
-                  <Text numberOfLines={1} className="mt-0.5 text-xs text-[#6E6B68]">
+                  <Text numberOfLines={1} className="mt-0.5 text-xs text-ink-secondary">
                     {author ? author.name : 'Usuario'} ·{' '}
                     {new Date(post.createdAt).toLocaleDateString()}
                   </Text>
@@ -82,8 +82,8 @@ export default function AdminPosts() {
               <Pressable
                 onPress={() => requestDelete(post)}
                 disabled={busy}
-                className="mt-3 h-10 flex-row items-center justify-center gap-2 rounded-2xl border border-[#E9AFA6] bg-[#FBE6E1] active:opacity-80 disabled:opacity-50">
-                <Text className="text-[13px] font-semibold text-[#C2391F]">
+                className="mt-3 h-10 flex-row items-center justify-center gap-2 rounded-2xl border border-admin-danger-line bg-admin-danger-bg active:opacity-80 disabled:opacity-50">
+                <Text className="text-[13px] font-semibold text-admin-danger">
                   {busy ? 'Eliminando...' : 'Eliminar'}
                 </Text>
               </Pressable>

@@ -5,9 +5,11 @@ import {
   Image,
   Pressable,
   ScrollView,
+  type ScrollViewInstance,
   Text,
-  TextInput,
+  type TextInputInstance,
   View,
+  type ViewInstance,
 } from 'react-native';
 
 import {
@@ -37,9 +39,9 @@ function EditorialMark() {
       className="flex-row items-center gap-2"
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants">
-      <View className="h-px w-7 bg-[#DCC7A8]" />
-      <View className="h-1 w-1 rounded-full bg-[#A81245]" />
-      <View className="h-px w-7 bg-[#DCC7A8]" />
+      <View className="h-px w-7 bg-beige" />
+      <View className="h-1 w-1 rounded-full bg-brand" />
+      <View className="h-px w-7 bg-beige" />
     </View>
   );
 }
@@ -55,18 +57,18 @@ function SectionHeading({
 }) {
   return (
     <View className="mb-4 flex-row items-start gap-3">
-      <View className="mt-0.5 h-8 w-8 items-center justify-center rounded-full border border-[#DCC7A8] bg-white">
-        <Text className="font-['Lora-Italic'] text-[14px] text-[#A81245]">
+      <View className="mt-0.5 h-8 w-8 items-center justify-center rounded-full border border-beige bg-white">
+        <Text className="font-['Lora-Italic'] text-[14px] text-brand">
           {number}
         </Text>
       </View>
 
       <View className="flex-1">
-        <Text className="font-['Lora-Italic'] text-[22px] leading-7 text-[#292724]">
+        <Text className="font-['Lora-Italic'] text-[22px] leading-7 text-ink">
           {title}
         </Text>
 
-        <Text className="mt-1 text-[12px] leading-[18px] text-[#6E6B68]">
+        <Text className="mt-1 text-[12px] leading-[18px] text-ink-secondary">
           {subtitle}
         </Text>
       </View>
@@ -75,16 +77,16 @@ function SectionHeading({
 }
 
 export default function CreatePost() {
-  const scrollRef = useRef<ScrollView>(null);
-  const contentRef = useRef<View>(null);
-  const imageRef = useRef<View>(null);
-  const infoRef = useRef<View>(null);
-  const garmentRef = useRef<View>(null);
-  const categoriesRef = useRef<View>(null);
-  const titleRef = useRef<TextInput>(null);
-  const descriptionRef = useRef<TextInput>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
+  const contentRef = useRef<ViewInstance>(null);
+  const imageRef = useRef<ViewInstance>(null);
+  const infoRef = useRef<ViewInstance>(null);
+  const garmentRef = useRef<ViewInstance>(null);
+  const categoriesRef = useRef<ViewInstance>(null);
+  const titleRef = useRef<TextInputInstance>(null);
+  const descriptionRef = useRef<TextInputInstance>(null);
 
-  const sectionRefs: Record<CreateSection, RefObject<View | null>> = {
+  const sectionRefs: Record<CreateSection, RefObject<ViewInstance | null>> = {
     image: imageRef,
     title: infoRef,
     description: infoRef,
@@ -131,7 +133,7 @@ export default function CreatePost() {
   } = useCreatePost({ onFirstError: focusSection });
 
   return (
-    <View className="flex-1 bg-[#FCFAF8]">
+    <View className="flex-1 bg-screen">
       <ScrollView
         ref={scrollRef}
         className="flex-1"
@@ -149,16 +151,16 @@ export default function CreatePost() {
           <View className="mb-6 mt-2">
             <View className="flex-row items-start justify-between">
               <View className="flex-1 pr-3">
-                <Text className="font-['Lora-Italic'] text-[29px] leading-[36px] text-[#292724]">
+                <Text className="font-['Lora-Italic'] text-[29px] leading-[36px] text-ink">
                   Tu estilo merece ser visto.
                 </Text>
 
-                <Text className="mt-2 text-[13px] leading-5 text-[#6E6B68]">
+                <Text className="mt-2 text-[13px] leading-5 text-ink-secondary">
                   Comparte ese look que habla un poquito de ti.
                 </Text>
               </View>
 
-              <View className="mt-1 h-11 w-11 items-center justify-center rounded-full border border-[#EAE6E1] bg-white">
+              <View className="mt-1 h-11 w-11 items-center justify-center rounded-full border border-line bg-white">
                 <Sparkles
                   size={20}
                   color={COLORS.burgundy}
@@ -170,11 +172,11 @@ export default function CreatePost() {
             <View className="mt-5 flex-row items-center gap-3">
               <EditorialMark />
 
-              <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#6E6B68]">
+              <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-ink-secondary">
                 HIBIRIO · EL EDITORIAL
               </Text>
 
-              <View className="h-px flex-1 bg-[#EAE6E1]" />
+              <View className="h-px flex-1 bg-line" />
             </View>
           </View>
         </View>
@@ -189,13 +191,13 @@ export default function CreatePost() {
             />
 
             <View className="gap-1.5">
-              <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
+              <Text className="text-xs font-semibold uppercase text-ink-secondary">
                 Foto del outfit
               </Text>
 
               {image ? (
                 <View
-                  className="overflow-hidden rounded-[22px] bg-[#EAE6E1]"
+                  className="overflow-hidden rounded-[22px] bg-line"
                   style={{
                     shadowColor: '#292724',
                     shadowOffset: { width: 0, height: 6 },
@@ -259,7 +261,7 @@ export default function CreatePost() {
                         alignItems: 'center',
                         gap: 6,
                       }}>
-                      <View className="h-1.5 w-1.5 rounded-full bg-[#DCC7A8]" />
+                      <View className="h-1.5 w-1.5 rounded-full bg-beige" />
                       <Text className="text-[9px] font-semibold uppercase tracking-[0.12em] text-white">
                         Hibirio · Preview
                       </Text>
@@ -271,9 +273,9 @@ export default function CreatePost() {
                   onPress={selectImage}
                   accessibilityRole="button"
                   accessibilityLabel="Seleccionar fotografía del outfit"
-                  className="overflow-hidden rounded-[22px] border border-dashed border-[#DCC7A8] bg-white">
+                  className="overflow-hidden rounded-[22px] border border-dashed border-beige bg-white">
                   <View className="items-center justify-center px-6 py-10">
-                    <View className="mb-4 h-[68px] w-[68px] items-center justify-center rounded-full bg-[#FCFAF8]">
+                    <View className="mb-4 h-[68px] w-[68px] items-center justify-center rounded-full bg-screen">
                       <ImagePlus
                         size={29}
                         color={COLORS.burgundy}
@@ -283,15 +285,15 @@ export default function CreatePost() {
 
                     <EditorialMark />
 
-                    <Text className="mt-4 font-['Lora-Italic'] text-[21px] text-[#292724]">
+                    <Text className="mt-4 font-['Lora-Italic'] text-[21px] text-ink">
                       Tu look, en primer plano
                     </Text>
 
-                    <Text className="mt-2 text-center text-[12px] leading-5 text-[#6E6B68]">
+                    <Text className="mt-2 text-center text-[12px] leading-5 text-ink-secondary">
                       Selecciona una fotografía para comenzar tu publicación.
                     </Text>
 
-                    <View className="mt-5 flex-row items-center gap-2 rounded-full bg-[#A81245] px-5 py-3">
+                    <View className="mt-5 flex-row items-center gap-2 rounded-full bg-brand px-5 py-3">
                       <ImagePlus size={15} color="#FFFFFF" />
                       <Text className="text-[11px] font-semibold text-white">
                         Elegir fotografía
@@ -317,7 +319,7 @@ export default function CreatePost() {
               subtitle="Dale contexto a tu outfit y deja que hable por sí solo."
             />
 
-            <View className="gap-5 rounded-[20px] border border-[#EAE6E1] bg-white p-4">
+            <View className="gap-5 rounded-card border border-line bg-white p-4">
               <Field
                 control={control}
                 name="title"
@@ -326,8 +328,8 @@ export default function CreatePost() {
                 placeholder="Ej. Un otoño en tonos tierra"
                 autoCapitalize="words"
                 maxLength={100}
-                inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
-                inputClassName="flex-1 text-sm text-[#292724]"
+                inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-line bg-screen px-4"
+                inputClassName="flex-1 text-sm text-ink"
                 rules={{
                   required: 'El título es obligatorio',
                   maxLength: {
@@ -347,8 +349,8 @@ export default function CreatePost() {
                 numberOfLines={5}
                 textAlignVertical="top"
                 maxLength={500}
-                inputWrapperClassName="min-h-[130px] flex-row items-start rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] p-4"
-                inputClassName="flex-1 text-sm leading-5 text-[#292724]"
+                inputWrapperClassName="min-h-[130px] flex-row items-start rounded-xl border border-line bg-screen p-4"
+                inputClassName="flex-1 text-sm leading-5 text-ink"
                 rules={{
                   required: 'La descripción es obligatoria',
                   maxLength: {
@@ -384,11 +386,11 @@ export default function CreatePost() {
             />
 
             <View className="gap-3">
-              <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
+              <Text className="text-xs font-semibold uppercase text-ink-secondary">
                 Estilos
               </Text>
 
-              <Text className="text-xs text-[#A39E9A]">
+              <Text className="text-xs text-ink-muted">
                 Puedes seleccionar varios estilos.
               </Text>
 
@@ -436,8 +438,8 @@ export default function CreatePost() {
                         <Text
                           className={`text-[13px] font-semibold ${
                             selected
-                              ? 'text-[#A81245]'
-                              : 'text-[#6E6B68]'
+                              ? 'text-brand'
+                              : 'text-ink-secondary'
                           }`}>
                           {style.name}
                         </Text>
@@ -456,9 +458,9 @@ export default function CreatePost() {
           </View>
 
           {/* Nota editorial */}
-          <View className="overflow-hidden rounded-[18px] border border-[#EAE6E1] bg-white p-4">
+          <View className="overflow-hidden rounded-row border border-line bg-white p-4">
             <View className="flex-row items-start gap-3">
-              <View className="mt-0.5 h-9 w-9 items-center justify-center rounded-full bg-[#FCFAF8]">
+              <View className="mt-0.5 h-9 w-9 items-center justify-center rounded-full bg-screen">
                 <Sparkles
                   size={17}
                   color={COLORS.burgundy}
@@ -467,11 +469,11 @@ export default function CreatePost() {
               </View>
 
               <View className="flex-1">
-                <Text className="font-['Lora-Italic'] text-[17px] text-[#292724]">
+                <Text className="font-['Lora-Italic'] text-[17px] text-ink">
                   Cada estilo cuenta algo.
                 </Text>
 
-                <Text className="mt-1 text-[12px] leading-5 text-[#6E6B68]">
+                <Text className="mt-1 text-[12px] leading-5 text-ink-secondary">
                   Comparte tu inspiración y descubre nuevas formas de expresar
                   tu personalidad a través de la moda.
                 </Text>
@@ -482,11 +484,11 @@ export default function CreatePost() {
           {/* Publicar */}
           <View className="gap-3 pb-8">
             <Pressable
-              onPress={requestCreate}
+              onPress={() => requestCreate()}
               disabled={loading}
               accessibilityRole="button"
               accessibilityLabel="Publicar outfit"
-              className="min-h-[54px] flex-row items-center justify-center gap-2 rounded-full bg-[#A81245] px-5 disabled:opacity-50"
+              className="min-h-[54px] flex-row items-center justify-center gap-2 rounded-full bg-brand px-5 disabled:opacity-50"
               style={{
                 shadowColor: COLORS.burgundy,
                 shadowOffset: { width: 0, height: 5 },
@@ -506,7 +508,7 @@ export default function CreatePost() {
               )}
             </Pressable>
 
-            <Text className="text-center text-[10px] leading-4 text-[#A09B95]">
+            <Text className="text-center text-[10px] leading-4 text-ink-muted">
               Tu estilo, tu historia. Comparte tu inspiración con Hibirio.
             </Text>
           </View>

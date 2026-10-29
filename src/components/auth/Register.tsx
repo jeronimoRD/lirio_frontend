@@ -9,12 +9,12 @@ import GlassSurface from '../LiquidGlass/GlassSurface';
 const HERO_IMAGE = require('../../../assets/Romantic Hibiscus and Stargazer Lily Arrangement.png');
 
 
-const LABEL = 'text-xs font-semibold uppercase text-[#6E6B68]';
+const LABEL = 'text-xs font-semibold uppercase text-ink-secondary';
 
 const INPUT_WRAPPER =
-  'h-12 flex-row items-center rounded-lg border border-[#EAE6E1] bg-white px-4';
+  'h-12 flex-row items-center rounded-lg border border-line bg-white px-4';
 
-const INPUT = 'flex-1 text-sm text-[#292724]';
+const INPUT = 'flex-1 text-sm text-ink';
 
 export default function Register() {
   const {
@@ -81,7 +81,7 @@ export default function Register() {
                   showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
                 }
               >
-                <Text className="text-xs font-medium text-[#A81245]">
+                <Text className="text-xs font-medium text-brand">
                   {showPassword ? 'Ocultar' : 'Mostrar'}
                 </Text>
               </Pressable>
@@ -93,7 +93,7 @@ export default function Register() {
         <View className="gap-3">
           <View className="gap-1">
             <Text className={LABEL}>Estilo preferido</Text>
-            <Text className="text-xs text-[#A39E9A]">
+            <Text className="text-xs text-ink-muted">
               Elige lo que más se parezca a ti (opcional)
             </Text>
           </View>
@@ -101,7 +101,7 @@ export default function Register() {
           {loadingCategories ? (
             <View className="items-center py-4">
               <ActivityIndicator color="#A81245" />
-              <Text className="mt-2 text-xs text-[#A39E9A]">
+              <Text className="mt-2 text-xs text-ink-muted">
                 Cargando estilos...
               </Text>
             </View>
@@ -141,7 +141,7 @@ export default function Register() {
                       }}>
                       <Text
                         className={`text-[13px] font-semibold ${
-                          selected ? 'text-[#A81245]' : 'text-[#6E6B68]'
+                          selected ? 'text-brand' : 'text-ink-secondary'
                         }`}>
                         {style.name}
                       </Text>
@@ -151,7 +151,7 @@ export default function Register() {
               })}
             </View>
           ) : (
-            <Text className="text-xs text-[#A39E9A]">
+            <Text className="text-xs text-ink-muted">
               No fue posible cargar los estilos. Puedes continuar sin elegir
               preferencias.
             </Text>
@@ -180,10 +180,10 @@ export default function Register() {
       {/* Botón y términos */}
       <View className="items-center gap-4 px-6 pt-6">
         <Pressable
-          onPress={submit}
+          onPress={() => submit()}
           disabled={isSubmitting}
           accessibilityRole="button"
-          className="h-12 w-full items-center justify-center rounded-full bg-[#A81245] disabled:opacity-50"
+          className="h-12 w-full items-center justify-center rounded-full bg-brand disabled:opacity-50"
         >
           {isSubmitting ? (
             <ActivityIndicator color="white" />
@@ -197,7 +197,7 @@ export default function Register() {
           )}
         </Pressable>
 
-        <Text className="text-center text-[11px] leading-[15px] text-[#A39E9A]">
+        <Text className="text-center text-[11px] leading-[15px] text-ink-muted">
           Al crear una cuenta aceptas nuestros Términos de servicio y Política
           de privacidad.
         </Text>

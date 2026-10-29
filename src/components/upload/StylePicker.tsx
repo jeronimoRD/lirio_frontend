@@ -16,8 +16,8 @@ export default function StylePicker({
 }) {
   return (
     <View className="gap-2">
-      <Text className="text-xs font-semibold uppercase text-[#6E6B68]">Estilos</Text>
-      <Text className="text-xs text-[#A39E9A]">Elige uno o varios estilos para este outfit</Text>
+      <Text className="text-xs font-semibold uppercase text-ink-secondary">Estilos</Text>
+      <Text className="text-xs text-ink-muted">Elige uno o varios estilos para este outfit</Text>
 
       <View className="flex-row flex-wrap gap-2.5">
         {categories.map((style) => {
@@ -52,7 +52,7 @@ export default function StylePicker({
                 }}>
                 <Text
                   className={`text-[13px] font-semibold ${
-                    selected ? 'text-[#A81245]' : 'text-[#6E6B68]'
+                    selected ? 'text-brand' : 'text-ink-secondary'
                   }`}>
                   {style.name}
                 </Text>

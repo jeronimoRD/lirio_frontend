@@ -106,14 +106,14 @@ export default function QuickCreateMenu({ visible, anchor, onClose }: Props) {
               onPress={() => choose(option.route)}
               accessibilityRole="button"
               accessibilityLabel={`Crear ${option.label.toLowerCase()}`}
-              className={`flex-row items-center gap-3 px-4 py-3.5 active:bg-[#FCFAF8] ${
-                index > 0 ? 'border-t border-[#EAE6E1]' : ''
+              className={`flex-row items-center gap-3 px-4 py-3.5 active:bg-screen ${
+                index > 0 ? 'border-t border-line' : ''
               }`}>
-              <View className="h-10 w-10 items-center justify-center rounded-full bg-[#F4EEE7]">
+              <View className="h-10 w-10 items-center justify-center rounded-full bg-icon-well">
                 <Icon size={18} color="#A81245" />
               </View>
 
-              <Text className="text-[14px] font-semibold text-[#292724]">
+              <Text className="text-[14px] font-semibold text-ink">
                 {option.label}
               </Text>
             </Pressable>

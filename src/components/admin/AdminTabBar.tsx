@@ -21,7 +21,7 @@ export default function AdminTabBar({ active, onChange }: AdminTabBarProps) {
 
   return (
     <View
-      className="flex-row items-center border-t border-[#EDE7E1] bg-white px-3"
+      className="flex-row items-center border-t border-admin-line bg-white px-3"
       style={{ height: 64 + insets.bottom, paddingBottom: insets.bottom }}>
       {TABS.map((tab, index) => {
         const Icon = tab.icon;

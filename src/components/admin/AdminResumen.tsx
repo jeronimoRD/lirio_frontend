@@ -32,7 +32,7 @@ export default function AdminResumen() {
   } = useAdminResumen();
 
   return (
-    <View className="flex-1 bg-[#FAF8F6]">
+    <View className="flex-1 bg-admin-screen">
       <AdminBrandHeader />
 
       <FlatList
@@ -45,8 +45,8 @@ export default function AdminResumen() {
         ListHeaderComponent={
           <View className="gap-5">
             <View>
-              <Text className="font-['Lora-Italic'] text-[28px] leading-9 text-[#241E1B]">Resumen</Text>
-              <Text className="mt-1 text-[13px] leading-4 text-[#7A6E65]">
+              <Text className="font-['Lora-Italic'] text-[28px] leading-9 text-admin-ink">Resumen</Text>
+              <Text className="mt-1 text-[13px] leading-4 text-admin-muted">
                 Visión general del panel
               </Text>
             </View>
@@ -70,8 +70,8 @@ export default function AdminResumen() {
                     icon={<Users size={14} color="#7A6E65" />}
                     value={users.length}
                     badge={
-                      <View className="self-start rounded bg-[#E4F1EA] px-1.5 py-0.5">
-                        <Text className="text-[10px] font-semibold leading-3 text-[#1F6B47]">
+                      <View className="self-start rounded bg-admin-success-bg px-1.5 py-0.5">
+                        <Text className="text-[10px] font-semibold leading-3 text-admin-success">
                           {usersThisWeek} nuevos esta semana
                         </Text>
                       </View>
@@ -83,8 +83,8 @@ export default function AdminResumen() {
                     icon={<ImageIcon size={14} color="#7A6E65" />}
                     value={posts.length}
                     badge={
-                      <View className="self-start rounded bg-[#E4F1EA] px-1.5 py-0.5">
-                        <Text className="text-[10px] font-semibold leading-3 text-[#1F6B47]">
+                      <View className="self-start rounded bg-admin-success-bg px-1.5 py-0.5">
+                        <Text className="text-[10px] font-semibold leading-3 text-admin-success">
                           {postsThisWeek} esta semana
                         </Text>
                       </View>
@@ -96,8 +96,8 @@ export default function AdminResumen() {
                     icon={<Tag size={14} color="#7A6E65" />}
                     value={categories.length}
                     badge={
-                      <View className="self-start rounded bg-[#F8E7ED] px-1.5 py-0.5">
-                        <Text className="text-[10px] font-semibold leading-3 text-[#7A6E65]">
+                      <View className="self-start rounded bg-admin-tint px-1.5 py-0.5">
+                        <Text className="text-[10px] font-semibold leading-3 text-admin-muted">
                           {categories.length} totales
                         </Text>
                       </View>
@@ -105,12 +105,12 @@ export default function AdminResumen() {
                   />
                 </View>
 
-                <View className="gap-4 rounded-xl border border-[#EDE7E1] bg-white p-4">
+                <View className="gap-4 rounded-xl border border-admin-line bg-white p-4">
                   <View className="flex-row items-center justify-between">
-                    <Text className="text-sm font-semibold leading-[17px] text-[#241E1B]">
+                    <Text className="text-sm font-semibold leading-[17px] text-admin-ink">
                       Actividad
                     </Text>
-                    <Text className="text-xs leading-[15px] text-[#7A6E65]">
+                    <Text className="text-xs leading-[15px] text-admin-muted">
                       Usuarios conectados · 7 días
                     </Text>
                   </View>
@@ -119,14 +119,14 @@ export default function AdminResumen() {
                 </View>
 
                 <View className="flex-row items-center justify-between">
-                  <Text className="text-sm font-semibold leading-[17px] text-[#241E1B]">
+                  <Text className="text-sm font-semibold leading-[17px] text-admin-ink">
                     Moderación
                   </Text>
                   <Pressable
                     onPress={goToReports}
                     className="flex-row items-center gap-1"
                     hitSlop={8}>
-                    <Text className="text-xs font-semibold text-[#A91243]">Ver todo</Text>
+                    <Text className="text-xs font-semibold text-admin-brand">Ver todo</Text>
                     <ChevronRight size={12} color="#A91243" />
                   </Pressable>
                 </View>
@@ -136,8 +136,8 @@ export default function AdminResumen() {
         }
         ListEmptyComponent={
           loading ? undefined : (
-            <View className="rounded-xl border border-[#EDE7E1] bg-white p-4">
-              <Text className="text-center text-[13px] text-[#7A6E65]">
+            <View className="rounded-xl border border-admin-line bg-white p-4">
+              <Text className="text-center text-[13px] text-admin-muted">
                 No hay reportes pendientes.
               </Text>
             </View>

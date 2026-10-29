@@ -13,16 +13,16 @@ Solo si no existe, usa las clases sueltas de este documento.
 
 | Papel | Clase | Nota |
 |---|---|---|
-| Fondo de pantalla | `bg-[#FCFAF8]` | Todas las pantallas |
+| Fondo de pantalla | `bg-screen` | Todas las pantallas |
 | Superficie (tarjeta, barra) | `bg-white` | |
-| Primario / marca / acción | `bg-[#A81245]`, `text-[#A81245]` | Botones principales, títulos, iconos de acento |
-| Acento suave (seleccionado) | `bg-[#A81245]/10` | Chips activos, estados marcados |
-| Beige decorativo | `bg-[#DCC7A8]` | Solo detalles (avatar, swatches). **No** para botones |
-| Fondo de icono circular | `bg-[#F4EEE7]` | Los "wells" de Settings y admin |
-| Borde | `border-[#EAE6E1]` | Campos, separadores, botones secundarios |
-| Texto fuerte | `text-[#292724]` | Títulos y contenido |
-| Texto secundario | `text-[#6E6B68]` | Descripciones, etiquetas |
-| Texto tenue / metadatos | `text-[#A09B95]` | Placeholders, fechas, ids |
+| Primario / marca / acción | `bg-brand`, `text-brand` | Botones principales, títulos, iconos de acento |
+| Acento suave (seleccionado) | `bg-brand/10` | Chips activos, estados marcados |
+| Beige decorativo | `bg-beige` | Solo detalles (avatar, swatches). **No** para botones |
+| Fondo de icono circular | `bg-icon-well` | Los "wells" de Settings y admin |
+| Borde | `border-line` | Campos, separadores, botones secundarios |
+| Texto fuerte | `text-ink` | Títulos y contenido |
+| Texto secundario | `text-ink-secondary` | Descripciones, etiquetas |
+| Texto tenue / metadatos | `text-ink-muted` | Placeholders, fechas, ids |
 | Error | `text-red-600`, `bg-red-50`, `border-red-200` | |
 | Éxito | `text-green-700`, `bg-green-50` | |
 
@@ -35,17 +35,17 @@ no traduce `placeholder:` en React Native.
 
 ```tsx
 // Pantalla simple
-<View className="flex-1 bg-[#FCFAF8]">
+<View className="flex-1 bg-screen">
 
 // Pantalla con scroll (formularios largos)
 <ScrollView
-  className="flex-1 bg-[#FCFAF8]"
+  className="flex-1 bg-screen"
   contentContainerClassName="px-5 py-8"
   keyboardShouldPersistTaps="handled">
 
 // Pantalla con teclado (login, register)
 <KeyboardAvoidingView
-  className="flex-1 bg-[#FCFAF8]"
+  className="flex-1 bg-screen"
   behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
 
 // Tarjeta
@@ -89,13 +89,13 @@ La marca usa **Lora itálica** como fuente de titulares. Está cargada en
 > en React Native. La familia ya *es* la itálica.
 
 ```tsx
-<Text className="font-['Lora-Italic'] text-[32px] leading-[41px] text-[#A81245]">  // Logo / marca
-<Text className="font-['Lora-Italic'] text-[28px] leading-9 text-[#A81245]">      // Título de pantalla
-<Text className="font-['Lora-Italic'] text-xl text-[#A81245]">                    // Título de header
-<Text className="text-base font-semibold text-[#292724]">                         // Título de elemento en lista
-<Text className="text-sm text-[#6E6B68]">                                         // Texto secundario
-<Text className="text-xs font-semibold uppercase text-[#6E6B68]">                 // Etiqueta de campo
-<Text className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#A09B95]"> // Etiqueta de sección
+<Text className="font-['Lora-Italic'] text-[32px] leading-[41px] text-brand">  // Logo / marca
+<Text className="font-['Lora-Italic'] text-[28px] leading-9 text-brand">      // Título de pantalla
+<Text className="font-['Lora-Italic'] text-xl text-brand">                    // Título de header
+<Text className="text-base font-semibold text-ink">                         // Título de elemento en lista
+<Text className="text-sm text-ink-secondary">                                         // Texto secundario
+<Text className="text-xs font-semibold uppercase text-ink-secondary">                 // Etiqueta de campo
+<Text className="text-[10px] font-bold uppercase tracking-[0.12em] text-ink-muted"> // Etiqueta de sección
 ```
 
 ---
@@ -156,8 +156,8 @@ Props: `text`, `onPress`, `disabled?`, `secondary?`, `danger?`, `className?`,
 | Parte | Clases |
 |---|---|
 | Base | `w-full h-12 flex-row items-center justify-center gap-3 rounded-full active:opacity-80 disabled:opacity-50` |
-| Primario | `bg-[#A81245]` + texto `text-base font-semibold text-white` |
-| Secundario | `border border-[#EAE6E1] bg-white` + texto `text-[#292724]` |
+| Primario | `bg-brand` + texto `text-base font-semibold text-white` |
+| Secundario | `border border-line bg-white` + texto `text-ink` |
 | Destructivo | `bg-red-600` + texto blanco |
 
 ---
@@ -189,7 +189,7 @@ error. Solo dentro de un formulario de react-hook-form.
   secureTextEntry={!showPassword}
   rightElement={
     <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
-      <Text className="text-xs font-medium text-[#A81245]">
+      <Text className="text-xs font-medium text-brand">
         {showPassword ? 'Ocultar' : 'Mostrar'}
       </Text>
     </Pressable>
@@ -203,18 +203,18 @@ pasarlas):
 | Parte | Clases |
 |---|---|
 | Grupo | `gap-1` |
-| Etiqueta | `text-xs font-semibold uppercase text-[#6E6B68]` |
-| Recuadro | `h-12 flex-row items-center rounded-xl border bg-white px-4` + `border-[#EAE6E1]` / `border-red-600` |
-| Input | `flex-1 text-sm text-[#292724]` |
+| Etiqueta | `text-xs font-semibold uppercase text-ink-secondary` |
+| Recuadro | `h-12 flex-row items-center rounded-xl border bg-white px-4` + `border-line` / `border-red-600` |
+| Input | `flex-1 text-sm text-ink` |
 | Error del campo | `text-xs text-red-600` |
 
 Input suelto (fuera de un formulario, como el buscador de Explore):
 
 ```tsx
-<View className="h-12 flex-row items-center gap-2 rounded-full border border-[#EAE6E1] bg-white px-4">
+<View className="h-12 flex-row items-center gap-2 rounded-full border border-line bg-white px-4">
   <Search size={18} color="#A09B95" />
   <TextInput
-    className="flex-1 text-sm text-[#292724]"
+    className="flex-1 text-sm text-ink"
     placeholderTextColor="#A09B95"
   />
 </View>
@@ -224,7 +224,7 @@ Input suelto (fuera de un formulario, como el buscador de Explore):
 
 ```tsx
 <TextInput
-  className="min-h-[120px] rounded-xl border border-[#EAE6E1] bg-white p-4 text-sm text-[#292724]"
+  className="min-h-[120px] rounded-xl border border-line bg-white p-4 text-sm text-ink"
   placeholderTextColor="#A09B95"
   multiline
   textAlignVertical="top"   // sin esto el texto se centra en Android
@@ -238,12 +238,12 @@ Input suelto (fuera de un formulario, como el buscador de Explore):
 ```tsx
 <Pressable
   className={`h-9 items-center justify-center rounded-full border px-4 ${
-    active ? 'border-[#A81245] bg-[#A81245]/10' : 'border-[#EAE6E1] bg-white'
+    active ? 'border-brand bg-brand/10' : 'border-line bg-white'
   }`}>
-  <Text className={`text-[13px] font-medium ${active ? 'text-[#A81245]' : 'text-[#6E6B68]'}`}>
+  <Text className={`text-[13px] font-medium ${active ? 'text-brand' : 'text-ink-secondary'}`}>
 ```
 
-Variante rellena (selector de rol en admin, tabs de perfil): `bg-[#A81245]`
+Variante rellena (selector de rol en admin, tabs de perfil): `bg-brand`
 con texto blanco.
 
 ---
@@ -272,7 +272,7 @@ Estado vacío:
 
 ```tsx
 <View className="rounded-2xl bg-white p-6" style={cardShadow}>
-  <Text className="text-center text-sm text-[#6E6B68]">Aún no hay…</Text>
+  <Text className="text-center text-sm text-ink-secondary">Aún no hay…</Text>
 </View>
 ```
 
@@ -296,7 +296,7 @@ Nunca se borra al primer toque. Patrón de dos pasos con estado
 Sobre una imagen, va como overlay:
 
 ```tsx
-<View className="absolute inset-0 items-center justify-center rounded-[18px] bg-black/50">
+<View className="absolute inset-0 items-center justify-center rounded-row bg-black/50">
   <Text className="mb-2 text-center text-xs font-semibold text-white">¿Eliminar?</Text>
   …botones Sí / No
 </View>

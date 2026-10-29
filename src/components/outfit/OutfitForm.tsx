@@ -5,9 +5,11 @@ import {
   Image,
   Pressable,
   ScrollView,
+  type ScrollViewInstance,
   Text,
-  TextInput,
+  type TextInputInstance,
   View,
+  type ViewInstance,
 } from 'react-native';
 import { Check, Sparkles } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -35,11 +37,11 @@ const VISIBILITY_OPTIONS = [
 export default function OutfitForm() {
   const insets = useSafeAreaInsets();
 
-  const scrollRef = useRef<ScrollView>(null);
-  const contentRef = useRef<View>(null);
-  const nameSectionRef = useRef<View>(null);
-  const piecesSectionRef = useRef<View>(null);
-  const nameInputRef = useRef<TextInput>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
+  const contentRef = useRef<ViewInstance>(null);
+  const nameSectionRef = useRef<ViewInstance>(null);
+  const piecesSectionRef = useRef<ViewInstance>(null);
+  const nameInputRef = useRef<TextInputInstance>(null);
 
   const focusSection = (section: OutfitSection) => {
     const target = section === 'name' ? nameSectionRef.current : piecesSectionRef.current;
@@ -78,7 +80,7 @@ export default function OutfitForm() {
   } = useOutfitForm({ onFirstError: focusSection });
 
   return (
-    <View className="flex-1 bg-[#FCFAF8]">
+    <View className="flex-1 bg-screen">
       <ScrollView
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
@@ -94,16 +96,16 @@ export default function OutfitForm() {
 
         <View className="mb-7 mt-4 flex-row items-start justify-between">
           <View className="flex-1 pr-3">
-            <Text className="font-['Lora-Italic'] text-[28px] leading-[36px] text-[#292724]">
+            <Text className="font-['Lora-Italic'] text-[28px] leading-[36px] text-ink">
               Combina tu look.
             </Text>
 
-            <Text className="mt-2 text-[13px] leading-5 text-[#6E6B68]">
+            <Text className="mt-2 text-[13px] leading-5 text-ink-secondary">
               Elige una prenda de cada tipo, de tus publicaciones o de las que guardaste.
             </Text>
           </View>
 
-          <View className="h-11 w-11 items-center justify-center rounded-full border border-[#EAE6E1] bg-white">
+          <View className="h-11 w-11 items-center justify-center rounded-full border border-line bg-white">
             <Sparkles size={20} color="#A81245" strokeWidth={1.4} />
           </View>
         </View>
@@ -111,13 +113,13 @@ export default function OutfitForm() {
         {loading && (
           <View className="items-center py-16">
             <ActivityIndicator color="#A81245" />
-            <Text className="mt-3 text-xs text-[#A09B95]">Cargando tus prendas…</Text>
+            <Text className="mt-3 text-xs text-ink-muted">Cargando tus prendas…</Text>
           </View>
         )}
 
         {!loading && !!loadError && (
-          <View className="rounded-[20px] border border-[#E8C9CE] bg-[#FBF0F1] p-5">
-            <Text className="text-[13px] leading-5 text-[#A81245]">{loadError}</Text>
+          <View className="rounded-card border border-brand-line bg-brand-tint p-5">
+            <Text className="text-[13px] leading-5 text-brand">{loadError}</Text>
           </View>
         )}
 
@@ -134,8 +136,8 @@ export default function OutfitForm() {
                 label="Nombre"
                 placeholder="Ej. Un otoño en tonos tierra"
                 maxLength={80}
-                inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-white px-4"
-                inputClassName="flex-1 text-sm text-[#292724]"
+                inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-line bg-white px-4"
+                inputClassName="flex-1 text-sm text-ink"
                 rules={{
                   required: 'El nombre es obligatorio',
                   maxLength: { value: 80, message: 'Máximo 80 caracteres' },
@@ -170,11 +172,11 @@ export default function OutfitForm() {
             <View className="gap-3">
               <SectionTitle number="03" title="Vista previa" />
 
-              <View className="aspect-[3/4] w-full items-center justify-center overflow-hidden rounded-[24px] border border-[#A81245]/25 bg-white">
+              <View className="aspect-[3/4] w-full items-center justify-center overflow-hidden rounded-tile border border-brand/25 bg-white">
                 {previewItems.length > 0 ? (
                   <OutfitCollage items={previewItems} />
                 ) : (
-                  <Text className="px-6 text-center text-[13px] leading-5 text-[#A09B95]">
+                  <Text className="px-6 text-center text-[13px] leading-5 text-ink-muted">
                     Elige prendas para verlas aquí.
                   </Text>
                 )}
@@ -195,19 +197,19 @@ export default function OutfitForm() {
                       onPress={() => setIsPublic(option.value)}
                       accessibilityRole="radio"
                       accessibilityState={{ selected: active }}
-                      className={`flex-1 gap-1 rounded-[18px] border p-4 ${
+                      className={`flex-1 gap-1 rounded-row border p-4 ${
                         active
-                          ? 'border-[#A81245] bg-[#A81245]/10'
-                          : 'border-[#EAE6E1] bg-white'
+                          ? 'border-brand bg-brand/10'
+                          : 'border-line bg-white'
                       }`}>
                       <Text
                         className={`text-[14px] font-semibold ${
-                          active ? 'text-[#A81245]' : 'text-[#292724]'
+                          active ? 'text-brand' : 'text-ink'
                         }`}>
                         {option.label}
                       </Text>
 
-                      <Text className="text-[11px] leading-4 text-[#6E6B68]">
+                      <Text className="text-[11px] leading-4 text-ink-secondary">
                         {option.description}
                       </Text>
                     </Pressable>
@@ -217,17 +219,17 @@ export default function OutfitForm() {
             </View>
 
             {!!submitError && (
-              <View className="rounded-[20px] border border-[#E8C9CE] bg-[#FBF0F1] p-4">
-                <Text className="text-[13px] leading-5 text-[#A81245]">{submitError}</Text>
+              <View className="rounded-card border border-brand-line bg-brand-tint p-4">
+                <Text className="text-[13px] leading-5 text-brand">{submitError}</Text>
               </View>
             )}
 
             <Pressable
-              onPress={onSubmit}
+              onPress={() => onSubmit()}
               disabled={saving}
               accessibilityRole="button"
               accessibilityLabel={isEdit ? 'Guardar cambios del outfit' : 'Guardar outfit'}
-              className="min-h-[54px] flex-row items-center justify-center gap-2 rounded-full bg-[#A81245] px-5 disabled:opacity-50">
+              className="min-h-[54px] flex-row items-center justify-center gap-2 rounded-full bg-brand px-5 disabled:opacity-50">
               {saving ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
@@ -257,11 +259,11 @@ function SectionTitle({
 }) {
   return (
     <View>
-      <Text className="text-[10px] font-bold uppercase tracking-[2px] text-[#A81245]">
+      <Text className="text-[10px] font-bold uppercase tracking-[2px] text-brand">
         {number} · {title}
       </Text>
 
-      {!!subtitle && <Text className="mt-1 text-[12px] text-[#6E6B68]">{subtitle}</Text>}
+      {!!subtitle && <Text className="mt-1 text-[12px] text-ink-secondary">{subtitle}</Text>}
     </View>
   );
 }
@@ -279,10 +281,10 @@ function GarmentRow({
 }) {
   return (
     <View className="gap-2">
-      <Text className="text-[12px] font-semibold text-[#292724]">{garmentLabel(type)}</Text>
+      <Text className="text-[12px] font-semibold text-ink">{garmentLabel(type)}</Text>
 
       {options.length === 0 ? (
-        <Text className="text-[12px] leading-5 text-[#A09B95]">
+        <Text className="text-[12px] leading-5 text-ink-muted">
           No tienes prendas de este tipo todavía.
         </Text>
       ) : (
@@ -302,7 +304,7 @@ function GarmentRow({
                 accessibilityState={{ selected }}
                 accessibilityLabel={`${garmentLabel(type)}: ${item.title}`}
                 className={`w-[84px] overflow-hidden rounded-[14px] border-2 bg-white ${
-                  selected ? 'border-[#A81245]' : 'border-transparent'
+                  selected ? 'border-brand' : 'border-transparent'
                 }`}>
                 <Image source={{ uri: item.image }} resizeMode="cover" className="h-[104px] w-full" />
 
@@ -311,7 +313,7 @@ function GarmentRow({
                   <Text
                     numberOfLines={1}
                     className={`text-[10px] font-semibold ${
-                      selected ? 'text-[#A81245]' : 'text-[#6E6B68]'
+                      selected ? 'text-brand' : 'text-ink-secondary'
                     }`}>
                     {selected ? 'Elegida' : item.title}
                   </Text>

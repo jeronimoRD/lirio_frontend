@@ -109,12 +109,12 @@ export default function HeroScreen({
             titleStyle,
             ]}>
             <View className="mb-3 flex-row items-center gap-1.5">
-            <View className="h-px w-8 bg-[#DCC7A8]" />
+            <View className="h-px w-8 bg-beige" />
             <View className="h-1 w-1 rounded-full bg-white" />
             </View>
             <Text className="font-['Lora-Italic'] text-[32px] leading-10 text-white">{title}</Text>
             {!!subtitle && (
-            <Text className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#DCC7A8]">
+            <Text className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-beige">
                 {subtitle}
             </Text>
             )}
@@ -144,7 +144,7 @@ export default function HeroScreen({
             shadowRadius: 16,
             elevation: 10,
             }}>
-            <View className="mb-5 h-1 w-10 self-center rounded-full bg-[#DCC7A8]" />
+            <View className="mb-5 h-1 w-10 self-center rounded-full bg-beige" />
             {children}
         </View>
         </Animated.ScrollView>

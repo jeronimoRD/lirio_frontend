@@ -34,7 +34,7 @@ export default function OutfitDetail() {
   } = useOutfitDetail();
 
   return (
-    <View className="flex-1 bg-[#FCFAF8]">
+    <View className="flex-1 bg-screen">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -50,48 +50,48 @@ export default function OutfitDetail() {
         )}
 
         {!loading && !!error && (
-          <View className="mt-5 rounded-[20px] border border-[#E8C9CE] bg-[#FBF0F1] p-5">
-            <Text className="text-[13px] leading-5 text-[#A81245]">{error}</Text>
+          <View className="mt-5 rounded-card border border-brand-line bg-brand-tint p-5">
+            <Text className="text-[13px] leading-5 text-brand">{error}</Text>
           </View>
         )}
 
         {outfit && (
           <>
             <View
-              className="mt-5 aspect-[3/4] w-full overflow-hidden rounded-[24px] border border-[#A81245]/25 bg-white"
+              className="mt-5 aspect-[3/4] w-full overflow-hidden rounded-tile border border-brand/25 bg-white"
               style={cardShadowLg}>
               <OutfitCollage items={outfit.items} />
             </View>
 
             <View className="mt-5 flex-row items-center gap-2">
-              <View className="rounded-full bg-[#A81245] px-3 py-1.5">
+              <View className="rounded-full bg-brand px-3 py-1.5">
                 <Text className="text-[9px] font-bold uppercase tracking-[1.5px] text-white">
                   Outfit
                 </Text>
               </View>
 
-              <View className="rounded-full border border-[#EAE6E1] bg-white px-3 py-1.5">
-                <Text className="text-[9px] font-semibold uppercase tracking-[1.5px] text-[#6E6B68]">
+              <View className="rounded-full border border-line bg-white px-3 py-1.5">
+                <Text className="text-[9px] font-semibold uppercase tracking-[1.5px] text-ink-secondary">
                   {outfit.isPublic ? 'Público' : 'Privado'}
                 </Text>
               </View>
             </View>
 
-            <Text className="mt-4 font-['Lora-Italic'] text-[28px] leading-[36px] text-[#292724]">
+            <Text className="mt-4 font-['Lora-Italic'] text-[28px] leading-[36px] text-ink">
               {outfit.name}
             </Text>
 
             {!outfit.isAvailable && (
-              <View className="mt-5 rounded-[20px] border border-[#E8C9CE] bg-[#FBF0F1] p-5">
+              <View className="mt-5 rounded-card border border-brand-line bg-brand-tint p-5">
                 <View className="flex-row items-center gap-2">
                   <AlertTriangle size={16} color="#A81245" />
 
-                  <Text className="text-[14px] font-semibold text-[#A81245]">
+                  <Text className="text-[14px] font-semibold text-brand">
                     Este outfit no está disponible
                   </Text>
                 </View>
 
-                <Text className="mt-2 text-[13px] leading-5 text-[#6E6B68]">
+                <Text className="mt-2 text-[13px] leading-5 text-ink-secondary">
                   {isOwner
                     ? 'Una de sus prendas se eliminó o ya no está guardada. Te recomendamos borrar este outfit.'
                     : 'Una de sus prendas ya no está disponible.'}
@@ -99,7 +99,7 @@ export default function OutfitDetail() {
               </View>
             )}
 
-            <Text className="mt-7 text-[10px] font-bold uppercase tracking-[2px] text-[#A81245]">
+            <Text className="mt-7 text-[10px] font-bold uppercase tracking-[2px] text-brand">
               PRENDAS
             </Text>
 
@@ -114,8 +114,8 @@ export default function OutfitDetail() {
                     disabled={!item.image}
                     accessibilityRole="button"
                     accessibilityLabel={`Ver prenda ${garmentLabel(item.garmentType)}`}
-                    className="flex-row items-center gap-3 rounded-[18px] border border-[#EAE6E1] bg-white p-3 active:opacity-80">
-                    <View className="h-[72px] w-[56px] items-center justify-center overflow-hidden rounded-[12px] bg-[#F4EEE7]">
+                    className="flex-row items-center gap-3 rounded-row border border-line bg-white p-3 active:opacity-80">
+                    <View className="h-[72px] w-[56px] items-center justify-center overflow-hidden rounded-[12px] bg-icon-well">
                       {uri ? (
                         <Image
                           source={{ uri }}
@@ -128,17 +128,17 @@ export default function OutfitDetail() {
                     </View>
 
                     <View className="flex-1">
-                      <Text className="text-[10px] font-bold uppercase tracking-[1.5px] text-[#A81245]">
+                      <Text className="text-[10px] font-bold uppercase tracking-[1.5px] text-brand">
                         {garmentLabel(item.garmentType)}
                       </Text>
 
                       <Text
                         numberOfLines={1}
-                        className="mt-1 font-['Lora-Italic'] text-[15px] text-[#292724]">
+                        className="mt-1 font-['Lora-Italic'] text-[15px] text-ink">
                         {item.title ?? 'Prenda eliminada'}
                       </Text>
 
-                      <Text className="mt-1 text-[11px] text-[#6E6B68]">
+                      <Text className="mt-1 text-[11px] text-ink-secondary">
                         {item.isAvailable ? 'Disponible' : 'No disponible'}
                       </Text>
                     </View>
@@ -151,7 +151,7 @@ export default function OutfitDetail() {
               <Pressable
                 onPress={askDelete}
                 accessibilityRole="button"
-                className="mt-8 h-12 flex-row items-center justify-center rounded-full border border-[#EAE6E1] bg-white">
+                className="mt-8 h-12 flex-row items-center justify-center rounded-full border border-line bg-white">
                 <Text className="text-[13px] font-semibold text-red-600">
                   Eliminar outfit
                 </Text>

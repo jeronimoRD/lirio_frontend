@@ -24,7 +24,7 @@ export default function GarmentPicker({
 }) {
   return (
     <View className="gap-1.5">
-      <Text className="text-xs font-semibold uppercase text-[#6E6B68]">
+      <Text className="text-xs font-semibold uppercase text-ink-secondary">
         Tipo de prenda
       </Text>
 
@@ -41,12 +41,12 @@ export default function GarmentPicker({
               accessibilityLabel={option.label}
               className={`h-12 flex-1 items-center justify-center rounded-lg border ${
                 selected
-                  ? 'border-[#A81245] bg-[#A81245]/10'
-                  : 'border-[#EAE6E1] bg-white'
+                  ? 'border-brand bg-brand/10'
+                  : 'border-line bg-white'
               }`}>
               <Text
                 className={`text-sm font-semibold ${
-                  selected ? 'text-[#A81245]' : 'text-[#6E6B68]'
+                  selected ? 'text-brand' : 'text-ink-secondary'
                 }`}>
                 {option.label}
               </Text>

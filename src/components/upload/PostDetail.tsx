@@ -23,6 +23,7 @@ import { ArrowLeft, Bookmark, Flag, Heart, Sparkles } from 'lucide-react-native'
 import ReportModal from '../ReportModal';
 import GlassIconButton from '@/components/LiquidGlass/GlassIconButton';
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
+import { glass } from '@/constants/theme';
 import { initialsOf } from '../../utils/strings';
 import { formatLikeCount } from '../../utils/format';
 import { usePostDetail } from '../../hooks/upload/usePostDetail';
@@ -50,9 +51,9 @@ function Ornament() {
       className="flex-row items-center gap-1.5"
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants">
-      <View className="h-px w-8 bg-[#DCC7A8]" />
-      <View className="h-1 w-1 rounded-full bg-[#A81245]" />
-      <View className="h-px w-8 bg-[#DCC7A8]" />
+      <View className="h-px w-8 bg-beige" />
+      <View className="h-1 w-1 rounded-full bg-brand" />
+      <View className="h-px w-8 bg-beige" />
     </View>
   );
 }
@@ -60,15 +61,15 @@ function Ornament() {
 // Estado de carga inicial, mientras se obtiene la información del post. Es hermosoooo
 function LoadingState() {
   return (
-    <View className="flex-1 items-center justify-center bg-[#FCFAF8] px-8">
-      <View className="mb-6 h-16 w-16 items-center justify-center rounded-full border border-[#EAE6E1] bg-white">
+    <View className="flex-1 items-center justify-center bg-screen px-8">
+      <View className="mb-6 h-16 w-16 items-center justify-center rounded-full border border-line bg-white">
         <Sparkles size={23} color="#A81245" strokeWidth={1.5} />
       </View>
       <ActivityIndicator color="#A81245" size="small" />
-      <Text className="mt-4 font-['Lora-Italic'] text-[19px] text-[#6E6B68]">
+      <Text className="mt-4 font-['Lora-Italic'] text-[19px] text-ink-secondary">
         Preparando el atuendo…
       </Text>
-      <View className="mt-4 h-px w-12 bg-[#DCC7A8]" />
+      <View className="mt-4 h-px w-12 bg-beige" />
     </View>
   );
 }
@@ -248,29 +249,29 @@ export default function PostDetail() {
   if (!post) {
     return (
       <View
-        className="flex-1 items-center justify-center bg-[#FCFAF8] px-8"
+        className="flex-1 items-center justify-center bg-screen px-8"
         style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}>
         <Pressable
           onPress={goBack}
           accessibilityRole="button"
           accessibilityLabel="Volver"
           hitSlop={12}
-          className="absolute left-5 h-11 w-11 items-center justify-center rounded-full border border-[#EAE6E1] bg-white"
+          className="absolute left-5 h-11 w-11 items-center justify-center rounded-full border border-line bg-white"
           style={{ top: insets.top + 8 }}>
           <ArrowLeft size={19} color="#292724" />
         </Pressable>
 
         <Ornament />
-        <Text className="mt-6 text-center font-['Lora-Italic'] text-[29px] leading-[37px] text-[#A81245]">
+        <Text className="mt-6 text-center font-['Lora-Italic'] text-[29px] leading-[37px] text-brand">
           Este look no está disponible
         </Text>
-        <Text className="mt-3 max-w-[290px] text-center text-[14px] leading-6 text-[#6E6B68]">
+        <Text className="mt-3 max-w-[290px] text-center text-[14px] leading-6 text-ink-secondary">
           Puede que la publicación ya no exista o que haya ocurrido un problema de conexión.
         </Text>
         <Pressable
           onPress={goBack}
           accessibilityRole="button"
-          className="mt-8 min-h-12 items-center justify-center rounded-full bg-[#A81245] px-9 active:opacity-80">
+          className="mt-8 min-h-12 items-center justify-center rounded-full bg-brand px-9 active:opacity-80">
           <Text className="text-sm font-semibold text-white">Volver a explorar</Text>
         </Pressable>
       </View>
@@ -280,7 +281,7 @@ export default function PostDetail() {
   const hasDescription = !!post.description?.trim();
 
   return (
-    <View className="flex-1 bg-[#FCFAF8]">
+    <View className="flex-1 bg-screen">
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
@@ -293,20 +294,20 @@ export default function PostDetail() {
           {/* Cabecera de revista */}
           <View className="mb-5 flex-row items-center justify-between px-6">
             <View className="gap-1">
-              <Text className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#A81245]">
+              <Text className="text-[10px] font-semibold uppercase tracking-[0.22em] text-brand">
                 HIBIRIO
               </Text>
-              <Text className="font-['Lora-Italic'] text-[14px] text-[#6E6B68]">
+              <Text className="font-['Lora-Italic'] text-[14px] text-ink-secondary">
                 Estilo, en cada detalle
               </Text>
             </View>
-            <View className="h-px w-12 bg-[#DCC7A8]" />
+            <View className="h-px w-12 bg-beige" />
           </View>
 
           {/* Imagen protagonista */}
           <View className="px-4">
             <View
-              className="overflow-hidden rounded-[28px] bg-[#F0ECE7]"
+              className="overflow-hidden rounded-hero bg-muted-surface"
               style={imageShadow}>
               <Pressable
                 onPress={handleDoubleTap}
@@ -357,8 +358,8 @@ export default function PostDetail() {
               />
             </GlassIconButton>
 
-            <View className="absolute bottom-4 left-7 rounded-full border border-white/60 bg-[#FCFAF8]/90 px-3 py-1.5">
-              <Text className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#6E6B68]">
+            <View className="absolute bottom-4 left-7 rounded-full border border-white/60 bg-screen/90 px-3 py-1.5">
+              <Text className="text-[9px] font-semibold uppercase tracking-[0.18em] text-ink-secondary">
                 The look
               </Text>
             </View>
@@ -367,12 +368,12 @@ export default function PostDetail() {
           {/* Titular editorial */}
           <View className="gap-4 px-6 pt-8">
             <Ornament />
-            <Text className="font-['Lora-Italic'] text-[31px] leading-[40px] text-[#292724]">
+            <Text className="font-['Lora-Italic'] text-[31px] leading-[40px] text-ink">
               {post.title}
             </Text>
             <View className="flex-row items-center gap-2">
-              <View className="h-px w-5 bg-[#DCC7A8]" />
-              <Text className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6E6B68]">
+              <View className="h-px w-5 bg-beige" />
+              <Text className="text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-secondary">
                 Inspiración de estilo
               </Text>
             </View>
@@ -380,8 +381,8 @@ export default function PostDetail() {
 
           {/* Autor y acción para reportar */}
           <View className="mt-7 flex-row items-center gap-3 px-6">
-            <View className="h-[50px] w-[50px] items-center justify-center rounded-full border border-[#DCC7A8] bg-white p-1">
-              <View className="h-full w-full items-center justify-center rounded-full bg-[#A81245]">
+            <View className="h-[50px] w-[50px] items-center justify-center rounded-full border border-beige bg-white p-1">
+              <View className="h-full w-full items-center justify-center rounded-full bg-brand">
                 <Text className="text-xs font-bold tracking-[0.08em] text-white">
                   {author ? initialsOf(author.name) : '??'}
                 </Text>
@@ -389,10 +390,10 @@ export default function PostDetail() {
             </View>
 
             <View className="min-w-0 flex-1">
-              <Text className="text-[9px] font-semibold uppercase tracking-[0.17em] text-[#A09B95]">
+              <Text className="text-[9px] font-semibold uppercase tracking-[0.17em] text-ink-muted">
                 Publicado por
               </Text>
-              <Text numberOfLines={1} className="mt-1 text-[14px] font-semibold text-[#292724]">
+              <Text numberOfLines={1} className="mt-1 text-[14px] font-semibold text-ink">
                 {author ? author.name : 'Un usuario'}
               </Text>
             </View>
@@ -403,22 +404,22 @@ export default function PostDetail() {
                 hitSlop={10}
                 accessibilityRole="button"
                 accessibilityLabel="Reportar publicación"
-                className="min-h-10 flex-row items-center gap-1.5 rounded-full border border-[#EAE6E1] bg-white px-3 active:opacity-60">
+                className="min-h-10 flex-row items-center gap-1.5 rounded-full border border-line bg-white px-3 active:opacity-60">
                 <Flag size={13} color="#6E6B68" strokeWidth={1.8} />
-                <Text className="text-[11px] font-medium text-[#6E6B68]">Reportar</Text>
+                <Text className="text-[11px] font-medium text-ink-secondary">Reportar</Text>
               </Pressable>
             )}
           </View>
 
-          <View className="mx-6 mt-7 h-px bg-[#EAE6E1]" />
+          <View className="mx-6 mt-7 h-px bg-line" />
 
           {/* Descripción */}
           {hasDescription && (
-            <View className="mx-6 mt-6 rounded-r-2xl border-l-2 border-[#DCC7A8] bg-white/60 py-4 pl-4 pr-3">
-              <Text className="mb-2 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#A81245]">
+            <View className="mx-6 mt-6 rounded-r-2xl border-l-2 border-beige bg-white/60 py-4 pl-4 pr-3">
+              <Text className="mb-2 text-[9px] font-semibold uppercase tracking-[0.18em] text-brand">
                 Descripción de tu atuendo
               </Text>
-              <Text className="text-[15px] leading-[27px] text-[#292724]">
+              <Text className="text-[15px] leading-[27px] text-ink">
                 {post.description}
               </Text>
             </View>
@@ -427,10 +428,10 @@ export default function PostDetail() {
           {/* Interacción con likes */}
           <View className="mt-7 flex-row items-center justify-between px-6">
             <View className="gap-1">
-              <Text className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#A09B95]">
+              <Text className="text-[9px] font-semibold uppercase tracking-[0.18em] text-ink-muted">
                 Comunidad hibirio 
               </Text>
-              <Text className="font-['Lora-Italic'] text-[17px] text-[#292724]">
+              <Text className="font-['Lora-Italic'] text-[17px] text-ink">
                 Un atuendo que inspira.
               </Text>
             </View>
@@ -443,8 +444,8 @@ export default function PostDetail() {
               accessibilityState={{ selected: liked }}
               className={`min-h-12 flex-row items-center gap-2.5 rounded-full border px-4 active:opacity-80 ${
                 liked
-                  ? 'border-[#A81245]/25 bg-[#A81245]/10'
-                  : 'border-[#EAE6E1] bg-white'
+                  ? 'border-brand/25 bg-brand/10'
+                  : 'border-line bg-white'
               }`}>
               <Animated.View style={likeIconStyle}>
                 <Heart
@@ -454,7 +455,7 @@ export default function PostDetail() {
                   strokeWidth={liked ? 2.5 : 1.8}
                 />
               </Animated.View>
-              <Text className="text-[14px] font-semibold text-[#292724]">
+              <Text className="text-[14px] font-semibold text-ink">
                 {formatLikeCount(likesCount)}
               </Text>
             </Pressable>
@@ -464,14 +465,14 @@ export default function PostDetail() {
           <View className="mt-9 px-6">
             <View className="flex-row items-center gap-3">
               <View className="gap-1">
-                <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#6E6B68]">
+                <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-ink-secondary">
                   Detalles de estilo
                 </Text>
-                <Text className="font-['Lora-Italic'] text-[21px] text-[#292724]">
+                <Text className="font-['Lora-Italic'] text-[21px] text-ink">
                   Colores del look
                 </Text>
               </View>
-              <View className="h-px flex-1 bg-[#EAE6E1]" />
+              <View className="h-px flex-1 bg-line" />
             </View>
 
             <View
@@ -495,33 +496,33 @@ export default function PostDetail() {
                   />
                   <View
                     className={`h-1 w-1 rounded-full ${
-                      index === 1 ? 'bg-[#A81245]' : 'bg-[#DCC7A8]'
+                      index === 1 ? 'bg-brand' : 'bg-beige'
                     }`}
                   />
                 </View>
               ))}
               <View className="ml-1 flex-1">
-                <Text className="text-[12px] leading-5 text-[#6E6B68]">
+                <Text className="text-[12px] leading-5 text-ink-secondary">
                   Una paleta cálida y natural para completar la inspiración.
                 </Text>
               </View>
             </View>
             {post.garmentType && (
               <View className="gap-1 pt-2">
-                <Text className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#A09B95]">
+                <Text className="text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-muted">
                   Tipo de prenda
                 </Text>
-                <Text className="text-sm font-semibold text-[#292724]">
+                <Text className="text-sm font-semibold text-ink">
                   {garmentLabel(post.garmentType)}
                 </Text>
               </View>
             )}
           </View>
 
-          <View className="mx-6 mt-9 h-px bg-[#EAE6E1]" />
+          <View className="mx-6 mt-9 h-px bg-line" />
           <View className="items-center px-6 pt-6">
             <Ornament />
-            <Text className="mt-3 font-['Lora-Italic'] text-[14px] text-[#6E6B68]">
+            <Text className="mt-3 font-['Lora-Italic'] text-[14px] text-ink-secondary">
               Encuentra tu manera de florecer como tu propia flor.
             </Text>
           </View>
@@ -543,7 +544,7 @@ export default function PostDetail() {
           }}>
           <GlassSurface
             intensity={30}
-            tintColor="rgba(41, 39, 36, 0.88)"
+            tintColor={glass.toast}
             style={{
               borderRadius: 999,
               paddingHorizontal: 18,

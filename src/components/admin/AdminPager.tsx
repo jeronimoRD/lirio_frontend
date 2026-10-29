@@ -22,18 +22,18 @@ export default function AdminPager() {
   };
 
   return (
-    <View className="flex-1 bg-[#FAF8F6]">
+    <View className="flex-1 bg-admin-screen">
       <TabPager ref={pagerRef} index={index} onPageSelected={handlePageSelected}>
-        <View key="resumen" className="flex-1 bg-[#FAF8F6]">
+        <View key="resumen" className="flex-1 bg-admin-screen">
           <AdminResumen />
         </View>
-        <View key="users" className="flex-1 bg-[#FAF8F6]">
+        <View key="users" className="flex-1 bg-admin-screen">
           <AdminUsers />
         </View>
-        <View key="posts" className="flex-1 bg-[#FAF8F6]">
+        <View key="posts" className="flex-1 bg-admin-screen">
           <AdminPosts />
         </View>
-        <View key="more" className="flex-1 bg-[#FAF8F6]">
+        <View key="more" className="flex-1 bg-admin-screen">
           <AdminMore />
         </View>
       </TabPager>

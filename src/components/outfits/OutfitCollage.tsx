@@ -5,13 +5,13 @@ import type { OutfitItem } from '../../types';
 
 export default function OutfitCollage({ items }: { items: OutfitItem[] }) {
   if (items.length === 0) {
-    return <View className="flex-1 bg-[#F4EEE7]" />;
+    return <View className="flex-1 bg-icon-well" />;
   }
 
   const [first, ...rest] = items;
 
   return (
-    <View className="flex-1 flex-row gap-[3px] bg-[#FCFAF8]">
+    <View className="flex-1 flex-row gap-[3px] bg-screen">
       <CollagePiece item={first} />
 
       {rest.length > 0 && (
@@ -29,7 +29,7 @@ function CollagePiece({ item }: { item: OutfitItem }) {
   const uri = item.isAvailable ? item.image : null;
 
   return (
-    <View className="flex-1 items-center justify-center overflow-hidden bg-[#F4EEE7]">
+    <View className="flex-1 items-center justify-center overflow-hidden bg-icon-well">
       {uri ? (
         <Image source={{ uri }} resizeMode="cover" className="h-full w-full" />
       ) : (

@@ -43,9 +43,9 @@ function EditorialMark() {
       className="flex-row items-center gap-2"
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants">
-      <View className="h-px w-7 bg-[#DCC7A8]" />
-      <View className="h-1 w-1 rounded-full bg-[#A81245]" />
-      <View className="h-px w-7 bg-[#DCC7A8]" />
+      <View className="h-px w-7 bg-beige" />
+      <View className="h-1 w-1 rounded-full bg-brand" />
+      <View className="h-px w-7 bg-beige" />
     </View>
   );
 }
@@ -71,7 +71,7 @@ export default function EditProfile() {
 
   return (
     <ScrollView
-      className="flex-1 bg-[#FCFAF8]"
+      className="flex-1 bg-screen"
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
       contentContainerClassName="items-center px-5"
@@ -89,17 +89,17 @@ export default function EditProfile() {
           <View className="mt-5">
             <View className="flex-row items-start justify-between">
               <View className="flex-1 pr-3">
-                <Text className="font-['Lora-Italic'] text-[29px] leading-[37px] text-[#292724]">
+                <Text className="font-['Lora-Italic'] text-[29px] leading-[37px] text-ink">
                   Tu esencia, tus palabras.
                 </Text>
 
-                <Text className="mt-2 text-[13px] leading-5 text-[#6E6B68]">
+                <Text className="mt-2 text-[13px] leading-5 text-ink-secondary">
                   Haz que tu perfil refleje quién eres y cómo expresas tu
                   estilo.
                 </Text>
               </View>
 
-              <View className="h-11 w-11 items-center justify-center rounded-full border border-[#EAE6E1] bg-white">
+              <View className="h-11 w-11 items-center justify-center rounded-full border border-line bg-white">
                 <Sparkles
                   size={20}
                   color={COLORS.burgundy}
@@ -111,11 +111,11 @@ export default function EditProfile() {
             <View className="mt-5 flex-row items-center gap-2">
               <EditorialMark />
 
-              <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#6E6B68]">
+              <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-ink-secondary">
                 HIBIRIO · Tu estilo
               </Text>
 
-              <View className="h-px flex-1 bg-[#EAE6E1]" />
+              <View className="h-px flex-1 bg-line" />
             </View>
           </View>
         </View>
@@ -124,11 +124,11 @@ export default function EditProfile() {
         <View>
           <SectionLabel text="TU IDENTIDAD" />
 
-          <View className="mt-2 overflow-hidden rounded-[22px] border border-[#EAE6E1] bg-white">
-            <View className="h-[70px] bg-[#A81245]" />
+          <View className="mt-2 overflow-hidden rounded-[22px] border border-line bg-white">
+            <View className="h-[70px] bg-brand" />
 
             <View className="px-4 pb-5">
-              <View className="-mt-8 mb-3 h-[66px] w-[66px] items-center justify-center rounded-full border-[3px] border-white bg-[#FCFAF8]">
+              <View className="-mt-8 mb-3 h-[66px] w-[66px] items-center justify-center rounded-full border-[3px] border-white bg-screen">
                 <UserRound
                   size={30}
                   color={COLORS.burgundy}
@@ -136,24 +136,24 @@ export default function EditProfile() {
                 />
               </View>
 
-              <Text className="font-['Lora-Italic'] text-[23px] text-[#292724]">
+              <Text className="font-['Lora-Italic'] text-[23px] text-ink">
                 {user.name || 'Tu nombre'}
               </Text>
 
-              <Text className="mt-1 text-[12px] text-[#6E6B68]">
+              <Text className="mt-1 text-[12px] text-ink-secondary">
                 Tu perfil en la comunidad Hibirio refleja tu estilo y personalidad. Haz que cada palabra cuente.
               </Text>
 
               <View className="mt-4 flex-row items-center gap-2">
-                <View className="rounded-full border border-[#EAE6E1] bg-[#FCFAF8] px-3 py-1.5">
-                  <Text className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#6E6B68]">
+                <View className="rounded-full border border-line bg-screen px-3 py-1.5">
+                  <Text className="text-[9px] font-semibold uppercase tracking-[0.1em] text-ink-secondary">
                     Mi espacio
                   </Text>
                 </View>
 
-                <View className="h-1 w-1 rounded-full bg-[#DCC7A8]" />
+                <View className="h-1 w-1 rounded-full bg-beige" />
 
-                <Text className="text-[10px] text-[#A09B95]">
+                <Text className="text-[10px] text-ink-muted">
                   Tu historia comienza aquí
                 </Text>
               </View>
@@ -178,9 +178,9 @@ export default function EditProfile() {
                 control={control}
                 name="name"
                 label="Nombre"
-                labelClassName="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#6E6B68]"
-                inputWrapperClassName="h-[52px] flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
-                inputClassName="flex-1 text-sm text-[#292724]"
+                labelClassName="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-secondary"
+                inputWrapperClassName="h-[52px] flex-row items-center rounded-xl border border-line bg-screen px-4"
+                inputClassName="flex-1 text-sm text-ink"
                 maxLength={50}
                 rules={{
                   required: 'El nombre es obligatorio',
@@ -198,20 +198,20 @@ export default function EditProfile() {
               {/* Biografía */}
               <View className="gap-2">
                 <View className="flex-row items-center justify-between">
-                  <Text className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#6E6B68]">
+                  <Text className="text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-secondary">
                     Biografía
                   </Text>
 
-                  <Text className="text-[10px] text-[#A09B95]">
+                  <Text className="text-[10px] text-ink-muted">
                     Hasta 200 caracteres
                   </Text>
                 </View>
 
                 <View
-                  className="overflow-hidden rounded-xl border border-[#EAE6E1] bg-[#FCFAF8]"
+                  className="overflow-hidden rounded-xl border border-line bg-screen"
                   style={bioFocused ? { borderColor: '#A81245' } : undefined}>
                   <TextInput
-                    className="min-h-[125px] p-4 text-sm leading-[22px] text-[#292724]"
+                    className="min-h-[125px] p-4 text-sm leading-[22px] text-ink"
                     placeholder="Cuéntanos algo sobre ti, tus gustos o tu forma de vivir la moda..."
                     placeholderTextColor={COLORS.muted}
                     value={bio}
@@ -224,16 +224,16 @@ export default function EditProfile() {
                     accessibilityLabel="Biografía"
                   />
 
-                  <View className="flex-row items-center justify-between border-t border-[#EAE6E1] px-4 py-3">
+                  <View className="flex-row items-center justify-between border-t border-line px-4 py-3">
                     <View className="flex-row items-center gap-2">
-                      <View className="h-1.5 w-1.5 rounded-full bg-[#DCC7A8]" />
+                      <View className="h-1.5 w-1.5 rounded-full bg-beige" />
 
-                      <Text className="text-[10px] text-[#6E6B68]">
+                      <Text className="text-[10px] text-ink-secondary">
                         Tu historia, a tu manera
                       </Text>
                     </View>
 
-                    <Text className="text-[10px] text-[#A09B95]">
+                    <Text className="text-[10px] text-ink-muted">
                       {bio.length}/200
                     </Text>
                   </View>
@@ -271,11 +271,11 @@ export default function EditProfile() {
 
               {/* Guardar cambios */}
               <Pressable
-                onPress={submit}
+                onPress={() => submit()}
                 disabled={saving}
                 accessibilityRole="button"
                 accessibilityLabel="Guardar cambios del perfil"
-                className="overflow-hidden rounded-full bg-[#A81245] disabled:opacity-50"
+                className="overflow-hidden rounded-full bg-brand disabled:opacity-50"
                 style={{
                   shadowColor: '#A81245',
                   shadowOffset: { width: 0, height: 4 },
@@ -300,7 +300,7 @@ export default function EditProfile() {
                 </View>
               </Pressable>
 
-              <Text className="text-center text-[10px] leading-4 text-[#A09B95]">
+              <Text className="text-center text-[10px] leading-4 text-ink-muted">
                 Un pequeño cambio puede decir mucho de ti.
               </Text>
             </View>
@@ -308,8 +308,8 @@ export default function EditProfile() {
         </View>
 
         {/* Detalle Liquid Glass */}
-        <View className="overflow-hidden rounded-[20px]">
-          <View className="h-[108px] overflow-hidden rounded-[20px] bg-[#292724]">
+        <View className="overflow-hidden rounded-card">
+          <View className="h-[108px] overflow-hidden rounded-card bg-ink">
             <View className="absolute -right-5 -top-9 h-32 w-32 rounded-full border border-white/10" />
             <View className="absolute -right-1 -top-5 h-24 w-24 rounded-full border border-white/10" />
             <View className="absolute -bottom-12 -left-5 h-32 w-32 rounded-full border border-white/10" />
@@ -350,7 +350,7 @@ export default function EditProfile() {
         <View className="items-center pb-2">
           <EditorialMark />
 
-          <Text className="mt-3 text-[9px] font-semibold uppercase tracking-[0.2em] text-[#A09B95]">
+          <Text className="mt-3 text-[9px] font-semibold uppercase tracking-[0.2em] text-ink-muted">
             HIBIRIO
           </Text>
         </View>

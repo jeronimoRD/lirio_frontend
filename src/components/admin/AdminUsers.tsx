@@ -14,8 +14,8 @@ import { initialsOf } from '../../utils/strings';
 import { useAdminUsers } from '../../hooks/admin/useAdminUsers';
 
 const ROLE_STYLE: Record<Role, { label: string; className: string }> = {
-  USER: { label: 'Usuario', className: 'bg-[#F4EEE7] text-[#6E6B68]' },
-  ADMIN: { label: 'Admin', className: 'bg-[#4A3728]/10 text-[#4A3728]' },
+  USER: { label: 'Usuario', className: 'bg-icon-well text-ink-secondary' },
+  ADMIN: { label: 'Admin', className: 'bg-admin-brown/10 text-admin-brown' },
 };
 
 export default function AdminUsers() {
@@ -53,18 +53,18 @@ export default function AdminUsers() {
     </View>
   ) : !error && users.length === 0 ? (
     <View className="mt-4 rounded-2xl bg-white p-6" style={cardShadow}>
-      <Text className="text-center text-sm text-[#6E6B68]">No hay usuarios registrados.</Text>
+      <Text className="text-center text-sm text-ink-secondary">No hay usuarios registrados.</Text>
     </View>
   ) : !error && users.length > 0 && filteredUsers.length === 0 ? (
     <View className="mt-4 rounded-2xl bg-white p-6" style={cardShadow}>
-      <Text className="text-center text-sm text-[#6E6B68]">
+      <Text className="text-center text-sm text-ink-secondary">
         No se encontraron usuarios para {`"${query}"`}.
       </Text>
     </View>
   ) : undefined;
 
   return (
-    <View className="flex-1 bg-[#FCFAF8]">
+    <View className="flex-1 bg-screen">
       <AdminBrandHeader />
       <FlatList
         data={loading ? [] : filteredUsers}
@@ -77,7 +77,7 @@ export default function AdminUsers() {
         ListHeaderComponent={
           <View className="mx-auto w-full max-w-md">
             <View className="mb-6">
-              <Text className="font-['Lora-Italic'] text-[28px] leading-9 text-[#241E1B]">
+              <Text className="font-['Lora-Italic'] text-[28px] leading-9 text-admin-ink">
                 Usuarios
               </Text>
             </View>
@@ -91,14 +91,14 @@ export default function AdminUsers() {
             <Button
               text={showCreate ? 'Cancelar' : 'Nuevo usuario'}
               secondary
-              textClassName="text-sm font-semibold text-[#292724]"
-              className="rounded-2xl border border-[#EAE6E1] bg-white"
+              textClassName="text-sm font-semibold text-ink"
+              className="rounded-2xl border border-line bg-white"
               onPress={toggleCreate}
             />
 
             {!showCreate && (
               <View
-                className="mt-4 h-12 flex-row items-center gap-2 rounded-full border border-[#EAE6E1] bg-white px-4"
+                className="mt-4 h-12 flex-row items-center gap-2 rounded-full border border-line bg-white px-4"
                 style={searchFocused ? { borderColor: '#A81245' } : undefined}>
                 <Search size={18} color="#A09B95" />
                 <TextInput
@@ -108,7 +108,7 @@ export default function AdminUsers() {
                   onBlur={() => setSearchFocused(false)}
                   placeholder="Buscar usuario por nombre o correo..."
                   placeholderTextColor="#A09B95"
-                  className="flex-1 text-sm text-[#292724]"
+                  className="flex-1 text-sm text-ink"
                   autoCapitalize="none"
                   returnKeyType="search"
                 />
@@ -128,9 +128,9 @@ export default function AdminUsers() {
                     name="name"
                     label="Nombre de usuario"
                     placeholder="lirio_secret"
-                    labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
-                    inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
-                    inputClassName="flex-1 text-sm text-[#292724]"
+                    labelClassName="text-xs font-semibold uppercase text-ink-secondary"
+                    inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-line bg-screen px-4"
+                    inputClassName="flex-1 text-sm text-ink"
                     maxLength={50}
                     rules={{
                       required: 'Escribe un nombre',
@@ -144,9 +144,9 @@ export default function AdminUsers() {
                     label="Correo electrónico"
                     keyboardType="email-address"
                     placeholder="nombre@correo.com"
-                    labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
-                    inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
-                    inputClassName="flex-1 text-sm text-[#292724]"
+                    labelClassName="text-xs font-semibold uppercase text-ink-secondary"
+                    inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-line bg-screen px-4"
+                    inputClassName="flex-1 text-sm text-ink"
                     maxLength={100}
                     rules={{
                       required: 'Escribe un correo',
@@ -160,9 +160,9 @@ export default function AdminUsers() {
                     label="Contraseña"
                     secureTextEntry
                     placeholder="••••••••"
-                    labelClassName="text-xs font-semibold uppercase text-[#6E6B68]"
-                    inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] px-4"
-                    inputClassName="flex-1 text-sm text-[#292724]"
+                    labelClassName="text-xs font-semibold uppercase text-ink-secondary"
+                    inputWrapperClassName="h-12 flex-row items-center rounded-xl border border-line bg-screen px-4"
+                    inputClassName="flex-1 text-sm text-ink"
                     maxLength={128}
                     rules={{
                       required: 'Escribe una contraseña',
@@ -172,7 +172,7 @@ export default function AdminUsers() {
                   />
 
                   <View className="gap-2">
-                    <Text className="text-xs font-semibold uppercase text-[#6E6B68]">Rol</Text>
+                    <Text className="text-xs font-semibold uppercase text-ink-secondary">Rol</Text>
                     <View className="flex-row gap-2">
                       {ROLES.map((role) => {
                         const selected = role === newRole;
@@ -181,11 +181,11 @@ export default function AdminUsers() {
                             key={role}
                             onPress={() => setNewRole(role)}
                             className={`flex-1 items-center rounded-xl border px-3 py-3 active:opacity-80 ${
-                              selected ? 'border-[#4A3728] bg-[#4A3728]' : 'border-[#EAE6E1] bg-white'
+                              selected ? 'border-admin-brown bg-admin-brown' : 'border-line bg-white'
                             }`}>
                             <Text
                               className={`text-sm font-semibold ${
-                                selected ? 'text-white' : 'text-[#6E6B68]'
+                                selected ? 'text-white' : 'text-ink-secondary'
                               }`}>
                               {ROLE_STYLE[role].label}
                             </Text>
@@ -199,7 +199,7 @@ export default function AdminUsers() {
                     text={submitting ? 'Creando...' : 'Crear usuario'}
                     onPress={requestCreate}
                     disabled={submitting}
-                    className="rounded-2xl bg-[#4A3728]"
+                    className="rounded-2xl bg-admin-brown"
                   />
                 </View>
               </View>
@@ -217,16 +217,16 @@ export default function AdminUsers() {
             <View className="mx-auto w-full max-w-md">
               <View className="mt-4 rounded-2xl bg-white p-5" style={cardShadow}>
                 <View className="flex-row items-center gap-3">
-                  <View className="h-11 w-11 items-center justify-center rounded-full bg-[#4A3728]">
+                  <View className="h-11 w-11 items-center justify-center rounded-full bg-admin-brown">
                     <Text className="text-sm font-bold text-white">{initialsOf(user.name)}</Text>
                   </View>
 
                   <View className="flex-1">
                     <View className="flex-row items-center gap-2">
-                      <Text className="text-base font-semibold text-[#292724]">{user.name}</Text>
-                      {isMe && <Text className="text-xs text-[#A09B95]">(tú)</Text>}
+                      <Text className="text-base font-semibold text-ink">{user.name}</Text>
+                      {isMe && <Text className="text-xs text-ink-muted">(tú)</Text>}
                     </View>
-                    <Text className="mt-0.5 text-sm text-[#6E6B68]">{user.email}</Text>
+                    <Text className="mt-0.5 text-sm text-ink-secondary">{user.email}</Text>
                   </View>
 
                   <View className={`rounded-full px-3 py-1 ${role.className}`}>
@@ -246,8 +246,8 @@ export default function AdminUsers() {
                               : 'Hacer admin'
                         }
                         secondary
-                        textClassName="text-sm font-semibold text-[#292724]"
-                        className="rounded-2xl border border-[#EAE6E1] bg-white"
+                        textClassName="text-sm font-semibold text-ink"
+                        className="rounded-2xl border border-line bg-white"
                         onPress={() => onToggleRole(user)}
                         disabled={busyId !== null || isMe}
                       />
@@ -258,8 +258,8 @@ export default function AdminUsers() {
                     <Pressable
                       onPress={() => requestDelete(user)}
                       disabled={busyId !== null || isMe}
-                      className="h-12 flex-row items-center justify-center gap-2 rounded-2xl border border-[#E9AFA6] bg-[#FBE6E1] active:opacity-80 disabled:opacity-50">
-                      <Text className="text-[13px] font-semibold text-[#C2391F]">
+                      className="h-12 flex-row items-center justify-center gap-2 rounded-2xl border border-admin-danger-line bg-admin-danger-bg active:opacity-80 disabled:opacity-50">
+                      <Text className="text-[13px] font-semibold text-admin-danger">
                         {busyId === user.id ? 'Eliminando...' : 'Eliminar'}
                       </Text>
                     </Pressable>

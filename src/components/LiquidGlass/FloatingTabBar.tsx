@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ComponentType, type Ref } from 'react';
-import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
+import { Pressable, StyleSheet, View, type LayoutChangeEvent, type ViewInstance } from 'react-native';
 import Animated, {
     interpolate,
     interpolateColor,
@@ -220,7 +220,7 @@ useEffect(() => {
 
 
 function AddButton() {
-    const buttonRef = useRef<View>(null);
+    const buttonRef = useRef<ViewInstance>(null);
     const press = useSharedValue(0);
     const [menuOpen, setMenuOpen] = useState(false);
     const [anchor, setAnchor] = useState<MenuAnchor | null>(null);

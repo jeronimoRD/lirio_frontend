@@ -44,9 +44,9 @@ function EditorialMark() {
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
     >
-      <View className="h-px w-7 bg-[#DCC7A8]" />
-      <View className="h-1 w-1 rounded-full bg-[#A81245]" />
-      <View className="h-px w-7 bg-[#DCC7A8]" />
+      <View className="h-px w-7 bg-beige" />
+      <View className="h-1 w-1 rounded-full bg-brand" />
+      <View className="h-px w-7 bg-beige" />
     </View>
   );
 }
@@ -54,17 +54,17 @@ function EditorialMark() {
 function LoadingState() {
   return (
     <View className="items-center py-16">
-      <View className="mb-5 h-14 w-14 items-center justify-center rounded-full border border-[#EAE6E1] bg-white">
+      <View className="mb-5 h-14 w-14 items-center justify-center rounded-full border border-line bg-white">
         <Sparkles size={22} color={COLORS.burgundy} strokeWidth={1.4} />
       </View>
 
       <ActivityIndicator color={COLORS.burgundy} size="small" />
 
-      <Text className="mt-4 font-['Lora-Italic'] text-[18px] text-[#6E6B68]">
+      <Text className="mt-4 font-['Lora-Italic'] text-[18px] text-ink-secondary">
         Preparando la selección…
       </Text>
 
-      <View className="mt-4 h-px w-12 bg-[#DCC7A8]" />
+      <View className="mt-4 h-px w-12 bg-beige" />
     </View>
   );
 }
@@ -77,18 +77,18 @@ function EmptyState({
   activeCategoryId: string | number | null | undefined;
 }) {
   return (
-    <View className="mx-[18px] items-center rounded-[22px] border border-[#EAE6E1] bg-white px-6 py-10">
-      <View className="mb-5 h-16 w-16 items-center justify-center rounded-full bg-[#FCFAF8]">
+    <View className="mx-[18px] items-center rounded-[22px] border border-line bg-white px-6 py-10">
+      <View className="mb-5 h-16 w-16 items-center justify-center rounded-full bg-screen">
         <Heart size={27} color={COLORS.burgundy} strokeWidth={1.3} />
       </View>
 
       <EditorialMark />
 
-      <Text className="mt-5 text-center font-['Lora-Italic'] text-[24px] leading-8 text-[#292724]">
+      <Text className="mt-5 text-center font-['Lora-Italic'] text-[24px] leading-8 text-ink">
         Un espacio para tu estilo
       </Text>
 
-      <Text className="mt-2 text-center text-[13px] leading-5 text-[#6E6B68]">
+      <Text className="mt-2 text-center text-[13px] leading-5 text-ink-secondary">
         {activeCategoryId
           ? `Todavía no hay outfits en "${activeFilter}".`
           : 'Aún no hay outfits publicados. Vuelve pronto para descubrir nuevas ideas.'}
@@ -114,7 +114,7 @@ export default function Home() {
   const showFeed = !loading && !error;
 
   return (
-    <View className="flex-1 bg-[#FCFAF8]">
+    <View className="flex-1 bg-screen">
       <FlatList
         className="flex-1"
         data={showFeed ? displayedPosts : []}
@@ -140,16 +140,16 @@ export default function Home() {
               <View className="mb-5 mt-3">
                 <View className="flex-row items-start justify-between">
                   <View className="flex-1 pr-3">
-                    <Text className="font-['Lora-Italic'] text-[30px] leading-[37px] text-[#292724]">
+                    <Text className="font-['Lora-Italic'] text-[30px] leading-[37px] text-ink">
                       Viste tu esencia.
                     </Text>
 
-                    <Text className="mt-2 max-w-[280px] text-[13px] leading-5 text-[#6E6B68]">
+                    <Text className="mt-2 max-w-[280px] text-[13px] leading-5 text-ink-secondary">
                       Inspiración, tendencias y looks que cuentan tu historia.
                     </Text>
                   </View>
 
-                  <View className="mt-1 h-11 w-11 items-center justify-center rounded-full border border-[#EAE6E1] bg-white">
+                  <View className="mt-1 h-11 w-11 items-center justify-center rounded-full border border-line bg-white">
                     <Sparkles
                       size={19}
                       color={COLORS.burgundy}
@@ -161,11 +161,11 @@ export default function Home() {
                 <View className="mt-5 flex-row items-center gap-2">
                   <EditorialMark />
 
-                  <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#6E6B68]">
+                  <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-ink-secondary">
                     HIBIRIO · THE EDIT
                   </Text>
 
-                  <View className="h-px flex-1 bg-[#EAE6E1]" />
+                  <View className="h-px flex-1 bg-line" />
                 </View>
               </View>
             </View>
@@ -187,13 +187,13 @@ export default function Home() {
                     accessibilityState={{ selected: active }}
                     className={`items-center justify-center rounded-full px-[17px] py-[10px] ${
                       active
-                        ? 'bg-[#A81245]'
-                        : 'border border-[#EAE6E1] bg-white'
+                        ? 'bg-brand'
+                        : 'border border-line bg-white'
                     }`}
                   >
                     <Text
                       className={`text-[12px] font-semibold ${
-                        active ? 'text-white' : 'text-[#6E6B68]'
+                        active ? 'text-white' : 'text-ink-secondary'
                       }`}
                     >
                       {filter}
@@ -216,16 +216,16 @@ export default function Home() {
             {showFeed && displayedPosts.length > 0 && (
               <View className="mb-4 flex-row items-end justify-between px-[18px] pt-1">
                 <View>
-                  <Text className="font-['Lora-Italic'] text-[23px] text-[#292724]">
+                  <Text className="font-['Lora-Italic'] text-[23px] text-ink">
                     Para inspirarte
                   </Text>
 
-                  <Text className="mt-1 text-[11px] tracking-[0.04em] text-[#6E6B68]">
+                  <Text className="mt-1 text-[11px] tracking-[0.04em] text-ink-secondary">
                     UNA SELECCIÓN DE LA COMUNIDAD
                   </Text>
                 </View>
 
-                <View className="mb-1 h-px w-10 bg-[#DCC7A8]" />
+                <View className="mb-1 h-px w-10 bg-beige" />
               </View>
             )}
           </View>
@@ -269,7 +269,7 @@ function FeedCard({
       style={{ marginBottom: 4 }}
     >
       <View
-        className="overflow-hidden rounded-[16px] bg-[#EAE6E1]"
+        className="overflow-hidden rounded-[16px] bg-line"
         style={{
           shadowColor: '#292724',
           shadowOffset: { width: 0, height: 5 },
@@ -378,18 +378,18 @@ function EditorialSpread({ post }: { post: Post }) {
       <View className="mb-4 flex-row items-center gap-2">
         <EditorialMark />
 
-        <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#6E6B68]">
+        <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-ink-secondary">
           HIBIRIO · EDITOR'S CHOICE
         </Text>
 
-        <View className="h-px flex-1 bg-[#EAE6E1]" />
+        <View className="h-px flex-1 bg-line" />
       </View>
 
       <Pressable
         onPress={openPost}
         accessibilityRole="button"
         accessibilityLabel={`Ver selección editorial: ${post.title}`}
-        className="overflow-hidden rounded-[20px] bg-[#292724]"
+        className="overflow-hidden rounded-card bg-ink"
         style={{
           shadowColor: '#292724',
           shadowOffset: { width: 0, height: 7 },
@@ -420,7 +420,7 @@ function EditorialSpread({ post }: { post: Post }) {
             paddingVertical: 14,
           }}
         >
-          <Text className="mb-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#DCC7A8]">
+          <Text className="mb-2 text-[9px] font-bold uppercase tracking-[0.2em] text-beige">
             La mirada de Hibirio
           </Text>
 
@@ -436,7 +436,7 @@ function EditorialSpread({ post }: { post: Post }) {
               {post.title}
             </Text>
 
-            <View className="rounded-full bg-[#A81245] px-3 py-2">
+            <View className="rounded-full bg-brand px-3 py-2">
               <Text className="text-[9px] font-bold uppercase tracking-[0.08em] text-white">
                 Ver outfit
               </Text>

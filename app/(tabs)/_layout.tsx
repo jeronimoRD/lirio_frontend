@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View, type ViewInstance } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurTargetView } from 'expo-blur';
 import { Heart, House, Plus, Search, UserRound } from 'lucide-react-native';
@@ -41,7 +41,7 @@ function UploadButton() {
   return (
     <Pressable
       onPress={() => router.push('/upload')}
-      className="h-14 w-14 items-center justify-center rounded-full border-[3px] border-white/70 bg-[#A81245]"
+      className="h-14 w-14 items-center justify-center rounded-full border-[3px] border-white/70 bg-brand"
       style={{
         shadowColor: '#A81245',
         shadowOffset: { width: 0, height: 6 },
@@ -68,7 +68,7 @@ export default function TabsLayout() {
   const pagerRef = useRef<TabPagerHandle>(null);
   const pagerIndexRef = useRef(index);
   // Contenido que la tab bar difumina (necesario para el blur en Android), porque es imitación del efecto de vidrio líquido.
-  const blurTargetRef = useRef<View | null>(null);
+  const blurTargetRef = useRef<ViewInstance | null>(null);
 
   if (pathname !== prevPathname) {
     setPrevPathname(pathname);
@@ -117,29 +117,29 @@ export default function TabsLayout() {
   };
 
   const home = (
-    <View key="home" className="flex-1 bg-[#FCFAF8]">
+    <View key="home" className="flex-1 bg-screen">
       <HomeScreen />
     </View>
   );
   const explore = (
-    <View key="explore" className="flex-1 bg-[#FCFAF8]">
+    <View key="explore" className="flex-1 bg-screen">
       <ExploreScreen />
     </View>
   );
   const saved = (
-    <View key="saved" className="flex-1 bg-[#FCFAF8]">
+    <View key="saved" className="flex-1 bg-screen">
       <SavedScreen />
     </View>
   );
   const profile = (
-    <View key="profile" className="flex-1 bg-[#FCFAF8]">
+    <View key="profile" className="flex-1 bg-screen">
       <ProfileScreen active={index === 3} />
     </View>
   );
 
   return (
     <TabBarClearanceContext.Provider value={clearance}>
-    <View className="flex-1 bg-[#FCFAF8]">
+    <View className="flex-1 bg-screen">
       <BlurTargetView ref={blurTargetRef} style={{ flex: 1 }}>
         <TabPager ref={pagerRef} index={index} onPageSelected={onPageSelected}>
           {home}
@@ -182,7 +182,7 @@ function TabButton({
       className="flex-1 items-center justify-center">
       <View
         className={`items-center gap-[2px] rounded-full px-2.5 py-1.5 ${
-          active ? 'bg-[#A81245]/10' : ''
+          active ? 'bg-brand/10' : ''
         }`}>
         <Icon size={21} color={color} />
         <Text className="text-[10px] font-semibold" style={{ color }}>

@@ -18,9 +18,9 @@ const FILTERS: { label: string; value: StatusFilter }[] = [
 ];
 
 const STATUS_BADGE: Record<ReportStatus, string> = {
-  PENDING: 'bg-[#A81245]/10 text-[#A81245]',
+  PENDING: 'bg-brand/10 text-brand',
   RESOLVED: 'bg-green-100 text-green-700',
-  DISMISSED: 'bg-[#F4EEE7] text-[#6E6B68]',
+  DISMISSED: 'bg-icon-well text-ink-secondary',
 };
 
 export default function AdminReports() {
@@ -42,7 +42,7 @@ export default function AdminReports() {
   } = useAdminReports();
 
   return (
-    <View className="flex-1 bg-[#FCFAF8]">
+    <View className="flex-1 bg-screen">
       <AdminBrandHeader />
       <FlatList
         className="flex-1"
@@ -57,11 +57,11 @@ export default function AdminReports() {
             <View className="mb-6">
               <Pressable
                 onPress={goBack}
-                className="mb-3 h-8 w-8 items-center justify-center rounded-full bg-[#F4EEE7]"
+                className="mb-3 h-8 w-8 items-center justify-center rounded-full bg-icon-well"
                 hitSlop={8}>
                 <ArrowLeft size={16} color="#4A3728" />
               </Pressable>
-              <Text className="font-['Lora-Italic'] text-[28px] leading-9 text-[#241E1B]">
+              <Text className="font-['Lora-Italic'] text-[28px] leading-9 text-admin-ink">
                 Reportes
               </Text>
             </View>
@@ -80,11 +80,11 @@ export default function AdminReports() {
                     key={option.label}
                     onPress={() => setFilter(option.value)}
                     className={`rounded-full px-4 py-2 active:opacity-80 ${
-                      active ? 'bg-[#4A3728]' : 'border border-[#EAE6E1] bg-white'
+                      active ? 'bg-admin-brown' : 'border border-line bg-white'
                     }`}>
                     <Text
                       className={`text-[13px] font-semibold ${
-                        active ? 'text-white' : 'text-[#6E6B68]'
+                        active ? 'text-white' : 'text-ink-secondary'
                       }`}>
                       {option.label}
                     </Text>
@@ -104,13 +104,13 @@ export default function AdminReports() {
           <View className="mx-auto w-full max-w-md">
             {!loading && !error && reports.length === 0 && (
               <View className="rounded-2xl bg-white p-6" style={cardShadow}>
-                <Text className="text-center text-sm text-[#6E6B68]">Aún no hay reportes.</Text>
+                <Text className="text-center text-sm text-ink-secondary">Aún no hay reportes.</Text>
               </View>
             )}
 
             {!loading && !error && reports.length > 0 && filteredReports.length === 0 && (
               <View className="rounded-2xl bg-white p-6" style={cardShadow}>
-                <Text className="text-center text-sm text-[#6E6B68]">
+                <Text className="text-center text-sm text-ink-secondary">
                   No hay reportes en este estado.
                 </Text>
               </View>
@@ -127,10 +127,10 @@ export default function AdminReports() {
             <View className="mx-auto mb-4 w-full max-w-md rounded-2xl bg-white p-5" style={cardShadow}>
               <View className="flex-row items-center justify-between gap-2">
                 <View className="flex-row items-center gap-2">
-                  <View className="h-8 w-8 items-center justify-center rounded-full bg-[#F4EEE7]">
+                  <View className="h-8 w-8 items-center justify-center rounded-full bg-icon-well">
                     <Flag size={14} color="#4A3728" />
                   </View>
-                  <Text className="text-sm font-semibold text-[#292724]">
+                  <Text className="text-sm font-semibold text-ink">
                     {report.targetType === 'POST' ? 'Publicación' : 'Usuario'}
                   </Text>
                 </View>
@@ -143,19 +143,19 @@ export default function AdminReports() {
               </View>
 
               <View className="mt-3 gap-1">
-                <Text className="text-base font-semibold text-[#292724]">
+                <Text className="text-base font-semibold text-ink">
                   {report.targetType === 'POST'
                     ? (report.target.title ??
                       (deleted ? 'Publicación eliminada' : 'Publicación'))
                     : (report.target.userName ?? (deleted ? 'Usuario eliminado' : 'Usuario'))}
                 </Text>
-                <Text className="text-sm text-[#6E6B68]">
+                <Text className="text-sm text-ink-secondary">
                   Motivo: {REPORT_REASON_LABELS[report.reason]}
                 </Text>
                 {!!report.description && (
-                  <Text className="text-sm text-[#6E6B68]">{report.description}</Text>
+                  <Text className="text-sm text-ink-secondary">{report.description}</Text>
                 )}
-                <Text className="text-xs text-[#A09B95]">
+                <Text className="text-xs text-ink-muted">
                   {new Date(report.createdAt).toLocaleDateString()}
                 </Text>
               </View>
@@ -168,15 +168,15 @@ export default function AdminReports() {
                         text={busy ? 'Guardando...' : 'Resolver'}
                         onPress={() => onStatusChange(report, 'RESOLVED')}
                         disabled={busyId !== null}
-                        className="rounded-2xl bg-[#4A3728]"
+                        className="rounded-2xl bg-admin-brown"
                       />
                     </View>
                     <View className="flex-1">
                       <Button
                         text={busy ? 'Guardando...' : 'Descartar'}
                         secondary
-                        textClassName="text-sm font-semibold text-[#292724]"
-                        className="rounded-2xl border border-[#EAE6E1] bg-white"
+                        textClassName="text-sm font-semibold text-ink"
+                        className="rounded-2xl border border-line bg-white"
                         onPress={() => onStatusChange(report, 'DISMISSED')}
                         disabled={busyId !== null}
                       />
@@ -187,8 +187,8 @@ export default function AdminReports() {
                     <Pressable
                       onPress={() => requestDeleteContent(report)}
                       disabled={busyId !== null}
-                      className="h-10 flex-row items-center justify-center gap-2 rounded-2xl border border-[#E9AFA6] bg-[#FBE6E1] active:opacity-80 disabled:opacity-50">
-                      <Text className="text-[13px] font-semibold text-[#C2391F]">
+                      className="h-10 flex-row items-center justify-center gap-2 rounded-2xl border border-admin-danger-line bg-admin-danger-bg active:opacity-80 disabled:opacity-50">
+                      <Text className="text-[13px] font-semibold text-admin-danger">
                         {busy ? 'Eliminando...' : 'Eliminar contenido reportado'}
                       </Text>
                     </Pressable>

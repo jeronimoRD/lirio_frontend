@@ -40,14 +40,14 @@ export default function ReportModal({ visible, targetType, targetId, onClose, on
       animationType="fade"
       statusBarTranslucent={Platform.OS === 'android'}
       onRequestClose={onClose}>
-      <Pressable className="flex-1 justify-end bg-[#292724]/45" onPress={onClose}>
+      <Pressable className="flex-1 justify-end bg-ink/45" onPress={onClose}>
         <Pressable className="max-h-[85%] w-full rounded-t-3xl bg-white p-6" style={cardShadow}>
           <View className="mb-1 items-center">
-            <View className="mb-4 h-1 w-10 rounded-full bg-[#EAE6E1]" />
+            <View className="mb-4 h-1 w-10 rounded-full bg-line" />
 
-            <Text className="text-center text-lg font-bold text-[#292724]">{title}</Text>
+            <Text className="text-center text-lg font-bold text-ink">{title}</Text>
 
-            <Text className="mt-1 text-center text-sm text-[#6E6B68]">
+            <Text className="mt-1 text-center text-sm text-ink-secondary">
               Elige un motivo. Nuestro equipo lo revisará.
             </Text>
           </View>
@@ -62,18 +62,18 @@ export default function ReportModal({ visible, targetType, targetId, onClose, on
                     key={option}
                     onPress={() => selectReason(option)}
                     className={`flex-row items-center rounded-xl border px-4 py-3 active:opacity-80 ${
-                      selected ? 'border-[#A81245] bg-[#A81245]/5' : 'border-[#EAE6E1] bg-white'
+                      selected ? 'border-brand bg-brand/5' : 'border-line bg-white'
                     }`}>
                     <View
                       className={`mr-3 h-5 w-5 items-center justify-center rounded-full border-2 ${
-                        selected ? 'border-[#A81245]' : 'border-[#EAE6E1]'
+                        selected ? 'border-brand' : 'border-line'
                       }`}>
-                      {selected && <View className="h-2.5 w-2.5 rounded-full bg-[#A81245]" />}
+                      {selected && <View className="h-2.5 w-2.5 rounded-full bg-brand" />}
                     </View>
 
                     <Text
                       className={`text-sm font-medium ${
-                        selected ? 'text-[#A81245]' : 'text-[#292724]'
+                        selected ? 'text-brand' : 'text-ink'
                       }`}>
                       {REPORT_REASON_LABELS[option]}
                     </Text>
@@ -92,7 +92,7 @@ export default function ReportModal({ visible, targetType, targetId, onClose, on
               multiline
               numberOfLines={3}
               maxLength={500}
-              className="mt-4 min-h-[96px] rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] p-4 text-sm text-[#292724]"
+              className="mt-4 min-h-[96px] rounded-xl border border-line bg-screen p-4 text-sm text-ink"
               style={descriptionFocused ? { borderColor: '#A81245' } : undefined}
               onFocus={() => setDescriptionFocused(true)}
               onBlur={() => setDescriptionFocused(false)}

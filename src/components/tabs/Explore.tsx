@@ -157,7 +157,7 @@ export default function Explore() {
             />;
 
   return (
-    <View className="flex-1 bg-[#FCFAF8]">
+    <View className="flex-1 bg-screen">
       <ScreenHeader title="Busca tu estilo" />
 
       <FlatList
@@ -202,11 +202,11 @@ export default function Explore() {
             <View className="px-4 pt-5">
               <View className="mb-4 flex-row items-end justify-between">
                 <View className="flex-1 pr-3">
-                  <Text className="mb-1 text-[10px] font-bold uppercase tracking-[3px] text-[#A81245]">
+                  <Text className="mb-1 text-[10px] font-bold uppercase tracking-[3px] text-brand">
                     TU PRÓXIMA INSPIRACIÓN
                   </Text>
 
-                  <Text className="font-['Lora-Italic'] text-[29px] leading-[36px] text-[#292724]">
+                  <Text className="font-['Lora-Italic'] text-[29px] leading-[36px] text-ink">
                     Encuentra tu estilo
                   </Text>
 
@@ -216,12 +216,12 @@ export default function Explore() {
                   onPress={openDrawer}
                   accessibilityRole="button"
                   accessibilityLabel="Abrir filtros"
-                  className="mb-1 h-12 w-12 items-center justify-center rounded-full border border-[#EAE6E1] bg-white"
+                  className="mb-1 h-12 w-12 items-center justify-center rounded-full border border-line bg-white"
                 >
                   <SlidersHorizontal size={19} color={COLORS.burgundy} />
 
                   {activeFilters.length > 0 && (
-                    <View className="absolute right-0 top-0 h-[19px] min-w-[19px] items-center justify-center rounded-full border-2 border-[#FCFAF8] bg-[#A81245] px-1">
+                    <View className="absolute right-0 top-0 h-[19px] min-w-[19px] items-center justify-center rounded-full border-2 border-screen bg-brand px-1">
                       <Text className="text-[9px] font-bold text-white">
                         {activeFilters.length}
                       </Text>
@@ -232,7 +232,7 @@ export default function Explore() {
 
               {/* Buscador */}
               <View
-                className="h-[50px] flex-row items-center gap-2 rounded-full border border-[#EAE6E1] bg-white px-4"
+                className="h-[50px] flex-row items-center gap-2 rounded-full border border-line bg-white px-4"
                 style={focused ? { borderColor: '#A81245' } : undefined}>
                 <Search size={18} color="#A09B95" />
 
@@ -243,7 +243,7 @@ export default function Explore() {
                   onBlur={handleBlur}
                   placeholder="Buscar outfits, estilos..."
                   placeholderTextColor="#A09B95"
-                  className="flex-1 text-sm text-[#292724]"
+                  className="flex-1 text-sm text-ink"
                   autoCapitalize="none"
                   returnKeyType="search"
                 />
@@ -266,9 +266,9 @@ export default function Explore() {
                     <Pressable
                       key={filter}
                       onPress={() => toggleFilter(filter)}
-                      className="flex-row items-center gap-1.5 rounded-full bg-[#F4EEE7] px-3 py-1.5"
+                      className="flex-row items-center gap-1.5 rounded-full bg-icon-well px-3 py-1.5"
                     >
-                      <Text className="text-[11px] font-medium text-[#A81245]">
+                      <Text className="text-[11px] font-medium text-brand">
                         {filter}
                       </Text>
                       <X size={12} color={COLORS.burgundy} />
@@ -281,7 +281,7 @@ export default function Explore() {
             {/* Pestañas de búsqueda */}
             {searchActive && (
               <View className="px-4 pt-4">
-                <View className="flex-row rounded-full border border-[#EAE6E1] bg-white p-1">
+                <View className="flex-row rounded-full border border-line bg-white p-1">
                   <TabButton
                     label="Prendas"
                     active={activeTab === 'prendas'}
@@ -324,10 +324,10 @@ export default function Explore() {
                   <View>
                     <View className="mb-3 flex-row items-center justify-between px-4">
                       <View>
-                        <Text className="text-[10px] font-bold uppercase tracking-[2px] text-[#A81245]">
+                        <Text className="text-[10px] font-bold uppercase tracking-[2px] text-brand">
                           DESCUBRIR
                         </Text>
-                        <Text className="mt-1 font-['Lora-Italic'] text-xl text-[#292724]">
+                        <Text className="mt-1 font-['Lora-Italic'] text-xl text-ink">
                           Cuentas para ti
                         </Text>
                       </View>
@@ -354,15 +354,15 @@ export default function Explore() {
                 <View>
                   <View className="mb-3 flex-row items-center justify-between px-4">
                     <View>
-                      <Text className="text-[10px] font-bold uppercase tracking-[2px] text-[#A81245]">
+                      <Text className="text-[10px] font-bold uppercase tracking-[2px] text-brand">
                         EL EDITORIAL DE HIBIRIO
                       </Text>
-                      <Text className="mt-1 font-['Lora-Italic'] text-xl text-[#292724]">
+                      <Text className="mt-1 font-['Lora-Italic'] text-xl text-ink">
                         Inspírate
                       </Text>
                     </View>
 
-                    <Text className="text-xs text-[#A09B95]">
+                    <Text className="text-xs text-ink-muted">
                       {results.length} looks
                     </Text>
                   </View>
@@ -377,7 +377,7 @@ export default function Explore() {
             {ready && isUsersMode && (
               <View className="mt-5 gap-3">
                 {!hasQuery && (
-                  <Text className="px-4 pt-2 text-[10px] font-bold uppercase tracking-[2px] text-[#6E6B68]">
+                  <Text className="px-4 pt-2 text-[10px] font-bold uppercase tracking-[2px] text-ink-secondary">
                     CUENTAS PARA DESCUBRIR
                   </Text>
                 )}
@@ -389,7 +389,7 @@ export default function Explore() {
                 )}
 
                 {hasQuery && usersError && (
-                  <View className="mx-4 rounded-2xl border border-[#EAE6E1] bg-white p-6">
+                  <View className="mx-4 rounded-2xl border border-line bg-white p-6">
                     <Text className="text-center text-sm text-red-700">
                       {usersError}
                     </Text>
@@ -418,7 +418,7 @@ export default function Explore() {
             className="absolute inset-0 bg-black/35"
           />
 
-          <View className="max-h-[82%] rounded-t-[30px] border-t border-[#EAE6E1] bg-[#FCFAF8] px-5 pb-8 pt-3">
+          <View className="max-h-[82%] rounded-t-[30px] border-t border-line bg-screen px-5 pb-8 pt-3">
             {/* Indicador del drawer */}
             <View className="mb-5 items-center">
               <View className="h-1.5 w-11 rounded-full bg-[#D8D0C7]" />
@@ -427,15 +427,15 @@ export default function Explore() {
             {/* Cabecera del panel */}
             <View className="mb-5 flex-row items-start justify-between">
               <View className="flex-1 pr-4">
-                <Text className="mb-1 text-[10px] font-bold uppercase tracking-[2.5px] text-[#A81245]">
+                <Text className="mb-1 text-[10px] font-bold uppercase tracking-[2.5px] text-brand">
                   TU SELECCIÓN
                 </Text>
 
-                <Text className="font-['Lora-Italic'] text-[27px] leading-8 text-[#292724]">
+                <Text className="font-['Lora-Italic'] text-[27px] leading-8 text-ink">
                   Refina tu búsqueda
                 </Text>
 
-                <Text className="mt-2 text-[13px] leading-5 text-[#6E6B68]">
+                <Text className="mt-2 text-[13px] leading-5 text-ink-secondary">
                   Elige las estéticas que quieras descubrir.
                 </Text>
               </View>
@@ -443,7 +443,7 @@ export default function Explore() {
               <Pressable
                 onPress={closeDrawer}
                 accessibilityLabel="Cerrar panel de filtros"
-                className="h-9 w-9 items-center justify-center rounded-full border border-[#EAE6E1] bg-white"
+                className="h-9 w-9 items-center justify-center rounded-full border border-line bg-white"
               >
                 <X size={17} color={COLORS.text} />
               </Pressable>
@@ -455,11 +455,11 @@ export default function Explore() {
               contentContainerClassName="pb-4"
             >
               <View className="mb-3 flex-row items-center justify-between">
-                <Text className="text-sm font-semibold text-[#292724]">
+                <Text className="text-sm font-semibold text-ink">
                   Categorías de estilo
                 </Text>
 
-                <Text className="text-xs text-[#A09B95]">
+                <Text className="text-xs text-ink-muted">
                   {draftFilters.length} seleccionadas
                 </Text>
               </View>
@@ -477,15 +477,15 @@ export default function Explore() {
                       accessibilityState={{ checked: selected }}
                       className={`flex-row items-center gap-2 rounded-full border px-4 py-3 ${
                         selected
-                          ? 'border-[#A81245] bg-[#A81245]'
-                          : 'border-[#EAE6E1] bg-white'
+                          ? 'border-brand bg-brand'
+                          : 'border-line bg-white'
                       }`}
                     >
                       {selected && <Check size={14} color="#FFFFFF" />}
 
                       <Text
                         className={`text-[13px] font-medium ${
-                          selected ? 'text-white' : 'text-[#6E6B68]'
+                          selected ? 'text-white' : 'text-ink-secondary'
                         }`}
                       >
                         {filter}
@@ -495,15 +495,15 @@ export default function Explore() {
                 })}
               </View>
 
-              <View className="mt-6 rounded-2xl border border-[#EAE6E1] bg-white p-4">
+              <View className="mt-6 rounded-2xl border border-line bg-white p-4">
                 <View className="flex-row items-center gap-2">
                   <Sparkles size={16} color={COLORS.champagne} />
-                  <Text className="text-[13px] font-semibold text-[#292724]">
+                  <Text className="text-[13px] font-semibold text-ink">
                     Un estilo, muchas posibilidades
                   </Text>
                 </View>
 
-                <Text className="mt-1.5 text-xs leading-5 text-[#6E6B68]">
+                <Text className="mt-1.5 text-xs leading-5 text-ink-secondary">
                   Combina varias categorías o deja todo sin seleccionar
                   para explorar todos los outfits.
                 </Text>
@@ -511,19 +511,19 @@ export default function Explore() {
             </ScrollView>
 
             {/* Acciones del drawer */}
-            <View className="mt-3 flex-row items-center gap-3 border-t border-[#EAE6E1] pt-4">
+            <View className="mt-3 flex-row items-center gap-3 border-t border-line pt-4">
               <Pressable
                 onPress={() => setDraftFilters([])}
-                className="min-h-[50px] items-center justify-center rounded-full border border-[#EAE6E1] bg-white px-5"
+                className="min-h-[50px] items-center justify-center rounded-full border border-line bg-white px-5"
               >
-                <Text className="text-[13px] font-semibold text-[#6E6B68]">
+                <Text className="text-[13px] font-semibold text-ink-secondary">
                   Limpiar
                 </Text>
               </Pressable>
 
               <Pressable
                 onPress={applyFilters}
-                className="min-h-[50px] flex-1 flex-row items-center justify-center gap-2 rounded-full bg-[#A81245] px-5"
+                className="min-h-[50px] flex-1 flex-row items-center justify-center gap-2 rounded-full bg-brand px-5"
               >
                 <Text className="text-[13px] font-semibold text-white">
                   Ver resultados
@@ -551,12 +551,12 @@ function TabButton({
     <Pressable
       onPress={onPress}
       className={`flex-1 items-center justify-center rounded-full py-2.5 ${
-        active ? 'bg-[#A81245]' : ''
+        active ? 'bg-brand' : ''
       }`}
     >
       <Text
         className={`text-[13px] font-semibold ${
-          active ? 'text-white' : 'text-[#6E6B68]'
+          active ? 'text-white' : 'text-ink-secondary'
         }`}
       >
         {label}
@@ -576,11 +576,11 @@ function AvatarRing({
 
   return (
     <View
-      className="items-center justify-center rounded-full border-2 border-[#DCC7A8]"
+      className="items-center justify-center rounded-full border-2 border-beige"
       style={{ width: ringSize, height: ringSize }}
     >
       <View
-        className="items-center justify-center rounded-full bg-[#A81245]"
+        className="items-center justify-center rounded-full bg-brand"
         style={{ width: size, height: size }}
       >
         <Text
@@ -611,7 +611,7 @@ function SuggestionCard({
       <View className="w-full items-center gap-1">
         <Text
           numberOfLines={1}
-          className="w-full text-center font-['Lora-Italic'] text-base text-[#292724]"
+          className="w-full text-center font-['Lora-Italic'] text-base text-ink"
         >
           {user.name}
         </Text>
@@ -619,15 +619,15 @@ function SuggestionCard({
         {!!user.bio && (
           <Text
             numberOfLines={1}
-            className="w-full text-center text-[11px] text-[#A09B95]"
+            className="w-full text-center text-[11px] text-ink-muted"
           >
             {user.bio}
           </Text>
         )}
       </View>
 
-      <View className="rounded-full bg-[#F4EEE7] px-3 py-1.5">
-        <Text className="text-[11px] font-semibold text-[#6E6B68]">
+      <View className="rounded-full bg-icon-well px-3 py-1.5">
+        <Text className="text-[11px] font-semibold text-ink-secondary">
           {outfitCount} {outfitCount === 1 ? 'outfit' : 'outfits'}
         </Text>
       </View>
@@ -644,7 +644,7 @@ function UserRow({
 }) {
   return (
     <View
-      className="mx-4 mb-3 flex-row items-center gap-3.5 rounded-[20px] border border-[#F0EBE5] bg-white p-4"
+      className="mx-4 mb-3 flex-row items-center gap-3.5 rounded-card border border-[#F0EBE5] bg-white p-4"
       style={cardShadowLg}
     >
       <AvatarRing initials={initialsOf(user.name)} size={52} />
@@ -652,23 +652,23 @@ function UserRow({
       <View className="flex-1 gap-[3px]">
         <Text
           numberOfLines={1}
-          className="font-['Lora-Italic'] text-base text-[#292724]"
+          className="font-['Lora-Italic'] text-base text-ink"
         >
           {user.name}
         </Text>
 
         {!!user.bio && (
-          <Text numberOfLines={1} className="text-xs text-[#6E6B68]">
+          <Text numberOfLines={1} className="text-xs text-ink-secondary">
             {user.bio}
           </Text>
         )}
       </View>
 
-      <View className="items-center rounded-2xl bg-[#F4EEE7] px-3 py-2">
-        <Text className="text-sm font-bold text-[#A81245]">
+      <View className="items-center rounded-2xl bg-icon-well px-3 py-2">
+        <Text className="text-sm font-bold text-brand">
           {outfitCount}
         </Text>
-        <Text className="text-[9px] font-semibold uppercase tracking-wide text-[#6E6B68]">
+        <Text className="text-[9px] font-semibold uppercase tracking-wide text-ink-secondary">
           {outfitCount === 1 ? 'outfit' : 'outfits'}
         </Text>
       </View>
@@ -678,12 +678,12 @@ function UserRow({
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <View className="mx-4 items-center rounded-[22px] border border-[#EAE6E1] bg-white px-6 py-8">
-      <View className="mb-3 h-11 w-11 items-center justify-center rounded-full bg-[#F4EEE7]">
+    <View className="mx-4 items-center rounded-[22px] border border-line bg-white px-6 py-8">
+      <View className="mb-3 h-11 w-11 items-center justify-center rounded-full bg-icon-well">
         <Search size={18} color={COLORS.burgundy} />
       </View>
 
-      <Text className="text-center text-sm leading-6 text-[#6E6B68]">
+      <Text className="text-center text-sm leading-6 text-ink-secondary">
         {message}
       </Text>
     </View>
