@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View, type ViewInstance } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurTargetView } from 'expo-blur';
+import { useSharedValue } from 'react-native-reanimated';
 import { Heart, House, Plus, Search, UserRound } from 'lucide-react-native';
 import { usePathname, useRouter } from 'expo-router';
 
@@ -57,7 +58,6 @@ function UploadButton() {
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
-  const router = useRouter();
 
   const [index, setIndex] = useState(() => {
     const i = TAB_ROUTES.indexOf(pathname as (typeof TAB_ROUTES)[number]);
@@ -67,6 +67,7 @@ export default function TabsLayout() {
   const [clearance, setClearance] = useState(DEFAULT_CLEARANCE);
   const pagerRef = useRef<TabPagerHandle>(null);
   const pagerIndexRef = useRef(index);
+  const scrollPosition = useSharedValue(index);
   // Contenido que la tab bar difumina (necesario para el blur en Android), porque es imitación del efecto de vidrio líquido.
   const blurTargetRef = useRef<ViewInstance | null>(null);
 
@@ -85,15 +86,18 @@ export default function TabsLayout() {
     pagerRef.current?.setPage(i);
   }, [pathname]);
 
+  const onPageScroll = (event: { nativeEvent: { position: number; offset: number } }) => {
+    scrollPosition.value = event.nativeEvent.position + event.nativeEvent.offset;
+  };
+
   const onPageSelected = (event: { nativeEvent: { position: number } }) => {
     const i = event.nativeEvent.position;
     pagerIndexRef.current = i;
+    scrollPosition.value = i;
     setIndex(i);
-    syncUrl(i);
   };
 
-  // Cambia la página del TabPager y sincroniza la URL con el índice de la pestaña seleccionada.
-  // Si la pestaña seleccionada es la misma que la actual, no hace nada.
+  // Cambia la página del TabPager. Si la pestaña seleccionada es la misma que la actual, no hace nada.
   // Si la diferencia entre la pestaña actual y la seleccionada es mayor a 1, cambia la página sin animación.
   // Esto es útil para saltar de la primera a la última pestaña (o viceversa) sin animación, evitando un efecto visual extraño.
   const goTo = (i: number) => {
@@ -104,16 +108,11 @@ export default function TabsLayout() {
     setIndex(i);
 
     if (Math.abs(i - current) > 1) {
+      scrollPosition.value = i;
       pagerRef.current?.setPageWithoutAnimation(i);
     } else {
       pagerRef.current?.setPage(i);
     }
-    syncUrl(i);
-  };
-
-  const syncUrl = (i: number) => {
-    const target = TAB_ROUTES[i];
-    if (target !== pathname) router.navigate(target);
   };
 
   const home = (
@@ -141,7 +140,7 @@ export default function TabsLayout() {
     <TabBarClearanceContext.Provider value={clearance}>
     <View className="flex-1 bg-screen">
       <BlurTargetView ref={blurTargetRef} style={{ flex: 1 }}>
-        <TabPager ref={pagerRef} index={index} onPageSelected={onPageSelected}>
+        <TabPager ref={pagerRef} index={index} onPageSelected={onPageSelected} onPageScroll={onPageScroll}>
           {home}
           {explore}
           {saved}
@@ -152,6 +151,7 @@ export default function TabsLayout() {
       {/* Tab bar flotante */}
         <FloatingTabBar
           index={index}
+          scrollPosition={scrollPosition}
           onChange={goTo}
           blurTarget={blurTargetRef}
           onClearanceChange={setClearance}

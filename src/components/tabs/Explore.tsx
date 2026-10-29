@@ -160,8 +160,112 @@ export default function Explore() {
     <View className="flex-1 bg-screen">
       <ScreenHeader title="Busca tu estilo" />
 
+      <View>
+        {/* Encabezado editorial */}
+        <View className="px-4 pt-5">
+          <View className="mb-4 flex-row items-end justify-between">
+            <View className="flex-1 pr-3">
+              <Text className="mb-1 text-[10px] font-bold uppercase tracking-[3px] text-brand">
+                TU PRÓXIMA INSPIRACIÓN
+              </Text>
+
+              <Text className="font-['Lora-Italic'] text-[29px] leading-[36px] text-ink">
+                Encuentra tu estilo
+              </Text>
+            </View>
+
+            <Pressable
+              onPress={openDrawer}
+              accessibilityRole="button"
+              accessibilityLabel="Abrir filtros"
+              className="mb-1 h-12 w-12 items-center justify-center rounded-full border border-line bg-white"
+            >
+              <SlidersHorizontal size={19} color={COLORS.burgundy} />
+
+              {activeFilters.length > 0 && (
+                <View className="absolute right-0 top-0 h-[19px] min-w-[19px] items-center justify-center rounded-full border-2 border-screen bg-brand px-1">
+                  <Text className="text-[9px] font-bold text-white">
+                    {activeFilters.length}
+                  </Text>
+                </View>
+              )}
+            </Pressable>
+          </View>
+
+          {/* Buscador */}
+          <View
+            className="h-[50px] flex-row items-center gap-2 rounded-full border border-line bg-white px-4"
+            style={focused ? { borderColor: '#A81245' } : undefined}>
+            <Search size={18} color="#A09B95" />
+
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              placeholder="Buscar outfits, estilos..."
+              placeholderTextColor="#A09B95"
+              className="flex-1 text-sm text-ink"
+              autoCapitalize="none"
+              returnKeyType="search"
+            />
+
+            {query.length > 0 && (
+              <Pressable
+                onPress={clearQuery}
+                hitSlop={8}
+                accessibilityLabel="Limpiar búsqueda"
+              >
+                <X size={16} color="#A09B95" />
+              </Pressable>
+            )}
+          </View>
+
+          {/* Filtros activos */}
+          {activeFilters.length > 0 && (
+            <View className="mt-3 flex-row flex-wrap gap-2">
+              {activeFilters.map((filter) => (
+                <Pressable
+                  key={filter}
+                  onPress={() => toggleFilter(filter)}
+                  className="flex-row items-center gap-1.5 rounded-full bg-icon-well px-3 py-1.5"
+                >
+                  <Text className="text-[11px] font-medium text-brand">
+                    {filter}
+                  </Text>
+                  <X size={12} color={COLORS.burgundy} />
+                </Pressable>
+              ))}
+            </View>
+          )}
+        </View>
+
+        {/* Pestañas de búsqueda */}
+        {searchActive && (
+          <View className="px-4 pt-4">
+            <View className="flex-row rounded-full border border-line bg-white p-1">
+              <TabButton
+                label="Prendas"
+                active={activeTab === 'prendas'}
+                onPress={() => setActiveTab('prendas')}
+              />
+              <TabButton
+                label="Outfits"
+                active={activeTab === 'outfits'}
+                onPress={() => setActiveTab('outfits')}
+              />
+              <TabButton
+                label="Cuentas"
+                active={activeTab === 'cuentas'}
+                onPress={() => setActiveTab('cuentas')}
+              />
+            </View>
+          </View>
+        )}
+      </View>
+
       <FlatList
-        key={searchActive ? activeTab : 'explore'}
+        key={isUsersMode ? 'users' : 'grid'}
         className="flex-1"
         data={listItems}
         numColumns={isUsersMode ? 1 : 2}
@@ -198,109 +302,6 @@ export default function Explore() {
         }}
         ListHeaderComponent={
           <View>
-            {/* Encabezado editorial */}
-            <View className="px-4 pt-5">
-              <View className="mb-4 flex-row items-end justify-between">
-                <View className="flex-1 pr-3">
-                  <Text className="mb-1 text-[10px] font-bold uppercase tracking-[3px] text-brand">
-                    TU PRÓXIMA INSPIRACIÓN
-                  </Text>
-
-                  <Text className="font-['Lora-Italic'] text-[29px] leading-[36px] text-ink">
-                    Encuentra tu estilo
-                  </Text>
-
-                </View>
-
-                <Pressable
-                  onPress={openDrawer}
-                  accessibilityRole="button"
-                  accessibilityLabel="Abrir filtros"
-                  className="mb-1 h-12 w-12 items-center justify-center rounded-full border border-line bg-white"
-                >
-                  <SlidersHorizontal size={19} color={COLORS.burgundy} />
-
-                  {activeFilters.length > 0 && (
-                    <View className="absolute right-0 top-0 h-[19px] min-w-[19px] items-center justify-center rounded-full border-2 border-screen bg-brand px-1">
-                      <Text className="text-[9px] font-bold text-white">
-                        {activeFilters.length}
-                      </Text>
-                    </View>
-                  )}
-                </Pressable>
-              </View>
-
-              {/* Buscador */}
-              <View
-                className="h-[50px] flex-row items-center gap-2 rounded-full border border-line bg-white px-4"
-                style={focused ? { borderColor: '#A81245' } : undefined}>
-                <Search size={18} color="#A09B95" />
-
-                <TextInput
-                  value={query}
-                  onChangeText={setQuery}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                  placeholder="Buscar outfits, estilos..."
-                  placeholderTextColor="#A09B95"
-                  className="flex-1 text-sm text-ink"
-                  autoCapitalize="none"
-                  returnKeyType="search"
-                />
-
-                {query.length > 0 && (
-                  <Pressable
-                    onPress={clearQuery}
-                    hitSlop={8}
-                    accessibilityLabel="Limpiar búsqueda"
-                  >
-                    <X size={16} color="#A09B95" />
-                  </Pressable>
-                )}
-              </View>
-
-              {/* Filtros activos */}
-              {activeFilters.length > 0 && (
-                <View className="mt-3 flex-row flex-wrap gap-2">
-                  {activeFilters.map((filter) => (
-                    <Pressable
-                      key={filter}
-                      onPress={() => toggleFilter(filter)}
-                      className="flex-row items-center gap-1.5 rounded-full bg-icon-well px-3 py-1.5"
-                    >
-                      <Text className="text-[11px] font-medium text-brand">
-                        {filter}
-                      </Text>
-                      <X size={12} color={COLORS.burgundy} />
-                    </Pressable>
-                  ))}
-                </View>
-              )}
-            </View>
-
-            {/* Pestañas de búsqueda */}
-            {searchActive && (
-              <View className="px-4 pt-4">
-                <View className="flex-row rounded-full border border-line bg-white p-1">
-                  <TabButton
-                    label="Prendas"
-                    active={activeTab === 'prendas'}
-                    onPress={() => setActiveTab('prendas')}
-                  />
-                  <TabButton
-                    label="Outfits"
-                    active={activeTab === 'outfits'}
-                    onPress={() => setActiveTab('outfits')}
-                  />
-                  <TabButton
-                    label="Cuentas"
-                    active={activeTab === 'cuentas'}
-                    onPress={() => setActiveTab('cuentas')}
-                  />
-                </View>
-              </View>
-            )}
-
             {/* Error general */}
             {error && (
               <View className="mx-4 mt-4 rounded-xl bg-red-50 p-4">
@@ -418,7 +419,10 @@ export default function Explore() {
             className="absolute inset-0 bg-black/35"
           />
 
-          <View className="max-h-[82%] rounded-t-[30px] border-t border-line bg-screen px-5 pb-8 pt-3">
+          <View
+            className="max-h-[82%] rounded-t-[30px] border-t border-line bg-screen px-5 pt-3"
+            style={{ paddingBottom: clearance - 40 }}
+          >
             {/* Indicador del drawer */}
             <View className="mb-5 items-center">
               <View className="h-1.5 w-11 rounded-full bg-[#D8D0C7]" />

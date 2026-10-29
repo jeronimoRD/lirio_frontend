@@ -15,6 +15,7 @@ import type { Post } from '../../types';
 import { useHome } from '../../hooks/tabs/useHome';
 import { usePostCard } from '../../hooks/tabs/usePostCard';
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
+import PressableCard from '@/components/PressableCard';
 import { useTabBarClearance } from '@/components/LiquidGlass/TabBarClearance';
 import { formatLikeCount } from '../../utils/format';
 
@@ -262,7 +263,7 @@ function FeedCard({
   const { openPost, liked, likesCount, toggleLike } = usePostCard(post);
 
   return (
-    <Pressable
+    <PressableCard
       onPress={openPost}
       accessibilityRole="button"
       accessibilityLabel={`Abrir outfit: ${post.title}`}
@@ -366,7 +367,7 @@ function FeedCard({
           elevation: 2,
         }}
       />
-    </Pressable>
+    </PressableCard>
   );
 }
 
@@ -385,7 +386,7 @@ function EditorialSpread({ post }: { post: Post }) {
         <View className="h-px flex-1 bg-line" />
       </View>
 
-      <Pressable
+      <PressableCard
         onPress={openPost}
         accessibilityRole="button"
         accessibilityLabel={`Ver selección editorial: ${post.title}`}
@@ -443,7 +444,7 @@ function EditorialSpread({ post }: { post: Post }) {
             </View>
           </View>
         </GlassSurface>
-      </Pressable>
+      </PressableCard>
     </View>
   );
 }

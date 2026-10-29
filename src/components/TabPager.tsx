@@ -7,11 +7,12 @@ export type { TabPagerHandle };
 export type TabPagerProps = {
   index: number;
   onPageSelected: (event: { nativeEvent: { position: number } }) => void;
+  onPageScroll?: (event: { nativeEvent: { position: number; offset: number } }) => void;
   children: ReactNode[];
 };
 
 const TabPager = forwardRef<TabPagerHandle, TabPagerProps>(
-  ({ index, onPageSelected, children }, ref) => {
+  ({ index, onPageSelected, onPageScroll, children }, ref) => {
     const { pagerRef } = useTabPager(ref);
 
     return (
@@ -20,7 +21,8 @@ const TabPager = forwardRef<TabPagerHandle, TabPagerProps>(
         style={{ flex: 1, backgroundColor: '#FCFAF8' }}
         initialPage={index}
         offscreenPageLimit={1}
-        onPageSelected={onPageSelected}>
+        onPageSelected={onPageSelected}
+        onPageScroll={onPageScroll}>
         {children}
       </PagerView>
     );

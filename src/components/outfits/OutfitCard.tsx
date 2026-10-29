@@ -5,6 +5,7 @@ import { AlertTriangle, MoreVertical } from 'lucide-react-native';
 
 import type { Outfit } from '../../types';
 import { cardShadowLg } from '../../constants/theme';
+import PressableCard from '../PressableCard';
 import OutfitCollage from './OutfitCollage';
 
 type OutfitCardProps = {
@@ -25,11 +26,11 @@ export default function OutfitCard({ outfit, onEdit, onDelete }: OutfitCardProps
   const hasMenu = !!onEdit || !!onDelete;
 
   return (
-    <Pressable
+    <PressableCard
       onPress={openOutfit}
       accessibilityRole="button"
       accessibilityLabel={`Abrir outfit ${outfit.name}`}
-      className="aspect-[3/5] overflow-hidden rounded-card border border-brand/25 bg-white active:opacity-80"
+      className="aspect-[3/5] overflow-hidden rounded-card border border-brand/25 bg-white"
       style={cardShadowLg}>
       <OutfitCollage items={outfit.items} />
 
@@ -100,6 +101,6 @@ export default function OutfitCard({ outfit, onEdit, onDelete }: OutfitCardProps
         </Text>
       </View>
 
-    </Pressable>
+    </PressableCard>
   );
 }

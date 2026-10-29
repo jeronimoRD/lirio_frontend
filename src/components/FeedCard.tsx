@@ -4,6 +4,7 @@ import { MoreVertical } from 'lucide-react-native';
 import type { Post } from '@/types';
 
 import { useFeedCard } from '@/hooks/general/useFeedCard';
+import PressableCard from '@/components/PressableCard';
 
 type FeedCardProps = {
   post: Post;
@@ -17,7 +18,7 @@ export default function FeedCard({ post, swatchColor, showMenu, onEdit, onDelete
   const { openMenu, toggleMenu, closeMenu } = useFeedCard();
 
   return (
-    <Pressable
+    <PressableCard
       onPress={() => router.push(`/${post.id}`)}
       className="overflow-hidden rounded-[14px]">
       <Image source={{ uri: post.image }} className="h-[200px] w-full" resizeMode="cover" />
@@ -64,6 +65,6 @@ export default function FeedCard({ post, swatchColor, showMenu, onEdit, onDelete
           {post.title}
         </Text>
       </View>
-    </Pressable>
+    </PressableCard>
   );
 }
