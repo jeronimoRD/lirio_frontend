@@ -1,6 +1,6 @@
 
 import { Redirect, useRouter } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -9,9 +9,7 @@ import {
   ScrollView,
   Text,
   View,
-  type ViewInstance,
 } from 'react-native';
-import { BlurTargetView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTabBarClearance } from '../LiquidGlass/TabBarClearance';
 import { Bookmark, Shirt, Settings2, LogOut, Sparkles } from 'lucide-react-native';
@@ -24,6 +22,7 @@ import { useGarmentTypes } from '../../garment-types/context';
 import type { Post, Role } from '../../types';
 import { cardShadowLg } from '../../constants/theme';
 import { initialsOf } from '../../utils/strings';
+import { cloudinaryImageUrl } from '../../utils/cloudinaryImage';
 import { useProfile } from '../../hooks/tabs/useProfile';
 import { useSaved } from '../../hooks/tabs/useSaved';
 
@@ -149,6 +148,10 @@ export default function Profile({ active = true }: { active?: boolean }) {
         className="flex-1 bg-screen"
         data={listData}
         numColumns={2}
+        initialNumToRender={6}
+        maxToRenderPerBatch={4}
+        updateCellsBatchingPeriod={50}
+        windowSize={7}
         keyExtractor={(post) => post.id}
         columnWrapperStyle={{ gap: 12, paddingHorizontal: 20 }}
         showsVerticalScrollIndicator={false}
@@ -475,8 +478,6 @@ function SavedCard({
   garmentTypeLabel: string;
   onPress: () => void;
 }) {
-  const imageRef = useRef<ViewInstance | null>(null);
-
   return (
     <Pressable
       onPress={onPress}
@@ -485,13 +486,15 @@ function SavedCard({
       className="overflow-hidden rounded-row border border-line bg-white"
       style={cardShadowLg}
     >
-      <BlurTargetView ref={imageRef} style={{ aspectRatio: 3 / 4, width: '100%' }}>
-        <Image source={{ uri: post.image }} className="h-full w-full" resizeMode="cover" />
-      </BlurTargetView>
+      <Image
+        source={{ uri: cloudinaryImageUrl(post.image, 600) }}
+        className="aspect-[3/4] w-full"
+        resizeMode="cover"
+      />
 
       {!!garmentTypeLabel && (
         <View className="absolute left-2 top-2">
-          <GlassBadge label={garmentTypeLabel} variant="garment" blurTarget={imageRef} />
+          <GlassBadge label={garmentTypeLabel} variant="garment" />
         </View>
       )}
 

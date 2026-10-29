@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -76,12 +76,6 @@ export default function Explore() {
 
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [draftFilters, setDraftFilters] = useState<string[]>(activeFilters);
-
-  useEffect(() => {
-    if (!drawerVisible) {
-      setDraftFilters(activeFilters);
-    }
-  }, [activeFilters, drawerVisible]);
 
   const openDrawer = () => {
     setDraftFilters([...activeFilters]);
@@ -269,6 +263,10 @@ export default function Explore() {
         className="flex-1"
         data={listItems}
         numColumns={isUsersMode ? 1 : 2}
+        initialNumToRender={isUsersMode ? 8 : 6}
+        maxToRenderPerBatch={isUsersMode ? 6 : 4}
+        updateCellsBatchingPeriod={50}
+        windowSize={7}
         columnWrapperStyle={isUsersMode ? undefined : { gap: 12, paddingHorizontal: 16 }}
         keyExtractor={(item) =>
           item.kind === 'post'
