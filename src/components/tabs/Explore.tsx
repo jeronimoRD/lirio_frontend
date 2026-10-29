@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  FlatList,
   Modal,
   Pressable,
   ScrollView,
@@ -21,10 +22,11 @@ import {
 import ScreenHeader from '../ScreenHeader';
 import FeedCard from '../FeedCard';
 import OutfitCard from '../outfits/OutfitCard';
-import type { User } from '../../types';
+import type { Outfit, Post, User } from '../../types';
 import { cardShadowLg } from '../../constants/theme';
 import { initialsOf } from '../../utils/strings';
 import { useExplore } from '../../hooks/tabs/useExplore';
+import { useTabBarClearance } from '../LiquidGlass/TabBarClearance';
 
 const COLORS = {
   background: '#FCFAF8',
@@ -38,6 +40,11 @@ const COLORS = {
   white: '#FFFFFF',
 };
 
+type ExploreItem =
+  | { kind: 'post'; post: Post }
+  | { kind: 'outfit'; outfit: Outfit }
+  | { kind: 'user'; user: User };
+
 export default function Explore() {
   const {
     loading,
@@ -47,6 +54,7 @@ export default function Explore() {
     clearQuery,
     handleFocus,
     handleBlur,
+    focused,
     hasQuery,
     searchActive,
     activeTab,
@@ -56,17 +64,15 @@ export default function Explore() {
     toggleFilter,
     hasCategoryFilter,
     results,
-    leftColumn,
-    rightColumn,
     outfitResults,
-    outfitLeftColumn,
-    outfitRightColumn,
     suggestions,
     users,
     usersLoading,
     usersError,
     outfitCountByUser,
   } = useExplore();
+
+  const clearance = useTabBarClearance();
 
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [draftFilters, setDraftFilters] = useState<string[]>(activeFilters);
@@ -104,311 +110,297 @@ export default function Explore() {
     closeDrawer();
   };
 
-  const columns = [leftColumn, rightColumn];
+  const ready = !loading && !error;
+  const isUsersMode = searchActive && activeTab === 'cuentas';
+  const isOutfitsMode = searchActive && activeTab === 'outfits';
+
+  const listItems: ExploreItem[] = !ready
+    ? []
+    : isUsersMode
+      ? (hasQuery ? users : suggestions).map((user): ExploreItem => ({ kind: 'user', user }))
+      : isOutfitsMode
+        ? outfitResults.map((outfit): ExploreItem => ({ kind: 'outfit', outfit }))
+        : results.map((post): ExploreItem => ({ kind: 'post', post }));
+
+  const emptyContent = !ready
+    ? null
+    : isUsersMode
+      ? hasQuery && !usersLoading && !usersError
+        ? <EmptyState message={`Sin cuentas para "${query}"`} />
+        : null
+      : isOutfitsMode
+        ? <EmptyState
+            message={
+              hasQuery
+                ? `Sin outfits para "${query}"`
+                : hasCategoryFilter
+                  ? 'Sin outfits en esas categorías todavía.'
+                  : 'Escribe para buscar outfits.'
+            }
+          />
+        : searchActive
+          ? <EmptyState
+              message={
+                hasQuery
+                  ? `Sin resultados para "${query}"`
+                  : hasCategoryFilter
+                    ? 'Sin prendas en esas categorías todavía.'
+                    : 'Escribe para buscar prendas.'
+            }
+          />
+          : <EmptyState
+              message={
+                hasCategoryFilter
+                  ? 'Todavía no hay outfits en esas categorías.'
+                  : 'Aún no hay outfits publicados. Vuelve pronto para descubrir nuevas ideas.'
+              }
+            />;
 
   return (
     <View className="flex-1 bg-[#FCFAF8]">
       <ScreenHeader title="Busca tu estilo" />
 
-      <ScrollView
+      <FlatList
+        key={searchActive ? activeTab : 'explore'}
         className="flex-1"
-        contentContainerClassName="pb-24"
+        data={listItems}
+        numColumns={isUsersMode ? 1 : 2}
+        columnWrapperStyle={isUsersMode ? undefined : { gap: 12, paddingHorizontal: 16 }}
+        keyExtractor={(item) =>
+          item.kind === 'post'
+            ? `post-${item.post.id}`
+            : item.kind === 'outfit'
+              ? `outfit-${item.outfit.id}`
+              : `user-${item.user.id}`
+        }
+        contentContainerStyle={{ paddingBottom: clearance }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
-      >
-        {/* Encabezado editorial */}
-        <View className="px-4 pt-5">
-          <View className="mb-4 flex-row items-end justify-between">
-            <View className="flex-1 pr-3">
-              <Text className="mb-1 text-[10px] font-bold uppercase tracking-[3px] text-[#A81245]">
-                TU PRÓXIMA INSPIRACIÓN
-              </Text>
+        renderItem={({ item }) => {
+          if (item.kind === 'user') {
+            return (
+              <UserRow
+                user={item.user}
+                outfitCount={outfitCountByUser.get(item.user.id) ?? 0}
+              />
+            );
+          }
 
-              <Text className="font-['Lora-Italic'] text-[29px] leading-[36px] text-[#292724]">
-                Encuentra tu estilo
-              </Text>
-
+          return (
+            <View className="flex-1 pb-3">
+              {item.kind === 'post' ? (
+                <FeedCard post={item.post} />
+              ) : (
+                <OutfitCard outfit={item.outfit} />
+              )}
             </View>
-
-            <Pressable
-              onPress={openDrawer}
-              accessibilityRole="button"
-              accessibilityLabel="Abrir filtros"
-              className="mb-1 h-12 w-12 items-center justify-center rounded-full border border-[#EAE6E1] bg-white"
-            >
-              <SlidersHorizontal size={19} color={COLORS.burgundy} />
-
-              {activeFilters.length > 0 && (
-                <View className="absolute right-0 top-0 h-[19px] min-w-[19px] items-center justify-center rounded-full border-2 border-[#FCFAF8] bg-[#A81245] px-1">
-                  <Text className="text-[9px] font-bold text-white">
-                    {activeFilters.length}
+          );
+        }}
+        ListHeaderComponent={
+          <View>
+            {/* Encabezado editorial */}
+            <View className="px-4 pt-5">
+              <View className="mb-4 flex-row items-end justify-between">
+                <View className="flex-1 pr-3">
+                  <Text className="mb-1 text-[10px] font-bold uppercase tracking-[3px] text-[#A81245]">
+                    TU PRÓXIMA INSPIRACIÓN
                   </Text>
+
+                  <Text className="font-['Lora-Italic'] text-[29px] leading-[36px] text-[#292724]">
+                    Encuentra tu estilo
+                  </Text>
+
+                </View>
+
+                <Pressable
+                  onPress={openDrawer}
+                  accessibilityRole="button"
+                  accessibilityLabel="Abrir filtros"
+                  className="mb-1 h-12 w-12 items-center justify-center rounded-full border border-[#EAE6E1] bg-white"
+                >
+                  <SlidersHorizontal size={19} color={COLORS.burgundy} />
+
+                  {activeFilters.length > 0 && (
+                    <View className="absolute right-0 top-0 h-[19px] min-w-[19px] items-center justify-center rounded-full border-2 border-[#FCFAF8] bg-[#A81245] px-1">
+                      <Text className="text-[9px] font-bold text-white">
+                        {activeFilters.length}
+                      </Text>
+                    </View>
+                  )}
+                </Pressable>
+              </View>
+
+              {/* Buscador */}
+              <View
+                className="h-[50px] flex-row items-center gap-2 rounded-full border border-[#EAE6E1] bg-white px-4"
+                style={focused ? { borderColor: '#A81245' } : undefined}>
+                <Search size={18} color="#A09B95" />
+
+                <TextInput
+                  value={query}
+                  onChangeText={setQuery}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  placeholder="Buscar outfits, estilos..."
+                  placeholderTextColor="#A09B95"
+                  className="flex-1 text-sm text-[#292724]"
+                  autoCapitalize="none"
+                  returnKeyType="search"
+                />
+
+                {query.length > 0 && (
+                  <Pressable
+                    onPress={clearQuery}
+                    hitSlop={8}
+                    accessibilityLabel="Limpiar búsqueda"
+                  >
+                    <X size={16} color="#A09B95" />
+                  </Pressable>
+                )}
+              </View>
+
+              {/* Filtros activos */}
+              {activeFilters.length > 0 && (
+                <View className="mt-3 flex-row flex-wrap gap-2">
+                  {activeFilters.map((filter) => (
+                    <Pressable
+                      key={filter}
+                      onPress={() => toggleFilter(filter)}
+                      className="flex-row items-center gap-1.5 rounded-full bg-[#F4EEE7] px-3 py-1.5"
+                    >
+                      <Text className="text-[11px] font-medium text-[#A81245]">
+                        {filter}
+                      </Text>
+                      <X size={12} color={COLORS.burgundy} />
+                    </Pressable>
+                  ))}
                 </View>
               )}
-            </Pressable>
-          </View>
-
-          {/* Buscador */}
-          <View className="h-[50px] flex-row items-center gap-2 rounded-full border border-[#EAE6E1] bg-white px-4">
-            <Search size={18} color="#A09B95" />
-
-            <TextInput
-              value={query}
-              onChangeText={setQuery}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              placeholder="Buscar outfits, estilos..."
-              placeholderTextColor="#A09B95"
-              className="flex-1 text-sm text-[#292724]"
-              autoCapitalize="none"
-              returnKeyType="search"
-            />
-
-            {query.length > 0 && (
-              <Pressable
-                onPress={clearQuery}
-                hitSlop={8}
-                accessibilityLabel="Limpiar búsqueda"
-              >
-                <X size={16} color="#A09B95" />
-              </Pressable>
-            )}
-          </View>
-
-          {/* Filtros activos */}
-          {activeFilters.length > 0 && (
-            <View className="mt-3 flex-row flex-wrap gap-2">
-              {activeFilters.map((filter) => (
-                <Pressable
-                  key={filter}
-                  onPress={() => toggleFilter(filter)}
-                  className="flex-row items-center gap-1.5 rounded-full bg-[#F4EEE7] px-3 py-1.5"
-                >
-                  <Text className="text-[11px] font-medium text-[#A81245]">
-                    {filter}
-                  </Text>
-                  <X size={12} color={COLORS.burgundy} />
-                </Pressable>
-              ))}
             </View>
-          )}
-        </View>
 
-        {/* Pestañas de búsqueda */}
-        {searchActive && (
-          <View className="px-4 pt-4">
-            <View className="flex-row rounded-full border border-[#EAE6E1] bg-white p-1">
-              <TabButton
-                label="Prendas"
-                active={activeTab === 'prendas'}
-                onPress={() => setActiveTab('prendas')}
-              />
-              <TabButton
-                label="Outfits"
-                active={activeTab === 'outfits'}
-                onPress={() => setActiveTab('outfits')}
-              />
-              <TabButton
-                label="Cuentas"
-                active={activeTab === 'cuentas'}
-                onPress={() => setActiveTab('cuentas')}
-              />
-            </View>
-          </View>
-        )}
-
-        {/* Error general */}
-        {error && (
-          <View className="mx-4 mt-4 rounded-xl bg-red-50 p-4">
-            <Text className="text-center text-sm font-medium text-red-700">
-              {error}
-            </Text>
-          </View>
-        )}
-
-        {/* Carga general */}
-        {loading && (
-          <View className="items-center py-16">
-            <ActivityIndicator color="#A81245" />
-          </View>
-        )}
-
-        {/* Explorar sin búsqueda activa */}
-        {!loading && !error && !searchActive && (
-          <View className="mt-6 gap-7">
-            {suggestions.length > 0 && (
-              <View>
-                <View className="mb-3 flex-row items-center justify-between px-4">
-                  <View>
-                    <Text className="text-[10px] font-bold uppercase tracking-[2px] text-[#A81245]">
-                      DESCUBRIR
-                    </Text>
-                    <Text className="mt-1 font-['Lora-Italic'] text-xl text-[#292724]">
-                      Cuentas para ti
-                    </Text>
-                  </View>
-
-                  <Sparkles size={18} color={COLORS.champagne} />
+            {/* Pestañas de búsqueda */}
+            {searchActive && (
+              <View className="px-4 pt-4">
+                <View className="flex-row rounded-full border border-[#EAE6E1] bg-white p-1">
+                  <TabButton
+                    label="Prendas"
+                    active={activeTab === 'prendas'}
+                    onPress={() => setActiveTab('prendas')}
+                  />
+                  <TabButton
+                    label="Outfits"
+                    active={activeTab === 'outfits'}
+                    onPress={() => setActiveTab('outfits')}
+                  />
+                  <TabButton
+                    label="Cuentas"
+                    active={activeTab === 'cuentas'}
+                    onPress={() => setActiveTab('cuentas')}
+                  />
                 </View>
-
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerClassName="gap-3 px-4 pb-1"
-                >
-                  {suggestions.map((user) => (
-                    <SuggestionCard
-                      key={user.id}
-                      user={user}
-                      outfitCount={outfitCountByUser.get(user.id) ?? 0}
-                    />
-                  ))}
-                </ScrollView>
               </View>
             )}
 
-            <View>
-              <View className="mb-3 flex-row items-center justify-between px-4">
-                <View>
-                  <Text className="text-[10px] font-bold uppercase tracking-[2px] text-[#A81245]">
-                    EL EDITORIAL DE HIBIRIO
-                  </Text>
-                  <Text className="mt-1 font-['Lora-Italic'] text-xl text-[#292724]">
-                    Inspírate
-                  </Text>
-                </View>
-
-                <Text className="text-xs text-[#A09B95]">
-                  {results.length} looks
+            {/* Error general */}
+            {error && (
+              <View className="mx-4 mt-4 rounded-xl bg-red-50 p-4">
+                <Text className="text-center text-sm font-medium text-red-700">
+                  {error}
                 </Text>
               </View>
+            )}
 
-              {results.length > 0 ? (
-                <View className="flex-row gap-3 px-4">
-                  {columns.map((column, index) => (
-                    <View key={index} className="flex-1 gap-3">
-                      {column.map((post) => (
-                        <FeedCard key={post.id} post={post} />
-                      ))}
+            {/* Carga general */}
+            {loading && (
+              <View className="items-center py-16">
+                <ActivityIndicator color="#A81245" />
+              </View>
+            )}
+
+            {/* Explorar sin búsqueda activa */}
+            {ready && !searchActive && (
+              <View className="mt-6 gap-7">
+                {suggestions.length > 0 && (
+                  <View>
+                    <View className="mb-3 flex-row items-center justify-between px-4">
+                      <View>
+                        <Text className="text-[10px] font-bold uppercase tracking-[2px] text-[#A81245]">
+                          DESCUBRIR
+                        </Text>
+                        <Text className="mt-1 font-['Lora-Italic'] text-xl text-[#292724]">
+                          Cuentas para ti
+                        </Text>
+                      </View>
+
+                      <Sparkles size={18} color={COLORS.champagne} />
                     </View>
-                  ))}
+
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerClassName="gap-3 px-4 pb-1"
+                    >
+                      {suggestions.map((user) => (
+                        <SuggestionCard
+                          key={user.id}
+                          user={user}
+                          outfitCount={outfitCountByUser.get(user.id) ?? 0}
+                        />
+                      ))}
+                    </ScrollView>
+                  </View>
+                )}
+
+                <View>
+                  <View className="mb-3 flex-row items-center justify-between px-4">
+                    <View>
+                      <Text className="text-[10px] font-bold uppercase tracking-[2px] text-[#A81245]">
+                        EL EDITORIAL DE HIBIRIO
+                      </Text>
+                      <Text className="mt-1 font-['Lora-Italic'] text-xl text-[#292724]">
+                        Inspírate
+                      </Text>
+                    </View>
+
+                    <Text className="text-xs text-[#A09B95]">
+                      {results.length} looks
+                    </Text>
+                  </View>
                 </View>
-              ) : (
-                <EmptyState
-                  message={
-                    hasCategoryFilter
-                      ? 'Todavía no hay outfits en esas categorías.'
-                      : 'Aún no hay outfits publicados. Vuelve pronto para descubrir nuevas ideas.'
-                  }
-                />
-              )}
-            </View>
-          </View>
-        )}
-
-        {/* Resultados de prendas */}
-        {!loading && !error && searchActive && activeTab === 'prendas' && (
-          <View className="mt-5">
-            {results.length > 0 ? (
-              <View className="flex-row gap-3 px-4">
-                {columns.map((column, index) => (
-                  <View key={index} className="flex-1 gap-3">
-                    {column.map((post) => (
-                      <FeedCard key={post.id} post={post} />
-                    ))}
-                  </View>
-                ))}
               </View>
-            ) : hasQuery || hasCategoryFilter ? (
-              <EmptyState
-                message={
-                  hasQuery
-                    ? `Sin resultados para "${query}"`
-                    : 'Sin prendas en esas categorías todavía.'
-                }
-              />
-            ) : (
-              <EmptyState message="Escribe para buscar prendas." />
             )}
-          </View>
-        )}
 
-        {/* Resultados de outfits */}
-        {!loading && !error && searchActive && activeTab === 'outfits' && (
-          <View className="mt-5">
-            {outfitResults.length > 0 ? (
-              <View className="flex-row gap-3 px-4">
-                {[outfitLeftColumn, outfitRightColumn].map((column, index) => (
-                  <View key={index} className="flex-1 gap-3">
-                    {column.map((outfit) => (
-                      <OutfitCard key={outfit.id} outfit={outfit} />
-                    ))}
-                  </View>
-                ))}
-              </View>
-            ) : hasQuery || hasCategoryFilter ? (
-              <EmptyState
-                message={
-                  hasQuery
-                    ? `Sin outfits para "${query}"`
-                    : 'Sin outfits en esas categorías todavía.'
-                }
-              />
-            ) : (
-              <EmptyState message="Escribe para buscar outfits." />
-            )}
-          </View>
-        )}
+            {/* Resultados de prendas y outfits */}
+            {ready && searchActive && !isUsersMode && <View className="h-5" />}
 
-        {/* Resultados de cuentas */}
-        {!loading && !error && searchActive && activeTab === 'cuentas' && (
-          <View className="mt-5 gap-3">
-            {hasQuery ? (
-              <>
-                {usersLoading && (
+            {/* Resultados de cuentas */}
+            {ready && isUsersMode && (
+              <View className="mt-5 gap-3">
+                {!hasQuery && (
+                  <Text className="px-4 pt-2 text-[10px] font-bold uppercase tracking-[2px] text-[#6E6B68]">
+                    CUENTAS PARA DESCUBRIR
+                  </Text>
+                )}
+
+                {hasQuery && usersLoading && (
                   <View className="items-center py-8">
                     <ActivityIndicator color="#A81245" />
                   </View>
                 )}
 
-                {users.map((user) => (
-                  <UserRow
-                    key={user.id}
-                    user={user}
-                    outfitCount={outfitCountByUser.get(user.id) ?? 0}
-                  />
-                ))}
-
-                {usersError && (
+                {hasQuery && usersError && (
                   <View className="mx-4 rounded-2xl border border-[#EAE6E1] bg-white p-6">
                     <Text className="text-center text-sm text-red-700">
                       {usersError}
                     </Text>
                   </View>
                 )}
-
-                {!usersLoading && !usersError && users.length === 0 && (
-                  <EmptyState message={`Sin cuentas para "${query}"`} />
-                )}
-              </>
-            ) : (
-              <>
-                <Text className="px-4 pt-2 text-[10px] font-bold uppercase tracking-[2px] text-[#6E6B68]">
-                  CUENTAS PARA DESCUBRIR
-                </Text>
-
-                {suggestions.map((user) => (
-                  <UserRow
-                    key={user.id}
-                    user={user}
-                    outfitCount={outfitCountByUser.get(user.id) ?? 0}
-                  />
-                ))}
-              </>
+              </View>
             )}
           </View>
-        )}
-      </ScrollView>
+        }
+        ListEmptyComponent={emptyContent ?? undefined}
+      />
 
       {/* Drawer inferior de filtros */}
       <Modal

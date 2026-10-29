@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
 import { REPORT_REASONS, REPORT_REASON_LABELS } from '../types';
@@ -30,6 +31,7 @@ export default function ReportModal({ visible, targetType, targetId, onClose, on
     });
 
   const title = targetType === 'POST' ? 'Reportar publicación' : 'Reportar usuario';
+  const [descriptionFocused, setDescriptionFocused] = useState(false);
 
   return (
     <Modal
@@ -91,6 +93,9 @@ export default function ReportModal({ visible, targetType, targetId, onClose, on
               numberOfLines={3}
               maxLength={500}
               className="mt-4 min-h-[96px] rounded-xl border border-[#EAE6E1] bg-[#FCFAF8] p-4 text-sm text-[#292724]"
+              style={descriptionFocused ? { borderColor: '#A81245' } : undefined}
+              onFocus={() => setDescriptionFocused(true)}
+              onBlur={() => setDescriptionFocused(false)}
               textAlignVertical="top"
             />
 

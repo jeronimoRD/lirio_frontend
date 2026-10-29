@@ -1,10 +1,12 @@
 
+import { useRef, type RefObject } from 'react';
 import {
   ActivityIndicator,
   Image,
   Pressable,
   ScrollView,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 
@@ -21,7 +23,7 @@ import Field from '../Field';
 import GlassSurface from '../LiquidGlass/GlassSurface';
 import GarmentPicker from './GarmentPicker';
 import StylePicker from './StylePicker';
-import { useCreatePost } from '../../hooks/upload/useCreatePost';
+import { useCreatePost, type CreateSection } from '../../hooks/upload/useCreatePost';
 
 const COLORS = {
   burgundy: '#A81245',
@@ -73,6 +75,40 @@ function SectionHeading({
 }
 
 export default function CreatePost() {
+  const scrollRef = useRef<ScrollView>(null);
+  const contentRef = useRef<View>(null);
+  const imageRef = useRef<View>(null);
+  const infoRef = useRef<View>(null);
+  const garmentRef = useRef<View>(null);
+  const categoriesRef = useRef<View>(null);
+  const titleRef = useRef<TextInput>(null);
+  const descriptionRef = useRef<TextInput>(null);
+
+  const sectionRefs: Record<CreateSection, RefObject<View | null>> = {
+    image: imageRef,
+    title: infoRef,
+    description: infoRef,
+    garment: garmentRef,
+    categories: categoriesRef,
+  };
+
+  const focusSection = (section: CreateSection) => {
+    const target = sectionRefs[section].current;
+
+    if (!target || !contentRef.current) return;
+
+    target.measureLayout(
+      contentRef.current,
+      (_x, y) => {
+        scrollRef.current?.scrollTo({ y: Math.max(0, y - 24), animated: true });
+
+        if (section === 'title') titleRef.current?.focus();
+        if (section === 'description') descriptionRef.current?.focus();
+      },
+      () => {},
+    );
+  };
+
   const {
     control,
     goBack,
@@ -92,11 +128,12 @@ export default function CreatePost() {
     confirmMessage,
     onConfirmCreate,
     cancelConfirm,
-  } = useCreatePost();
+  } = useCreatePost({ onFirstError: focusSection });
 
   return (
     <View className="flex-1 bg-[#FCFAF8]">
       <ScrollView
+        ref={scrollRef}
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerClassName="flex-grow pb-5"
@@ -142,9 +179,9 @@ export default function CreatePost() {
           </View>
         </View>
 
-        <View className="gap-7 px-[18px]">
+        <View ref={contentRef} className="gap-7 px-[18px]">
           {/* 01 — Fotografía */}
-          <View>
+          <View ref={imageRef}>
             <SectionHeading
               number="01"
               title="La fotografía"
@@ -273,7 +310,7 @@ export default function CreatePost() {
           </View>
 
           {/* 02 — Información */}
-          <View>
+          <View ref={infoRef}>
             <SectionHeading
               number="02"
               title="La historia del look"
@@ -284,6 +321,7 @@ export default function CreatePost() {
               <Field
                 control={control}
                 name="title"
+                inputRef={titleRef}
                 label="Título"
                 placeholder="Ej. Un otoño en tonos tierra"
                 autoCapitalize="words"
@@ -302,6 +340,7 @@ export default function CreatePost() {
               <Field
                 control={control}
                 name="description"
+                inputRef={descriptionRef}
                 label="Descripción"
                 placeholder="Cuéntanos sobre las prendas, los colores o la inspiración detrás de este outfit..."
                 multiline
@@ -322,7 +361,7 @@ export default function CreatePost() {
           </View>
 
           {/* 03 — Tipo de prenda */}
-          <View>
+          <View ref={garmentRef}>
             <SectionHeading
               number="03"
               title="El tipo de prenda"
@@ -337,7 +376,7 @@ export default function CreatePost() {
           </View>
 
           {/* 04 — Estilos */}
-          <View>
+          <View ref={categoriesRef}>
             <SectionHeading
               number="04"
               title="Tu identidad visual"

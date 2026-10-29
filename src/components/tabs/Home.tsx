@@ -1,6 +1,7 @@
 
 import {
   ActivityIndicator,
+  FlatList,
   Image,
   Pressable,
   ScrollView,
@@ -14,6 +15,7 @@ import type { Post } from '../../types';
 import { useHome } from '../../hooks/tabs/useHome';
 import { usePostCard } from '../../hooks/tabs/usePostCard';
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
+import { useTabBarClearance } from '@/components/LiquidGlass/TabBarClearance';
 import { formatLikeCount } from '../../utils/format';
 
 const COLORS = {
@@ -99,121 +101,120 @@ export default function Home() {
   const {
     loading,
     error,
-    showSpinner,
     filters,
     activeFilter,
     setActiveFilter,
     activeCategoryId,
     displayedPosts,
     featuredPost,
-    leftColumn,
-    rightColumn,
   } = useHome();
+
+  const clearance = useTabBarClearance();
+
+  const showFeed = !loading && !error;
 
   return (
     <View className="flex-1 bg-[#FCFAF8]">
-      <ScrollView
+      <FlatList
         className="flex-1"
+        data={showFeed ? displayedPosts : []}
+        numColumns={2}
+        keyExtractor={(post) => post.id}
+        columnWrapperStyle={{ gap: 13, paddingHorizontal: 18 }}
         showsVerticalScrollIndicator={false}
-        contentContainerClassName="pb-32"
-      >
-        {/* Encabezado editorial */}
-        <View className="px-[18px] pt-2">
-          <ScreenHeader title="Hibirio" />
+        contentContainerStyle={{ paddingBottom: clearance }}
+        renderItem={({ item, index }) => (
+          <View className="flex-1 pb-5">
+            <FeedCard
+              post={item}
+              swatchColor={SWATCH_COLORS[index % SWATCH_COLORS.length]}
+            />
+          </View>
+        )}
+        ListHeaderComponent={
+          <View>
+            {/* Encabezado editorial */}
+            <View className="px-[18px] pt-2">
+              <ScreenHeader title="Hibirio" />
 
-          <View className="mb-5 mt-3">
-            <View className="flex-row items-start justify-between">
-              <View className="flex-1 pr-3">
-                <Text className="font-['Lora-Italic'] text-[30px] leading-[37px] text-[#292724]">
-                  Viste tu esencia.
-                </Text>
+              <View className="mb-5 mt-3">
+                <View className="flex-row items-start justify-between">
+                  <View className="flex-1 pr-3">
+                    <Text className="font-['Lora-Italic'] text-[30px] leading-[37px] text-[#292724]">
+                      Viste tu esencia.
+                    </Text>
 
-                <Text className="mt-2 max-w-[280px] text-[13px] leading-5 text-[#6E6B68]">
-                  Inspiración, tendencias y looks que cuentan tu historia.
-                </Text>
-              </View>
+                    <Text className="mt-2 max-w-[280px] text-[13px] leading-5 text-[#6E6B68]">
+                      Inspiración, tendencias y looks que cuentan tu historia.
+                    </Text>
+                  </View>
 
-              <View className="mt-1 h-11 w-11 items-center justify-center rounded-full border border-[#EAE6E1] bg-white">
-                <Sparkles
-                  size={19}
-                  color={COLORS.burgundy}
-                  strokeWidth={1.4}
-                />
+                  <View className="mt-1 h-11 w-11 items-center justify-center rounded-full border border-[#EAE6E1] bg-white">
+                    <Sparkles
+                      size={19}
+                      color={COLORS.burgundy}
+                      strokeWidth={1.4}
+                    />
+                  </View>
+                </View>
+
+                <View className="mt-5 flex-row items-center gap-2">
+                  <EditorialMark />
+
+                  <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#6E6B68]">
+                    HIBIRIO · THE EDIT
+                  </Text>
+
+                  <View className="h-px flex-1 bg-[#EAE6E1]" />
+                </View>
               </View>
             </View>
 
-            <View className="mt-5 flex-row items-center gap-2">
-              <EditorialMark />
+            {/* Filtros */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerClassName="gap-2 px-[18px] pb-5 pt-1"
+            >
+              {filters.map((filter) => {
+                const active = filter === activeFilter;
 
-              <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#6E6B68]">
-                HIBIRIO · THE EDIT
-              </Text>
+                return (
+                  <Pressable
+                    key={filter}
+                    onPress={() => setActiveFilter(filter)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active }}
+                    className={`items-center justify-center rounded-full px-[17px] py-[10px] ${
+                      active
+                        ? 'bg-[#A81245]'
+                        : 'border border-[#EAE6E1] bg-white'
+                    }`}
+                  >
+                    <Text
+                      className={`text-[12px] font-semibold ${
+                        active ? 'text-white' : 'text-[#6E6B68]'
+                      }`}
+                    >
+                      {filter}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
 
-              <View className="h-px flex-1 bg-[#EAE6E1]" />
-            </View>
-          </View>
-        </View>
-
-        {/* Filtros */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerClassName="gap-2 px-[18px] pb-5 pt-1"
-        >
-          {filters.map((filter) => {
-            const active = filter === activeFilter;
-
-            return (
-              <Pressable
-                key={filter}
-                onPress={() => setActiveFilter(filter)}
-                accessibilityRole="button"
-                accessibilityState={{ selected: active }}
-                className={`items-center justify-center rounded-full px-[17px] py-[10px] ${
-                  active
-                    ? 'bg-[#A81245]'
-                    : 'border border-[#EAE6E1] bg-white'
-                }`}
-              >
-                <Text
-                  className={`text-[12px] font-semibold ${
-                    active ? 'text-white' : 'text-[#6E6B68]'
-                  }`}
-                >
-                  {filter}
+            {/* Error */}
+            {!!error && (
+              <View className="mx-[18px] rounded-2xl border border-red-200 bg-red-50 p-4">
+                <Text className="text-center text-[13px] leading-5 text-red-700">
+                  {error}
                 </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
+              </View>
+            )}
 
-        {/* Error */}
-        {!!error && (
-          <View className="mx-[18px] rounded-2xl border border-red-200 bg-red-50 p-4">
-            <Text className="text-center text-[13px] leading-5 text-red-700">
-              {error}
-            </Text>
-          </View>
-        )}
-
-        {/* Carga */}
-        {(showSpinner || (loading && displayedPosts.length === 0)) && (
-          <LoadingState />
-        )}
-
-        {/* Estado vacío */}
-        {!loading && !error && displayedPosts.length === 0 && (
-          <EmptyState
-            activeFilter={activeFilter}
-            activeCategoryId={activeCategoryId}
-          />
-        )}
-
-        {/* Feed */}
-        {!loading && !error && displayedPosts.length > 0 && (
-          <View className="gap-7 px-[18px] pt-1">
-            <View>
-              <View className="mb-4 flex-row items-end justify-between">
+            {/* Feed */}
+            {showFeed && displayedPosts.length > 0 && (
+              <View className="mb-4 flex-row items-end justify-between px-[18px] pt-1">
                 <View>
                   <Text className="font-['Lora-Italic'] text-[23px] text-[#292724]">
                     Para inspirarte
@@ -226,33 +227,27 @@ export default function Home() {
 
                 <View className="mb-1 h-px w-10 bg-[#DCC7A8]" />
               </View>
-
-              <View className="flex-row items-start gap-[13px]">
-                {[leftColumn, rightColumn].map((column, colIndex) => (
-                  <View key={colIndex} className="flex-1 gap-5">
-                    {column.map((post, i) => {
-                      const globalIndex = colIndex + i * 2;
-                      const swatch =
-                        SWATCH_COLORS[globalIndex % SWATCH_COLORS.length];
-
-                      return (
-                        <FeedCard
-                          key={post.id}
-                          post={post}
-                          swatchColor={swatch}
-                        />
-                      );
-                    })}
-                  </View>
-                ))}
-              </View>
-            </View>
-
-            {/* Selección editorial */}
-            {featuredPost && <EditorialSpread post={featuredPost} />}
+            )}
           </View>
-        )}
-      </ScrollView>
+        }
+        ListEmptyComponent={
+          loading ? (
+            <LoadingState />
+          ) : error ? undefined : (
+            <EmptyState
+              activeFilter={activeFilter}
+              activeCategoryId={activeCategoryId}
+            />
+          )
+        }
+        ListFooterComponent={
+          showFeed && featuredPost ? (
+            <View className="mt-7 px-[18px]">
+              <EditorialSpread post={featuredPost} />
+            </View>
+          ) : undefined
+        }
+      />
     </View>
   );
 }

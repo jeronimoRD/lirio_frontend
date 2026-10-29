@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
-import { useForm } from 'react-hook-form';
+import { useForm, type FieldErrors } from 'react-hook-form';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 
@@ -14,7 +14,13 @@ export type CreatePostForm = {
   description: string;
 };
 
-export function useCreatePost() {
+export type CreateSection = 'image' | 'title' | 'description' | 'garment' | 'categories';
+
+export function useCreatePost({
+  onFirstError,
+}: {
+  onFirstError: (section: CreateSection) => void;
+}) {
   const router = useRouter();
 
   const { control, handleSubmit, getValues } = useForm<CreatePostForm>({
@@ -112,28 +118,43 @@ export function useCreatePost() {
     setGarmentError(null);
   };
 
-  const requestCreate = handleSubmit(() => {
-    setCategoryError(null);
-    setGarmentError(null);
-    setImageError(null);
+  const validateAll = (formErrors: FieldErrors<CreatePostForm>): CreateSection | null => {
+    const imageMissing = !image;
+    const garmentMissing = !garmentType;
+    const categoriesMissing = categoryIds.length === 0;
 
-    if (categoryIds.length === 0) {
-      setCategoryError('Selecciona al menos un estilo.');
-      return;
-    }
+    setImageError(imageMissing ? 'Selecciona una imagen.' : null);
+    setGarmentError(garmentMissing ? 'Selecciona el tipo de prenda.' : null);
+    setCategoryError(categoriesMissing ? 'Selecciona al menos un estilo.' : null);
 
-    if (!garmentType) {
-      setGarmentError('Selecciona el tipo de prenda.');
-      return;
-    }
+    if (imageMissing) return 'image';
+    if (formErrors.title) return 'title';
+    if (formErrors.description) return 'description';
+    if (garmentMissing) return 'garment';
+    if (categoriesMissing) return 'categories';
 
-    if (!image) {
-      setImageError('Selecciona una imagen.');
-      return;
-    }
+    return null;
+  };
 
-    setConfirm(true);
-  });
+  const requestCreate = handleSubmit(
+    () => {
+      const section = validateAll({});
+
+      if (section) {
+        onFirstError(section);
+        return;
+      }
+
+      setConfirm(true);
+    },
+    (errors) => {
+      const section = validateAll(errors);
+
+      if (section) {
+        onFirstError(section);
+      }
+    },
+  );
 
   const onConfirmCreate = async () => {
     if (loading || categoryIds.length === 0 || !garmentType || !image) {

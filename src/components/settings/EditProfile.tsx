@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { Redirect } from 'expo-router';
 import {
   ActivityIndicator,
@@ -51,6 +52,7 @@ function EditorialMark() {
 
 export default function EditProfile() {
   const insets = useSafeAreaInsets();
+  const [bioFocused, setBioFocused] = useState(false);
 
   const {
     user,
@@ -205,13 +207,17 @@ export default function EditProfile() {
                   </Text>
                 </View>
 
-                <View className="overflow-hidden rounded-xl border border-[#EAE6E1] bg-[#FCFAF8]">
+                <View
+                  className="overflow-hidden rounded-xl border border-[#EAE6E1] bg-[#FCFAF8]"
+                  style={bioFocused ? { borderColor: '#A81245' } : undefined}>
                   <TextInput
                     className="min-h-[125px] p-4 text-sm leading-[22px] text-[#292724]"
                     placeholder="Cuéntanos algo sobre ti, tus gustos o tu forma de vivir la moda..."
                     placeholderTextColor={COLORS.muted}
                     value={bio}
                     onChangeText={setBio}
+                    onFocus={() => setBioFocused(true)}
+                    onBlur={() => setBioFocused(false)}
                     maxLength={200}
                     multiline
                     textAlignVertical="top"

@@ -172,22 +172,16 @@ export function useExplore() {
 
     const outfitCountByUser = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const post of posts) {
-        counts.set(post.userId, (counts.get(post.userId) ?? 0) + 1);
+    for (const outfit of outfits) {
+        counts.set(outfit.userId, (counts.get(outfit.userId) ?? 0) + 1);
     }
     return counts;
-    }, [posts]);
+    }, [outfits]);
 
     const hasQuery = query.trim().length > 0;
     const searchActive = focused || hasQuery;
     const hasCategoryFilter = activeCategoryIds.length > 0;
     const filters = categories.map((category) => category.name);
-
-    const leftColumn = results.filter((_, i) => i % 2 === 0);
-    const rightColumn = results.filter((_, i) => i % 2 === 1);
-
-    const outfitLeftColumn = outfitResults.filter((_, i) => i % 2 === 0);
-    const outfitRightColumn = outfitResults.filter((_, i) => i % 2 === 1);
 
     return {
     // carga general
@@ -200,6 +194,7 @@ export function useExplore() {
     clearQuery,
     handleFocus,
     handleBlur,
+    focused,
     hasQuery,
     searchActive,
 
@@ -215,13 +210,9 @@ export function useExplore() {
 
     // prendas (posts)
     results,
-    leftColumn,
-    rightColumn,
 
     // outfits
     outfitResults,
-    outfitLeftColumn,
-    outfitRightColumn,
 
     // cuentas
     suggestions,

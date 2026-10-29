@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -5,6 +6,7 @@ import {
   Pressable,
   ScrollView,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import { Check, Sparkles } from 'lucide-react-native';
@@ -14,7 +16,7 @@ import Field from '../Field';
 import ScreenHeader from '../ScreenHeader';
 import OutfitCollage from '../outfits/OutfitCollage';
 import { garmentLabel } from '../upload/GarmentPicker';
-import { useOutfitForm } from '../../hooks/outfit/useOutfitForm';
+import { useOutfitForm, type OutfitSection } from '../../hooks/outfit/useOutfitForm';
 import { GARMENT_TYPES, type GarmentType, type Post } from '../../types';
 
 const VISIBILITY_OPTIONS = [
@@ -33,6 +35,30 @@ const VISIBILITY_OPTIONS = [
 export default function OutfitForm() {
   const insets = useSafeAreaInsets();
 
+  const scrollRef = useRef<ScrollView>(null);
+  const contentRef = useRef<View>(null);
+  const nameSectionRef = useRef<View>(null);
+  const piecesSectionRef = useRef<View>(null);
+  const nameInputRef = useRef<TextInput>(null);
+
+  const focusSection = (section: OutfitSection) => {
+    const target = section === 'name' ? nameSectionRef.current : piecesSectionRef.current;
+
+    if (!target || !contentRef.current) return;
+
+    target.measureLayout(
+      contentRef.current,
+      (_x, y) => {
+        scrollRef.current?.scrollTo({ y: Math.max(0, y - 24), animated: true });
+
+        if (section === 'name') {
+          nameInputRef.current?.focus();
+        }
+      },
+      () => {},
+    );
+  };
+
   const {
     isEdit,
     control,
@@ -49,11 +75,12 @@ export default function OutfitForm() {
     saving,
     onSubmit,
     goBack,
-  } = useOutfitForm();
+  } = useOutfitForm({ onFirstError: focusSection });
 
   return (
     <View className="flex-1 bg-[#FCFAF8]">
       <ScrollView
+        ref={scrollRef}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
@@ -95,14 +122,15 @@ export default function OutfitForm() {
         )}
 
         {!loading && !loadError && (
-          <View className="gap-7">
+          <View ref={contentRef} className="gap-7">
             {/* 01 — Nombre */}
-            <View className="gap-3">
+            <View ref={nameSectionRef} className="gap-3">
               <SectionTitle number="01" title="El nombre" />
 
               <Field
                 control={control}
                 name="name"
+                inputRef={nameInputRef}
                 label="Nombre"
                 placeholder="Ej. Un otoño en tonos tierra"
                 maxLength={80}
@@ -116,7 +144,7 @@ export default function OutfitForm() {
             </View>
 
             {/* 02 — Prendas */}
-            <View className="gap-5">
+            <View ref={piecesSectionRef} className="gap-5">
               <SectionTitle
                 number="02"
                 title="Las prendas"

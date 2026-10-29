@@ -12,6 +12,10 @@ import ProfileScreen from './profile';
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
 import TabPager, { type TabPagerHandle } from '@/components/TabPager';
 import FloatingTabBar from '@/components/LiquidGlass/FloatingTabBar';
+import {
+  DEFAULT_CLEARANCE,
+  TabBarClearanceContext,
+} from '@/components/LiquidGlass/TabBarClearance';
 
 const TAB_ROUTES = ['/home', '/explore', '/saved', '/profile'] as const;
 
@@ -60,6 +64,7 @@ export default function TabsLayout() {
     return i === -1 ? 0 : i;
   });
   const [prevPathname, setPrevPathname] = useState(pathname);
+  const [clearance, setClearance] = useState(DEFAULT_CLEARANCE);
   const pagerRef = useRef<TabPagerHandle>(null);
   const pagerIndexRef = useRef(index);
   // Contenido que la tab bar difumina (necesario para el blur en Android), porque es imitación del efecto de vidrio líquido.
@@ -133,6 +138,7 @@ export default function TabsLayout() {
   );
 
   return (
+    <TabBarClearanceContext.Provider value={clearance}>
     <View className="flex-1 bg-[#FCFAF8]">
       <BlurTargetView ref={blurTargetRef} style={{ flex: 1 }}>
         <TabPager ref={pagerRef} index={index} onPageSelected={onPageSelected}>
@@ -144,8 +150,14 @@ export default function TabsLayout() {
       </BlurTargetView>
 
       {/* Tab bar flotante */}
-        <FloatingTabBar index={index} onChange={goTo} blurTarget={blurTargetRef} />
+        <FloatingTabBar
+          index={index}
+          onChange={goTo}
+          blurTarget={blurTargetRef}
+          onClearanceChange={setClearance}
+        />
     </View>
+    </TabBarClearanceContext.Provider>
   );
 }
 

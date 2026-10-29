@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 
 import { getPosts, deletePost } from '../../api/posts';
+import { getMyOutfits } from '../../api/outfits';
 import { useSession } from '../../session/context';
 import type { Post } from '../../types';
 
@@ -13,6 +14,7 @@ export function useProfile(active = true) {
     const router = useRouter();
 
     const [posts, setPosts] = useState<Post[]>([]);
+    const [outfitCount, setOutfitCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<GalleryTab>('outfits');
@@ -41,6 +43,22 @@ export function useProfile(active = true) {
     };
 
     load();
+
+    return () => {
+        cancelled = true;
+        };
+    }, [active, user]);
+
+    useEffect(() => {
+    if (!active || !user) return;
+
+    let cancelled = false;
+
+    getMyOutfits()
+        .then((all) => {
+        if (!cancelled) setOutfitCount(all.length);
+        })
+        .catch(() => {});
 
     return () => {
         cancelled = true;
@@ -77,9 +95,6 @@ export function useProfile(active = true) {
         params: { id: post.id },
     } as any);
 
-    const leftColumn = posts.filter((_, i) => i % 2 === 0);
-    const rightColumn = posts.filter((_, i) => i % 2 === 1);
-
     const showSpinner = loading && posts.length === 0;
 
   return {
@@ -87,8 +102,7 @@ export function useProfile(active = true) {
     signOut,
 
     posts,
-    leftColumn,
-    rightColumn,
+    outfitCount,
     error,
     showSpinner,
 

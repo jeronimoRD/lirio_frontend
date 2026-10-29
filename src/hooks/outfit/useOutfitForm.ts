@@ -16,9 +16,17 @@ type OutfitFormValues = {
   name: string;
 };
 
+export type OutfitSection = 'name' | 'pieces';
+
 export type PieceSelection = Partial<Record<GarmentType, string>>;
 
-export function useOutfitForm() {
+const PIECES_MIN_MESSAGE = 'Elige al menos 2 prendas de tipos distintos.';
+
+export function useOutfitForm({
+  onFirstError,
+}: {
+  onFirstError: (section: OutfitSection) => void;
+}) {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const outfitId = id ? String(id) : undefined;
 
@@ -135,39 +143,52 @@ export function useOutfitForm() {
     ];
   });
 
-  const onSubmit = handleSubmit(async (values) => {
-    const postIds = GARMENT_TYPES.map((type) => selected[type]).filter(
+  const selectedPostIds = () =>
+    GARMENT_TYPES.map((type) => selected[type]).filter(
       (postId): postId is string => !!postId,
     );
 
-    if (postIds.length < 2) {
-      setPiecesError('Elige al menos 2 prendas de tipos distintos.');
-      return;
-    }
+  const onSubmit = handleSubmit(
+    async (values) => {
+      const postIds = selectedPostIds();
 
-    setSaving(true);
-    setSubmitError(null);
-
-    try {
-      const input = {
-        name: values.name.trim(),
-        isPublic,
-        postIds,
-      };
-
-      if (outfitId) {
-        await updateOutfit(outfitId, input);
-      } else {
-        await createOutfit(input);
+      if (postIds.length < 2) {
+        setPiecesError(PIECES_MIN_MESSAGE);
+        onFirstError('pieces');
+        return;
       }
 
-      router.back();
-    } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'No se pudo guardar el outfit.');
-    } finally {
-      setSaving(false);
-    }
-  });
+      setSaving(true);
+      setSubmitError(null);
+
+      try {
+        const input = {
+          name: values.name.trim(),
+          isPublic,
+          postIds,
+        };
+
+        if (outfitId) {
+          await updateOutfit(outfitId, input);
+        } else {
+          await createOutfit(input);
+        }
+
+        router.back();
+      } catch (err) {
+        setSubmitError(err instanceof Error ? err.message : 'No se pudo guardar el outfit.');
+      } finally {
+        setSaving(false);
+      }
+    },
+    () => {
+      if (selectedPostIds().length < 2) {
+        setPiecesError(PIECES_MIN_MESSAGE);
+      }
+
+      onFirstError('name');
+    },
+  );
 
   return {
     isEdit: !!outfitId,

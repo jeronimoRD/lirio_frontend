@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode, type Ref } from 'react';
 import {
   Controller,
   type Control,
@@ -19,6 +19,7 @@ type Props<T extends FieldValues> = TextInputProps & {
   inputClassName?: string;
   /** Elemento opcional a la derecha del input, dentro del recuadro (ej. botón mostrar/ocultar contraseña) */
   rightElement?: ReactNode;
+  inputRef?: Ref<TextInput>;
 };
 
 export default function Field<T extends FieldValues>({
@@ -31,8 +32,12 @@ export default function Field<T extends FieldValues>({
   inputWrapperClassName,
   inputClassName,
   rightElement,
+  inputRef,
   ...input
 }: Props<T>) {
+  const [focused, setFocused] = useState(false);
+  const { onFocus: onFocusProp, ...inputProps } = input;
+
   return (
     <Controller
       control={control}
@@ -49,15 +54,30 @@ export default function Field<T extends FieldValues>({
               inputWrapperClassName ??
               'h-12 flex-row items-center rounded-xl border border-[#EAE6E1] bg-white px-4'
             }
+            style={
+              error
+                ? { borderColor: '#DC2626' }
+                : focused
+                  ? { borderColor: '#A81245' }
+                  : undefined
+            }
           >
             <TextInput
+              ref={inputRef}
               className={inputClassName ?? 'flex-1 text-sm text-[#292724]'}
               value={value}
               onChangeText={onChange}
-              onBlur={onBlur}
               placeholderTextColor="#A09B95"
               autoCapitalize="none"
-              {...input}
+              {...inputProps}
+              onFocus={(event) => {
+                setFocused(true);
+                onFocusProp?.(event);
+              }}
+              onBlur={() => {
+                setFocused(false);
+                onBlur();
+              }}
             />
             {rightElement}
           </View>

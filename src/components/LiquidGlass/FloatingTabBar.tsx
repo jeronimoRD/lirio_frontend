@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ComponentType, type Ref } from 'react';
-import { Pressable, StyleSheet, View, Text, Modal, type LayoutChangeEvent } from 'react-native';
+import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import Animated, {
     interpolate,
     interpolateColor,
@@ -8,10 +8,10 @@ import Animated, {
     withSpring,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
 import { Heart, House, Plus, Search, Shirt, UserRound } from 'lucide-react-native';
 
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
+import QuickCreateMenu, { type MenuAnchor } from '../QuickCreateMenu';
 
 const BAR_HEIGHT = 64;
 const SIDE_MARGIN = 20;
@@ -20,6 +20,8 @@ const BAR_PADDING = 8;
 const PILL_HEIGHT = 48;
 const SLOTS = 5; // 4 tabs + el hueco del botón +
 const ADD_SIZE = 66;
+const ADD_OVERHANG = 26;
+const CLEARANCE_EXTRA = 24;
 
 const INACTIVE = '#6E6B68';
 const ACTIVE = '#A81245';
@@ -48,9 +50,10 @@ interface Props {
     index: number;
     onChange: (index: number) => void;
     blurTarget?: Ref<View> | any;
+    onClearanceChange?: (px: number) => void;
 }
 
-export default function FloatingTabBar({ index, onChange, blurTarget }: Props) {
+export default function FloatingTabBar({ index, onChange, blurTarget, onClearanceChange }: Props) {
     const insets = useSafeAreaInsets();
     const [barWidth, setBarWidth] = useState(0);
     const pillX = useSharedValue(0);
@@ -81,6 +84,11 @@ export default function FloatingTabBar({ index, onChange, blurTarget }: Props) {
     return (
     <View
         pointerEvents="box-none"
+        onLayout={(event) =>
+            onClearanceChange?.(
+                insets.bottom + BOTTOM_GAP + ADD_OVERHANG + CLEARANCE_EXTRA + event.nativeEvent.layout.height,
+            )
+        }
         style={{
         position: 'absolute',
         left: SIDE_MARGIN,
@@ -212,9 +220,17 @@ useEffect(() => {
 
 
 function AddButton() {
-    const router = useRouter();
+    const buttonRef = useRef<View>(null);
     const press = useSharedValue(0);
-    const [modalVisible, setModalVisible] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [anchor, setAnchor] = useState<MenuAnchor | null>(null);
+
+    const openMenu = () => {
+        buttonRef.current?.measureInWindow((x, y, width, height) => {
+            setAnchor({ x, y, width, height });
+            setMenuOpen(true);
+        });
+    };
 
     const buttonStyle = useAnimatedStyle(() => ({
         transform: [{ scale: interpolate(press.value, [0, 1], [1, 0.9]) }],
@@ -224,21 +240,17 @@ function AddButton() {
         transform: [{ rotate: `${press.value * 90}deg` }],
     }));
 
-    const navigateTo = (route: '/upload' | '/outfit/new') => {
-        setModalVisible(false);
-        router.push(route);
-    };
-
     return (
         <>
             <Pressable
+                ref={buttonRef}
                 onPressIn={() => {
                     press.value = withSpring(1, SPRING);
                 }}
                 onPressOut={() => {
                     press.value = withSpring(0, BOUNCE);
                 }}
-                onPress={() => setModalVisible(true)}
+                onPress={openMenu}
                 accessibilityRole="button"
                 accessibilityLabel="Elegir qué crear"
             >
@@ -268,58 +280,11 @@ function AddButton() {
                 </Animated.View>
             </Pressable>
 
-            <Modal
-                visible={modalVisible}
-                transparent
-                animationType="fade"
-                onRequestClose={() => setModalVisible(false)}
-                statusBarTranslucent
-            >
-                <Pressable
-                    className="flex-1 items-center justify-center bg-black/40 px-6"
-                    onPress={() => setModalVisible(false)}
-                >
-                    <Pressable
-                        onPress={(event) => event.stopPropagation()}
-                        className="w-full max-w-[340px] rounded-[28px] border border-[#EAE6E1] bg-[#FCFAF8] p-6"
-                    >
-                        <Text className="font-['Lora-Italic'] text-[25px] text-[#292724]">
-                            ¿Qué quieres crear?
-                        </Text>
-
-                        <Text className="mb-6 mt-2 text-[13px] leading-5 text-[#6E6B68]">
-                            Elige qué quieres agregar a LirioHibisco.
-                        </Text>
-
-                        <Pressable
-                            onPress={() => navigateTo('/upload')}
-                            className="mb-3 items-center rounded-full bg-[#A81245] px-5 py-4 active:opacity-80"
-                        >
-                            <Text className="text-[14px] font-semibold text-white">
-                                Crear publicación
-                            </Text>
-                        </Pressable>
-
-                        <Pressable
-                            onPress={() => navigateTo('/outfit/new')}
-                            className="items-center rounded-full border border-[#EAE6E1] bg-white px-5 py-4 active:opacity-80"
-                        >
-                            <Text className="text-[14px] font-semibold text-[#292724]">
-                                Crear outfit
-                            </Text>
-                        </Pressable>
-
-                        <Pressable
-                            onPress={() => setModalVisible(false)}
-                            className="mt-4 items-center py-2"
-                        >
-                            <Text className="text-[13px] font-medium text-[#6E6B68]">
-                                Cancelar
-                            </Text>
-                        </Pressable>
-                    </Pressable>
-                </Pressable>
-            </Modal>
+            <QuickCreateMenu
+                visible={menuOpen}
+                anchor={anchor}
+                onClose={() => setMenuOpen(false)}
+            />
         </>
     );
 }
