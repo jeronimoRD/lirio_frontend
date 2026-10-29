@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ComponentType, type Ref } from 'react';
-import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
+import { Pressable, StyleSheet, View, type LayoutChangeEvent, type ViewInstance } from 'react-native';
 import Animated, {
     interpolate,
     interpolateColor,
@@ -8,10 +8,10 @@ import Animated, {
     withSpring,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { Heart, House, Plus, Search, UserRound } from 'lucide-react-native';
+import { Heart, House, Plus, Search, Shirt, UserRound } from 'lucide-react-native';
 
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
+import QuickCreateMenu, { type MenuAnchor } from '../QuickCreateMenu';
 
 const BAR_HEIGHT = 64;
 const SIDE_MARGIN = 20;
@@ -20,6 +20,8 @@ const BAR_PADDING = 8;
 const PILL_HEIGHT = 48;
 const SLOTS = 5; // 4 tabs + el hueco del botón +
 const ADD_SIZE = 66;
+const ADD_OVERHANG = 26;
+const CLEARANCE_EXTRA = 24;
 
 const INACTIVE = '#6E6B68';
 const ACTIVE = '#A81245';
@@ -28,7 +30,7 @@ const ACTIVE = '#A81245';
 const TABS = [
     { label: 'Inicio', icon: House, slot: 0 },
     { label: 'Explorar', icon: Search, slot: 1 },
-    { label: 'Favoritos', icon: Heart, slot: 3 },
+    { label: 'Vestidor', icon: Shirt, slot: 3 },
     { label: 'Perfil', icon: UserRound, slot: 4 },
 ] as const;
 
@@ -48,9 +50,10 @@ interface Props {
     index: number;
     onChange: (index: number) => void;
     blurTarget?: Ref<View> | any;
+    onClearanceChange?: (px: number) => void;
 }
 
-export default function FloatingTabBar({ index, onChange, blurTarget }: Props) {
+export default function FloatingTabBar({ index, onChange, blurTarget, onClearanceChange }: Props) {
     const insets = useSafeAreaInsets();
     const [barWidth, setBarWidth] = useState(0);
     const pillX = useSharedValue(0);
@@ -65,7 +68,7 @@ export default function FloatingTabBar({ index, onChange, blurTarget }: Props) {
     const target = BAR_PADDING + slot * slotWidth + (slotWidth - pillWidth) / 2;
 
     if (!initialized.current) {
-      pillX.value = target; // primera vez: sin animar
+        pillX.value = target; // primera vez: sin animar
         initialized.current = true;
     } else {
         pillX.value = withSpring(target, SPRING);
@@ -81,6 +84,11 @@ export default function FloatingTabBar({ index, onChange, blurTarget }: Props) {
     return (
     <View
         pointerEvents="box-none"
+        onLayout={(event) =>
+            onClearanceChange?.(
+                insets.bottom + BOTTOM_GAP + ADD_OVERHANG + CLEARANCE_EXTRA + event.nativeEvent.layout.height,
+            )
+        }
         style={{
         position: 'absolute',
         left: SIDE_MARGIN,
@@ -210,51 +218,73 @@ useEffect(() => {
     );
 }
 
+
 function AddButton() {
-    const router = useRouter();
+    const buttonRef = useRef<ViewInstance>(null);
     const press = useSharedValue(0);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [anchor, setAnchor] = useState<MenuAnchor | null>(null);
+
+    const openMenu = () => {
+        buttonRef.current?.measureInWindow((x, y, width, height) => {
+            setAnchor({ x, y, width, height });
+            setMenuOpen(true);
+        });
+    };
 
     const buttonStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: interpolate(press.value, [0, 1], [1, 0.9]) }],
+        transform: [{ scale: interpolate(press.value, [0, 1], [1, 0.9]) }],
     }));
+
     const plusStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${press.value * 90}deg` }],
+        transform: [{ rotate: `${press.value * 90}deg` }],
     }));
 
     return (
-    <Pressable
-        onPressIn={() => {
-        press.value = withSpring(1, SPRING);
-        }}
-        onPressOut={() => {
-        press.value = withSpring(0, BOUNCE);
-        }}
-        onPress={() => router.push('/upload')}
-        accessibilityRole="button"
-        accessibilityLabel="Crear publicación">
-        <Animated.View
-        style={[
-            {
-            width: ADD_SIZE,
-            height: ADD_SIZE,
-            borderRadius: ADD_SIZE / 2,
-            backgroundColor: ACTIVE,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderWidth: 4,
-            borderColor: 'rgba(255, 255, 255, 0.75)',
-            shadowColor: ACTIVE,
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.4,
-            shadowRadius: 12,
-            elevation: 8,
-            },
-            buttonStyle,
-        ]}>
-        <Animated.View style={plusStyle}>
-            <Plus size={28} color="#FFFFFF" strokeWidth={2.4} />
-        </Animated.View>
-        </Animated.View>
-    </Pressable>
+        <>
+            <Pressable
+                ref={buttonRef}
+                onPressIn={() => {
+                    press.value = withSpring(1, SPRING);
+                }}
+                onPressOut={() => {
+                    press.value = withSpring(0, BOUNCE);
+                }}
+                onPress={openMenu}
+                accessibilityRole="button"
+                accessibilityLabel="Elegir qué crear"
+            >
+                <Animated.View
+                    style={[
+                        {
+                            width: ADD_SIZE,
+                            height: ADD_SIZE,
+                            borderRadius: ADD_SIZE / 2,
+                            backgroundColor: ACTIVE,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderWidth: 4,
+                            borderColor: 'rgba(255, 255, 255, 0.75)',
+                            shadowColor: ACTIVE,
+                            shadowOffset: { width: 0, height: 8 },
+                            shadowOpacity: 0.4,
+                            shadowRadius: 12,
+                            elevation: 8,
+                        },
+                        buttonStyle,
+                    ]}
+                >
+                    <Animated.View style={plusStyle}>
+                        <Plus size={28} color="#FFFFFF" strokeWidth={2.4} />
+                    </Animated.View>
+                </Animated.View>
+            </Pressable>
+
+            <QuickCreateMenu
+                visible={menuOpen}
+                anchor={anchor}
+                onClose={() => setMenuOpen(false)}
+            />
+        </>
     );
 }

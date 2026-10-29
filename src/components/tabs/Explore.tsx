@@ -1,12 +1,49 @@
-import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
-import { Search, X } from 'lucide-react-native';
+
+import { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import {
+  Search,
+  X,
+  SlidersHorizontal,
+  Check,
+  Sparkles,
+  ArrowUpRight,
+} from 'lucide-react-native';
 
 import ScreenHeader from '../ScreenHeader';
 import FeedCard from '../FeedCard';
-import type { User } from '../../types';
+import OutfitCard from '../outfits/OutfitCard';
+import type { Outfit, Post, User } from '../../types';
 import { cardShadowLg } from '../../constants/theme';
 import { initialsOf } from '../../utils/strings';
 import { useExplore } from '../../hooks/tabs/useExplore';
+import { useTabBarClearance } from '../LiquidGlass/TabBarClearance';
+
+const COLORS = {
+  background: '#FCFAF8',
+  burgundy: '#A81245',
+  text: '#292724',
+  secondary: '#6E6B68',
+  muted: '#A09B95',
+  border: '#EAE6E1',
+  champagne: '#DCC7A8',
+  soft: '#F4EEE7',
+  white: '#FFFFFF',
+};
+
+type ExploreItem =
+  | { kind: 'post'; post: Post }
+  | { kind: 'outfit'; outfit: Outfit }
+  | { kind: 'user'; user: User };
 
 export default function Explore() {
   const {
@@ -17,6 +54,7 @@ export default function Explore() {
     clearQuery,
     handleFocus,
     handleBlur,
+    focused,
     hasQuery,
     searchActive,
     activeTab,
@@ -26,8 +64,7 @@ export default function Explore() {
     toggleFilter,
     hasCategoryFilter,
     results,
-    leftColumn,
-    rightColumn,
+    outfitResults,
     suggestions,
     users,
     usersLoading,
@@ -35,221 +72,468 @@ export default function Explore() {
     outfitCountByUser,
   } = useExplore();
 
+  const clearance = useTabBarClearance();
+
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [draftFilters, setDraftFilters] = useState<string[]>(activeFilters);
+
+  useEffect(() => {
+    if (!drawerVisible) {
+      setDraftFilters(activeFilters);
+    }
+  }, [activeFilters, drawerVisible]);
+
+  const openDrawer = () => {
+    setDraftFilters([...activeFilters]);
+    setDrawerVisible(true);
+  };
+
+  const closeDrawer = () => setDrawerVisible(false);
+
+  const toggleDraftFilter = (filter: string) => {
+    setDraftFilters((current) =>
+      current.includes(filter)
+        ? current.filter((item) => item !== filter)
+        : [...current, filter],
+    );
+  };
+
+  const applyFilters = () => {
+    activeFilters
+      .filter((filter) => !draftFilters.includes(filter))
+      .forEach(toggleFilter);
+
+    draftFilters
+      .filter((filter) => !activeFilters.includes(filter))
+      .forEach(toggleFilter);
+
+    closeDrawer();
+  };
+
+  const ready = !loading && !error;
+  const isUsersMode = searchActive && activeTab === 'cuentas';
+  const isOutfitsMode = searchActive && activeTab === 'outfits';
+
+  const listItems: ExploreItem[] = !ready
+    ? []
+    : isUsersMode
+      ? (hasQuery ? users : suggestions).map((user): ExploreItem => ({ kind: 'user', user }))
+      : isOutfitsMode
+        ? outfitResults.map((outfit): ExploreItem => ({ kind: 'outfit', outfit }))
+        : results.map((post): ExploreItem => ({ kind: 'post', post }));
+
+  const emptyContent = !ready
+    ? null
+    : isUsersMode
+      ? hasQuery && !usersLoading && !usersError
+        ? <EmptyState message={`Sin cuentas para "${query}"`} />
+        : null
+      : isOutfitsMode
+        ? <EmptyState
+            message={
+              hasQuery
+                ? `Sin outfits para "${query}"`
+                : hasCategoryFilter
+                  ? 'Sin outfits en esas categorías todavía.'
+                  : 'Escribe para buscar outfits.'
+            }
+          />
+        : searchActive
+          ? <EmptyState
+              message={
+                hasQuery
+                  ? `Sin resultados para "${query}"`
+                  : hasCategoryFilter
+                    ? 'Sin prendas en esas categorías todavía.'
+                    : 'Escribe para buscar prendas.'
+            }
+          />
+          : <EmptyState
+              message={
+                hasCategoryFilter
+                  ? 'Todavía no hay outfits en esas categorías.'
+                  : 'Aún no hay outfits publicados. Vuelve pronto para descubrir nuevas ideas.'
+              }
+            />;
+
   return (
-    <View className="flex-1 bg-[#FCFAF8]">
+    <View className="flex-1 bg-screen">
       <ScreenHeader title="Busca tu estilo" />
 
-      <ScrollView
+      <FlatList
+        key={searchActive ? activeTab : 'explore'}
         className="flex-1"
-        contentContainerClassName="pb-24"
+        data={listItems}
+        numColumns={isUsersMode ? 1 : 2}
+        columnWrapperStyle={isUsersMode ? undefined : { gap: 12, paddingHorizontal: 16 }}
+        keyExtractor={(item) =>
+          item.kind === 'post'
+            ? `post-${item.post.id}`
+            : item.kind === 'outfit'
+              ? `outfit-${item.outfit.id}`
+              : `user-${item.user.id}`
+        }
+        contentContainerStyle={{ paddingBottom: clearance }}
         showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled">
-        {/* Barra de búsqueda */}
-        <View className="px-4 pt-4">
-          <View className="h-12 flex-row items-center gap-2 rounded-full border border-[#EAE6E1] bg-white px-4">
-            <Search size={18} color="#A09B95" />
-            <TextInput
-              value={query}
-              onChangeText={setQuery}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              placeholder="Buscar outfits, estilos..."
-              placeholderTextColor="#A09B95"
-              className="flex-1 text-sm text-[#292724]"
-              autoCapitalize="none"
-              returnKeyType="search"
-            />
-            {query.length > 0 && (
-              <Pressable onPress={clearQuery} hitSlop={8}>
-                <X size={16} color="#A09B95" />
-              </Pressable>
-            )}
-          </View>
-        </View>
+        keyboardShouldPersistTaps="handled"
+        renderItem={({ item }) => {
+          if (item.kind === 'user') {
+            return (
+              <UserRow
+                user={item.user}
+                outfitCount={outfitCountByUser.get(item.user.id) ?? 0}
+              />
+            );
+          }
 
-        {/* Pestañas: Outfits | Cuentas (solo al presionar el buscador) */}
-        {searchActive && (
-          <View className="px-4 pt-4">
-            <View className="flex-row rounded-full border border-[#EAE6E1] bg-white p-1">
-              <TabButton
-                label="Outfits"
-                active={activeTab === 'outfits'}
-                onPress={() => setActiveTab('outfits')}
-              />
-              <TabButton
-                label="Cuentas"
-                active={activeTab === 'cuentas'}
-                onPress={() => setActiveTab('cuentas')}
-              />
+          return (
+            <View className="flex-1 pb-3">
+              {item.kind === 'post' ? (
+                <FeedCard post={item.post} />
+              ) : (
+                <OutfitCard outfit={item.outfit} />
+              )}
             </View>
-          </View>
-        )}
-
-        {activeTab === 'outfits' && (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerClassName="gap-2 px-4 py-4"
-            keyboardShouldPersistTaps="handled">
-            {filters.map((filter) => {
-              const active = activeFilters.includes(filter);
-              return (
-                <Pressable
-                  key={filter}
-                  onPress={() => toggleFilter(filter)}
-                  className={`items-center justify-center rounded-full px-4 py-2 ${
-                    active ? 'bg-[#A81245]' : 'border border-[#EAE6E1]'
-                  }`}>
-                  <Text
-                    className={`text-[13px] font-semibold ${
-                      active ? 'text-white' : 'text-[#6E6B68]'
-                    }`}>
-                    {filter}
+          );
+        }}
+        ListHeaderComponent={
+          <View>
+            {/* Encabezado editorial */}
+            <View className="px-4 pt-5">
+              <View className="mb-4 flex-row items-end justify-between">
+                <View className="flex-1 pr-3">
+                  <Text className="mb-1 text-[10px] font-bold uppercase tracking-[3px] text-brand">
+                    TU PRÓXIMA INSPIRACIÓN
                   </Text>
+
+                  <Text className="font-['Lora-Italic'] text-[29px] leading-[36px] text-ink">
+                    Encuentra tu estilo
+                  </Text>
+
+                </View>
+
+                <Pressable
+                  onPress={openDrawer}
+                  accessibilityRole="button"
+                  accessibilityLabel="Abrir filtros"
+                  className="mb-1 h-12 w-12 items-center justify-center rounded-full border border-line bg-white"
+                >
+                  <SlidersHorizontal size={19} color={COLORS.burgundy} />
+
+                  {activeFilters.length > 0 && (
+                    <View className="absolute right-0 top-0 h-[19px] min-w-[19px] items-center justify-center rounded-full border-2 border-screen bg-brand px-1">
+                      <Text className="text-[9px] font-bold text-white">
+                        {activeFilters.length}
+                      </Text>
+                    </View>
+                  )}
                 </Pressable>
-              );
-            })}
-          </ScrollView>
-        )}
+              </View>
 
-        {error && (
-          <View className="mx-4 rounded-xl bg-red-50 p-4">
-            <Text className="text-center text-sm font-medium text-red-700">{error}</Text>
-          </View>
-        )}
+              {/* Buscador */}
+              <View
+                className="h-[50px] flex-row items-center gap-2 rounded-full border border-line bg-white px-4"
+                style={focused ? { borderColor: '#A81245' } : undefined}>
+                <Search size={18} color="#A09B95" />
 
-        {loading && (
-          <View className="items-center py-16">
-            <ActivityIndicator color="#A81245" />
-          </View>
-        )}
+                <TextInput
+                  value={query}
+                  onChangeText={setQuery}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  placeholder="Buscar outfits, estilos..."
+                  placeholderTextColor="#A09B95"
+                  className="flex-1 text-sm text-ink"
+                  autoCapitalize="none"
+                  returnKeyType="search"
+                />
 
-        {!loading && !error && !searchActive && (
-          <View className="gap-7">
-            {/* Sugerencias de cuentas al entrar */}
-            {suggestions.length > 0 && (
-              <View>
-                <Text className="mb-3 px-4 text-[11px] font-bold uppercase tracking-widest text-[#6E6B68]">
-                  Cuentas para ti
-                </Text>
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerClassName="gap-3 px-4">
-                  {suggestions.map((user) => (
-                    <SuggestionCard
-                      key={user.id}
-                      user={user}
-                      outfitCount={outfitCountByUser.get(user.id) ?? 0}
-                    />
+                {query.length > 0 && (
+                  <Pressable
+                    onPress={clearQuery}
+                    hitSlop={8}
+                    accessibilityLabel="Limpiar búsqueda"
+                  >
+                    <X size={16} color="#A09B95" />
+                  </Pressable>
+                )}
+              </View>
+
+              {/* Filtros activos */}
+              {activeFilters.length > 0 && (
+                <View className="mt-3 flex-row flex-wrap gap-2">
+                  {activeFilters.map((filter) => (
+                    <Pressable
+                      key={filter}
+                      onPress={() => toggleFilter(filter)}
+                      className="flex-row items-center gap-1.5 rounded-full bg-icon-well px-3 py-1.5"
+                    >
+                      <Text className="text-[11px] font-medium text-brand">
+                        {filter}
+                      </Text>
+                      <X size={12} color={COLORS.burgundy} />
+                    </Pressable>
                   ))}
-                </ScrollView>
+                </View>
+              )}
+            </View>
+
+            {/* Pestañas de búsqueda */}
+            {searchActive && (
+              <View className="px-4 pt-4">
+                <View className="flex-row rounded-full border border-line bg-white p-1">
+                  <TabButton
+                    label="Prendas"
+                    active={activeTab === 'prendas'}
+                    onPress={() => setActiveTab('prendas')}
+                  />
+                  <TabButton
+                    label="Outfits"
+                    active={activeTab === 'outfits'}
+                    onPress={() => setActiveTab('outfits')}
+                  />
+                  <TabButton
+                    label="Cuentas"
+                    active={activeTab === 'cuentas'}
+                    onPress={() => setActiveTab('cuentas')}
+                  />
+                </View>
               </View>
             )}
 
-            {results.length > 0 ? (
-              <View className="flex-row gap-3 px-4">
-                {[leftColumn, rightColumn].map((column, colIndex) => (
-                  <View key={colIndex} className="flex-1 gap-3">
-                    {column.map((post) => (
-                      <FeedCard key={post.id} post={post} />
-                    ))}
+            {/* Error general */}
+            {error && (
+              <View className="mx-4 mt-4 rounded-xl bg-red-50 p-4">
+                <Text className="text-center text-sm font-medium text-red-700">
+                  {error}
+                </Text>
+              </View>
+            )}
+
+            {/* Carga general */}
+            {loading && (
+              <View className="items-center py-16">
+                <ActivityIndicator color="#A81245" />
+              </View>
+            )}
+
+            {/* Explorar sin búsqueda activa */}
+            {ready && !searchActive && (
+              <View className="mt-6 gap-7">
+                {suggestions.length > 0 && (
+                  <View>
+                    <View className="mb-3 flex-row items-center justify-between px-4">
+                      <View>
+                        <Text className="text-[10px] font-bold uppercase tracking-[2px] text-brand">
+                          DESCUBRIR
+                        </Text>
+                        <Text className="mt-1 font-['Lora-Italic'] text-xl text-ink">
+                          Cuentas para ti
+                        </Text>
+                      </View>
+
+                      <Sparkles size={18} color={COLORS.champagne} />
+                    </View>
+
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerClassName="gap-3 px-4 pb-1"
+                    >
+                      {suggestions.map((user) => (
+                        <SuggestionCard
+                          key={user.id}
+                          user={user}
+                          outfitCount={outfitCountByUser.get(user.id) ?? 0}
+                        />
+                      ))}
+                    </ScrollView>
                   </View>
-                ))}
-              </View>
-            ) : (
-              <View className="mx-4 rounded-2xl border border-[#EAE6E1] bg-white p-6">
-                <Text className="text-center text-sm text-[#6E6B68]">
-                  {hasCategoryFilter
-                    ? 'Sin outfits en esas categorías todavía.'
-                    : 'Aún no hay outfits publicados.'}
-                </Text>
-              </View>
-            )}
-          </View>
-        )}
+                )}
 
-        {/* Búsqueda activa: outfits */}
-        {!loading && !error && searchActive && activeTab === 'outfits' && (
-          <View className="gap-7">
-            {results.length > 0 ? (
-              <View className="flex-row gap-3 px-4">
-                {[leftColumn, rightColumn].map((column, colIndex) => (
-                  <View key={colIndex} className="flex-1 gap-3">
-                    {column.map((post) => (
-                      <FeedCard key={post.id} post={post} />
-                    ))}
+                <View>
+                  <View className="mb-3 flex-row items-center justify-between px-4">
+                    <View>
+                      <Text className="text-[10px] font-bold uppercase tracking-[2px] text-brand">
+                        EL EDITORIAL DE HIBIRIO
+                      </Text>
+                      <Text className="mt-1 font-['Lora-Italic'] text-xl text-ink">
+                        Inspírate
+                      </Text>
+                    </View>
+
+                    <Text className="text-xs text-ink-muted">
+                      {results.length} looks
+                    </Text>
                   </View>
-                ))}
-              </View>
-            ) : hasQuery || hasCategoryFilter ? (
-              <View className="mx-4 rounded-2xl border border-[#EAE6E1] bg-white p-6">
-                <Text className="text-center text-sm text-[#6E6B68]">
-                  {hasQuery
-                    ? `Sin resultados para "${query}"`
-                    : 'Sin outfits en esas categorías todavía.'}
-                </Text>
-              </View>
-            ) : (
-              <View className="mx-4 rounded-2xl border border-[#EAE6E1] bg-white p-6">
-                <Text className="text-center text-sm text-[#6E6B68]">
-                  Escribe para buscar outfits.
-                </Text>
+                </View>
               </View>
             )}
-          </View>
-        )}
 
-        {!loading && !error && searchActive && activeTab === 'cuentas' && (
-          <View className="mt-4 gap-3">
-            {hasQuery ? (
-              <>
-                {usersLoading && (
+            {/* Resultados de prendas y outfits */}
+            {ready && searchActive && !isUsersMode && <View className="h-5" />}
+
+            {/* Resultados de cuentas */}
+            {ready && isUsersMode && (
+              <View className="mt-5 gap-3">
+                {!hasQuery && (
+                  <Text className="px-4 pt-2 text-[10px] font-bold uppercase tracking-[2px] text-ink-secondary">
+                    CUENTAS PARA DESCUBRIR
+                  </Text>
+                )}
+
+                {hasQuery && usersLoading && (
                   <View className="items-center py-8">
                     <ActivityIndicator color="#A81245" />
                   </View>
                 )}
 
-                {users.length > 0 &&
-                  users.map((user) => (
-                    <UserRow
-                      key={user.id}
-                      user={user}
-                      outfitCount={outfitCountByUser.get(user.id) ?? 0}
-                    />
-                  ))}
-
-                {usersError && (
-                  <View className="mx-4 rounded-2xl border border-[#EAE6E1] bg-white p-6">
-                    <Text className="text-center text-sm text-red-700">{usersError}</Text>
-                  </View>
-                )}
-
-                {!usersLoading && !usersError && users.length === 0 && (
-                  <View className="mx-4 rounded-2xl border border-[#EAE6E1] bg-white p-6">
-                    <Text className="text-center text-sm text-[#6E6B68]">
-                      {`Sin cuentas para "${query}"`}
+                {hasQuery && usersError && (
+                  <View className="mx-4 rounded-2xl border border-line bg-white p-6">
+                    <Text className="text-center text-sm text-red-700">
+                      {usersError}
                     </Text>
                   </View>
                 )}
-              </>
-            ) : (
-              <>
-                <Text className="px-4 pt-2 text-[11px] font-bold uppercase tracking-widest text-[#6E6B68]">
-                  Escribe para buscar cuentas
-                </Text>
-                {suggestions.map((user) => (
-                  <UserRow
-                    key={user.id}
-                    user={user}
-                    outfitCount={outfitCountByUser.get(user.id) ?? 0}
-                  />
-                ))}
-              </>
+              </View>
             )}
           </View>
-        )}
-      </ScrollView>
+        }
+        ListEmptyComponent={emptyContent ?? undefined}
+      />
+
+      {/* Drawer inferior de filtros */}
+      <Modal
+        visible={drawerVisible}
+        transparent
+        animationType="slide"
+        statusBarTranslucent
+        onRequestClose={closeDrawer}
+      >
+        <View className="flex-1 justify-end">
+          {/* Fondo oscurecido */}
+          <Pressable
+            accessibilityLabel="Cerrar filtros"
+            onPress={closeDrawer}
+            className="absolute inset-0 bg-black/35"
+          />
+
+          <View className="max-h-[82%] rounded-t-[30px] border-t border-line bg-screen px-5 pb-8 pt-3">
+            {/* Indicador del drawer */}
+            <View className="mb-5 items-center">
+              <View className="h-1.5 w-11 rounded-full bg-[#D8D0C7]" />
+            </View>
+
+            {/* Cabecera del panel */}
+            <View className="mb-5 flex-row items-start justify-between">
+              <View className="flex-1 pr-4">
+                <Text className="mb-1 text-[10px] font-bold uppercase tracking-[2.5px] text-brand">
+                  TU SELECCIÓN
+                </Text>
+
+                <Text className="font-['Lora-Italic'] text-[27px] leading-8 text-ink">
+                  Refina tu búsqueda
+                </Text>
+
+                <Text className="mt-2 text-[13px] leading-5 text-ink-secondary">
+                  Elige las estéticas que quieras descubrir.
+                </Text>
+              </View>
+
+              <Pressable
+                onPress={closeDrawer}
+                accessibilityLabel="Cerrar panel de filtros"
+                className="h-9 w-9 items-center justify-center rounded-full border border-line bg-white"
+              >
+                <X size={17} color={COLORS.text} />
+              </Pressable>
+            </View>
+
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              contentContainerClassName="pb-4"
+            >
+              <View className="mb-3 flex-row items-center justify-between">
+                <Text className="text-sm font-semibold text-ink">
+                  Categorías de estilo
+                </Text>
+
+                <Text className="text-xs text-ink-muted">
+                  {draftFilters.length} seleccionadas
+                </Text>
+              </View>
+
+              {/* Chips de categorías */}
+              <View className="flex-row flex-wrap gap-2.5">
+                {filters.map((filter) => {
+                  const selected = draftFilters.includes(filter);
+
+                  return (
+                    <Pressable
+                      key={filter}
+                      onPress={() => toggleDraftFilter(filter)}
+                      accessibilityRole="checkbox"
+                      accessibilityState={{ checked: selected }}
+                      className={`flex-row items-center gap-2 rounded-full border px-4 py-3 ${
+                        selected
+                          ? 'border-brand bg-brand'
+                          : 'border-line bg-white'
+                      }`}
+                    >
+                      {selected && <Check size={14} color="#FFFFFF" />}
+
+                      <Text
+                        className={`text-[13px] font-medium ${
+                          selected ? 'text-white' : 'text-ink-secondary'
+                        }`}
+                      >
+                        {filter}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+
+              <View className="mt-6 rounded-2xl border border-line bg-white p-4">
+                <View className="flex-row items-center gap-2">
+                  <Sparkles size={16} color={COLORS.champagne} />
+                  <Text className="text-[13px] font-semibold text-ink">
+                    Un estilo, muchas posibilidades
+                  </Text>
+                </View>
+
+                <Text className="mt-1.5 text-xs leading-5 text-ink-secondary">
+                  Combina varias categorías o deja todo sin seleccionar
+                  para explorar todos los outfits.
+                </Text>
+              </View>
+            </ScrollView>
+
+            {/* Acciones del drawer */}
+            <View className="mt-3 flex-row items-center gap-3 border-t border-line pt-4">
+              <Pressable
+                onPress={() => setDraftFilters([])}
+                className="min-h-[50px] items-center justify-center rounded-full border border-line bg-white px-5"
+              >
+                <Text className="text-[13px] font-semibold text-ink-secondary">
+                  Limpiar
+                </Text>
+              </Pressable>
+
+              <Pressable
+                onPress={applyFilters}
+                className="min-h-[50px] flex-1 flex-row items-center justify-center gap-2 rounded-full bg-brand px-5"
+              >
+                <Text className="text-[13px] font-semibold text-white">
+                  Ver resultados
+                </Text>
+                <ArrowUpRight size={16} color="#FFFFFF" />
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -266,26 +550,43 @@ function TabButton({
   return (
     <Pressable
       onPress={onPress}
-      className={`flex-1 items-center justify-center rounded-full py-2 ${
-        active ? 'bg-[#A81245]' : ''
-      }`}>
-      <Text className={`text-[13px] font-semibold ${active ? 'text-white' : 'text-[#6E6B68]'}`}>
+      className={`flex-1 items-center justify-center rounded-full py-2.5 ${
+        active ? 'bg-brand' : ''
+      }`}
+    >
+      <Text
+        className={`text-[13px] font-semibold ${
+          active ? 'text-white' : 'text-ink-secondary'
+        }`}
+      >
         {label}
       </Text>
     </Pressable>
   );
 }
 
-function AvatarRing({ initials, size = 64 }: { initials: string; size?: number }) {
+function AvatarRing({
+  initials,
+  size = 64,
+}: {
+  initials: string;
+  size?: number;
+}) {
   const ringSize = size + 8;
+
   return (
     <View
-      className="items-center justify-center rounded-full border-2 border-[#DCC7A8]"
-      style={{ width: ringSize, height: ringSize }}>
+      className="items-center justify-center rounded-full border-2 border-beige"
+      style={{ width: ringSize, height: ringSize }}
+    >
       <View
-        className="items-center justify-center rounded-full bg-[#A81245]"
-        style={{ width: size, height: size }}>
-        <Text className="font-bold text-white" style={{ fontSize: size * 0.32 }}>
+        className="items-center justify-center rounded-full bg-brand"
+        style={{ width: size, height: size }}
+      >
+        <Text
+          className="font-bold text-white"
+          style={{ fontSize: size * 0.32 }}
+        >
           {initials}
         </Text>
       </View>
@@ -293,28 +594,40 @@ function AvatarRing({ initials, size = 64 }: { initials: string; size?: number }
   );
 }
 
-function SuggestionCard({ user, outfitCount }: { user: User; outfitCount: number }) {
+function SuggestionCard({
+  user,
+  outfitCount,
+}: {
+  user: User;
+  outfitCount: number;
+}) {
   return (
     <View
-      className="w-[160px] items-center gap-3 rounded-[20px] bg-white px-4 pb-4 pt-5"
-      style={cardShadowLg}>
+      className="w-[160px] items-center gap-3 rounded-[22px] border border-[#F0EBE5] bg-white px-4 pb-4 pt-5"
+      style={cardShadowLg}
+    >
       <AvatarRing initials={initialsOf(user.name)} />
 
-      <View className="items-center gap-1">
+      <View className="w-full items-center gap-1">
         <Text
           numberOfLines={1}
-          className="w-full text-center font-['Lora-Italic'] text-base text-[#292724]">
+          className="w-full text-center font-['Lora-Italic'] text-base text-ink"
+        >
           {user.name}
         </Text>
+
         {!!user.bio && (
-          <Text numberOfLines={1} className="w-full text-center text-[11px] text-[#A09B95]">
+          <Text
+            numberOfLines={1}
+            className="w-full text-center text-[11px] text-ink-muted"
+          >
             {user.bio}
           </Text>
         )}
       </View>
 
-      <View className="rounded-full bg-[#F4EEE7] px-3 py-1">
-        <Text className="text-[11px] font-semibold text-[#6E6B68]">
+      <View className="rounded-full bg-icon-well px-3 py-1.5">
+        <Text className="text-[11px] font-semibold text-ink-secondary">
           {outfitCount} {outfitCount === 1 ? 'outfit' : 'outfits'}
         </Text>
       </View>
@@ -322,30 +635,57 @@ function SuggestionCard({ user, outfitCount }: { user: User; outfitCount: number
   );
 }
 
-function UserRow({ user, outfitCount }: { user: User; outfitCount: number }) {
+function UserRow({
+  user,
+  outfitCount,
+}: {
+  user: User;
+  outfitCount: number;
+}) {
   return (
     <View
-      className="mx-4 mb-3 flex-row items-center gap-3.5 rounded-[20px] bg-white p-4"
-      style={cardShadowLg}>
+      className="mx-4 mb-3 flex-row items-center gap-3.5 rounded-card border border-[#F0EBE5] bg-white p-4"
+      style={cardShadowLg}
+    >
       <AvatarRing initials={initialsOf(user.name)} size={52} />
 
       <View className="flex-1 gap-[3px]">
-        <Text numberOfLines={1} className="font-['Lora-Italic'] text-base text-[#292724]">
+        <Text
+          numberOfLines={1}
+          className="font-['Lora-Italic'] text-base text-ink"
+        >
           {user.name}
         </Text>
+
         {!!user.bio && (
-          <Text numberOfLines={1} className="text-xs text-[#6E6B68]">
+          <Text numberOfLines={1} className="text-xs text-ink-secondary">
             {user.bio}
           </Text>
         )}
       </View>
 
-      <View className="items-center rounded-2xl bg-[#F4EEE7] px-3 py-2">
-        <Text className="text-sm font-bold text-[#A81245]">{outfitCount}</Text>
-        <Text className="text-[9px] font-semibold uppercase tracking-wide text-[#6E6B68]">
+      <View className="items-center rounded-2xl bg-icon-well px-3 py-2">
+        <Text className="text-sm font-bold text-brand">
+          {outfitCount}
+        </Text>
+        <Text className="text-[9px] font-semibold uppercase tracking-wide text-ink-secondary">
           {outfitCount === 1 ? 'outfit' : 'outfits'}
         </Text>
       </View>
+    </View>
+  );
+}
+
+function EmptyState({ message }: { message: string }) {
+  return (
+    <View className="mx-4 items-center rounded-[22px] border border-line bg-white px-6 py-8">
+      <View className="mb-3 h-11 w-11 items-center justify-center rounded-full bg-icon-well">
+        <Search size={18} color={COLORS.burgundy} />
+      </View>
+
+      <Text className="text-center text-sm leading-6 text-ink-secondary">
+        {message}
+      </Text>
     </View>
   );
 }

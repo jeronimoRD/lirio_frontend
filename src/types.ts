@@ -28,6 +28,10 @@ export interface User {
   lastLogin?: string;
 }
 
+/** Tipos de prenda del post. Los valores coinciden con el enum del backend. */
+export const GARMENT_TYPES = ['SHIRT', 'PANTS', 'SHOES'] as const;
+export type GarmentType = (typeof GARMENT_TYPES)[number];
+
 /** Una publicación creada por un usuario. */
 export interface Post {
   id: string;
@@ -36,8 +40,46 @@ export interface Post {
   description: string;
   userId: string;
   createdAt: string;
-  /** ID de la categoría del outfit (opcional hasta que todos los posts la tengan). */
-  categoryId?: string;
+  /** IDs de los estilos (categorías) del outfit. */
+  categoryIds: string[];
+  /** Número total de likes */
+  likesCount?: number;
+  /** Indica si el usuario actual ha dado like */
+  isLikedByMe?: boolean;
+  /** Lista de usuarios que han dado like (opcional) */
+  likedBy?: string[];
+  /** Indica si el usuario actual ha guardado el post */
+  isSavedByMe?: boolean;
+  /** Lista de usuarios que han guardado el post (opcional) */
+  savedBy?: string[];
+  /** Tipo de prenda principal del post */
+  garmentType?: GarmentType;
+}
+
+/** Pieza de un outfit: un post elegido para un tipo de prenda. */
+export interface OutfitItem {
+  postId: string;
+  garmentType: GarmentType;
+  /** Null si el post ya no existe. */
+  title: string | null;
+  /** Null si el post ya no existe. */
+  image: string | null;
+  /** Falso si el dueño ya no puede usar esta prenda. */
+  isAvailable: boolean;
+}
+
+/** Combinación de hasta una prenda por tipo, creada por un usuario. */
+export interface Outfit {
+  id: string;
+  name: string;
+  userId: string;
+  isPublic: boolean;
+  /** Falso si alguna pieza ya no está disponible. */
+  isAvailable: boolean;
+  /** Categorías de las piezas disponibles, para filtrar en explorar. */
+  categoryIds: string[];
+  items: OutfitItem[];
+  createdAt?: string;
 }
 
 /** Categoría de los posts (outfits). La gestiona el admin. */

@@ -24,13 +24,13 @@ function OptionCard({
       onPress={onPress}
       className="mb-4 flex-row items-center gap-4 rounded-2xl bg-white p-5 active:opacity-80"
       style={cardShadow}>
-      <View className="h-12 w-12 items-center justify-center rounded-full bg-[#F4EEE7]">
+      <View className="h-12 w-12 items-center justify-center rounded-full bg-icon-well">
         {icon}
       </View>
 
       <View className="flex-1">
-        <Text className="text-base font-semibold text-[#292724]">{title}</Text>
-        <Text className="mt-0.5 text-sm text-[#6E6B68]">{subtitle}</Text>
+        <Text className="text-base font-semibold text-ink">{title}</Text>
+        <Text className="mt-0.5 text-sm text-ink-secondary">{subtitle}</Text>
       </View>
 
       <ChevronRight size={18} color="#A09B95" />
@@ -44,7 +44,7 @@ export default function AdminMore() {
   const insets = useSafeAreaInsets();
 
   return (
-    <View className="flex-1 bg-[#FAF8F6]">
+    <View className="flex-1 bg-admin-screen">
       <AdminBrandHeader />
       <ScrollView
         className="flex-1"
@@ -52,7 +52,7 @@ export default function AdminMore() {
         contentContainerStyle={{ paddingTop: 24, paddingBottom: 24 + insets.bottom }}>
         <View className="mx-auto w-full max-w-md">
           <View className="mb-6">
-            <Text className="font-['Lora-Italic'] text-[28px] leading-9 text-[#241E1B]">Más</Text>
+            <Text className="font-['Lora-Italic'] text-[28px] leading-9 text-admin-ink">Más</Text>
           </View>
 
           <OptionCard

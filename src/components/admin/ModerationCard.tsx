@@ -23,9 +23,9 @@ export default function ModerationCard({
   onDelete,
 }: ModerationCardProps) {
   return (
-    <View className="gap-3 rounded-xl border border-[#EDE7E1] bg-white p-3.5">
+    <View className="gap-3 rounded-xl border border-admin-line bg-white p-3.5">
       <View className="flex-row items-center gap-3">
-        <View className="h-11 w-11 items-center justify-center rounded-lg bg-[#F8E7ED]">
+        <View className="h-11 w-11 items-center justify-center rounded-lg bg-admin-tint">
           {image ? (
             <Image
               source={{ uri: image }}
@@ -38,15 +38,15 @@ export default function ModerationCard({
         </View>
 
         <View className="flex-1 gap-1">
-          <Text numberOfLines={1} className="text-sm font-semibold text-[#241E1B]">
+          <Text numberOfLines={1} className="text-sm font-semibold text-admin-ink">
             {title}
           </Text>
           <View className="flex-row items-center gap-1">
-            <Text className="text-xs font-medium text-[#C2391F]">
+            <Text className="text-xs font-medium text-admin-danger">
               {reportCount} reporte{reportCount === 1 ? '' : 's'}
             </Text>
-            <Text className="text-xs text-[#7A6E65]">·</Text>
-            <Text numberOfLines={1} className="flex-1 text-xs text-[#7A6E65]">
+            <Text className="text-xs text-admin-muted">·</Text>
+            <Text numberOfLines={1} className="flex-1 text-xs text-admin-muted">
               {reasonLabel}
             </Text>
           </View>
@@ -58,8 +58,8 @@ export default function ModerationCard({
           <Button
             text={busy ? 'Enviando...' : 'Aprobar'}
             secondary
-            textClassName="text-sm font-semibold text-[#292724]"
-            className="rounded-2xl border border-[#EAE6E1] bg-white"
+            textClassName="text-sm font-semibold text-ink"
+            className="rounded-2xl border border-line bg-white"
             onPress={onApprove}
             disabled={busy}
           />
@@ -68,8 +68,8 @@ export default function ModerationCard({
           <Pressable
             onPress={onDelete}
             disabled={busy}
-            className="h-12 flex-row items-center justify-center gap-2 rounded-2xl border border-[#E9AFA6] bg-[#FBE6E1] active:opacity-80 disabled:opacity-50">
-            <Text className="text-[13px] font-semibold text-[#C2391F]">
+            className="h-12 flex-row items-center justify-center gap-2 rounded-2xl border border-admin-danger-line bg-admin-danger-bg active:opacity-80 disabled:opacity-50">
+            <Text className="text-[13px] font-semibold text-admin-danger">
               {busy ? 'Enviando...' : 'Eliminar'}
             </Text>
           </Pressable>

@@ -16,21 +16,25 @@ import {
     StyleSheet,
     View,
     type StyleProp,
+    type ViewInstance,
     type ViewStyle,
 } from 'react-native';
+
+import { glass } from '@/constants/theme';
 
 // Propiedad del componente GlassSurface
 //  que permite personalizar su apariencia y comportamiento.
 // y futuros cambios en la interfaz de usuario si se desean a futuro.
+// se utiliza para crear un efecto de vidrio líquido en la interfaz de usuario, compatible con iOS y Android.
 interface Props {
     children?: ReactNode;
     style?: StyleProp<ViewStyle>;
     intensity?: number;
     tintColor?: string;
-    blurTarget?: RefObject<View | null>;
+    blurTarget?: RefObject<ViewInstance | null>;
 }
 
-const DEFAULT_TINT = 'rgba(252, 250, 248, 0.55)';
+const DEFAULT_TINT = glass.fill;
 
 export default function GlassSurface({
     children,
@@ -75,5 +79,5 @@ export default function GlassSurface({
 
 const styles = StyleSheet.create({
     clip: { overflow: 'hidden' },
-    edge: { borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.5)' },
+    edge: { borderWidth: 1, borderColor: glass.edge },
 });

@@ -3,6 +3,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
 
 import Field from '../Field';
+import GarmentPicker from './GarmentPicker';
+import StylePicker from './StylePicker';
 import GlassIconButton from '@/components/LiquidGlass/GlassIconButton';
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
 import { cardShadow } from '../../constants/theme';
@@ -18,25 +20,39 @@ const imageShadow = {
 
 export default function EditPost() {
   const insets = useSafeAreaInsets();
-  const { control, image, loading, saving, goBack, requestUpdate } = useEditPost();
+  const {
+    control,
+    image,
+    loading,
+    saving,
+    goBack,
+    requestUpdate,
+    categories,
+    categoryIds,
+    categoryError,
+    toggleCategory,
+    garmentType,
+    garmentError,
+    selectGarment,
+  } = useEditPost();
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-[#FCFAF8]">
+      <View className="flex-1 items-center justify-center bg-screen">
         <ActivityIndicator color="#A81245" />
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-[#FCFAF8]">
+    <View className="flex-1 bg-screen">
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 40 + insets.bottom }}
         keyboardShouldPersistTaps="handled">
         {/* Imagen como tarjeta flotante, con el botón de atrás encima — mismo lenguaje que PostDetail */}
         <View className="px-5 pt-14">
-          <View className="overflow-hidden rounded-[24px]" style={imageShadow}>
+          <View className="overflow-hidden rounded-tile" style={imageShadow}>
             {image && (
               <Image source={{ uri: image }} className="aspect-[4/5] w-full" resizeMode="cover" />
             )}
@@ -65,13 +81,13 @@ export default function EditPost() {
         </View>
 
         {/* Título de la pantalla */}
-        <Text className="px-6 pt-6 font-['Lora-Italic'] text-2xl text-[#A81245]">
+        <Text className="px-6 pt-6 font-['Lora-Italic'] text-2xl text-brand">
           Editar publicación
         </Text>
 
         {/* Formulario agrupado en una sola tarjeta */}
         <View className="px-6 pt-4">
-          <View className="gap-4 rounded-[20px] bg-white p-5" style={cardShadow}>
+          <View className="gap-4 rounded-card bg-white p-5" style={cardShadow}>
             <Field
               control={control}
               name="title"
@@ -83,8 +99,8 @@ export default function EditPost() {
                 required: 'El título es obligatorio',
                 maxLength: { value: 100, message: 'Máximo 100 caracteres' },
               }}
-              inputWrapperClassName="h-12 flex-row items-center rounded-lg border border-[#EAE6E1] bg-[#FCFAF8] px-4"
-              inputClassName="flex-1 text-sm text-[#292724]"
+              inputWrapperClassName="h-12 flex-row items-center rounded-lg border border-line bg-screen px-4"
+              inputClassName="flex-1 text-sm text-ink"
             />
 
             <Field
@@ -100,18 +116,27 @@ export default function EditPost() {
                 required: 'La descripción es obligatoria',
                 maxLength: { value: 500, message: 'Máximo 500 caracteres' },
               }}
-              inputWrapperClassName="min-h-[120px] flex-row items-start rounded-lg border border-[#EAE6E1] bg-[#FCFAF8] p-4"
-              inputClassName="flex-1 text-sm text-[#292724]"
+              inputWrapperClassName="min-h-[120px] flex-row items-start rounded-lg border border-line bg-screen p-4"
+              inputClassName="flex-1 text-sm text-ink"
             />
+
+            <StylePicker
+              categories={categories}
+              value={categoryIds}
+              onToggle={toggleCategory}
+              error={categoryError}
+            />
+
+            <GarmentPicker value={garmentType} onChange={selectGarment} error={garmentError} />
           </View>
         </View>
 
         {/* Botón de guardar */}
         <View className="items-center px-6 pt-6">
           <Pressable
-            onPress={requestUpdate}
+            onPress={() => requestUpdate()}
             disabled={saving}
-            className="h-12 w-full items-center justify-center rounded-full bg-[#A81245] disabled:opacity-50">
+            className="h-12 w-full items-center justify-center rounded-full bg-brand disabled:opacity-50">
             {saving ? (
               <ActivityIndicator color="white" />
             ) : (

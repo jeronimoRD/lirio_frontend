@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "frontend",
+    "name": "Hibirio",
     "slug": "lirio-hibisco",
-    "scheme": "your-app-scheme",
+    "scheme": "hibirio",
     "version": "1.0.0",
     "web": {
       "bundler": "metro"
@@ -34,9 +34,9 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#FCFAF8"
       },
-      "package": "com.anonymous.frontend"
+      "package": "com.hibirio.app"
     },
     "extra": {
       "router": {},

@@ -5,6 +5,9 @@ import { Settings } from 'lucide-react-native';
 
 import GlassIconButton from '@/components/LiquidGlass/GlassIconButton';
 
+// Se utiliza para crear una portada de perfil con un efecto de vidrio líquido en la interfaz de usuario,
+//  compatible con iOS y Android. Que se ve en la parte superior de la pantalla y contiene una imagen de fondo y un botón de configuración.
+// en las pantallas de perfil de la aplicación.
 interface Props {
     imageUri?: string;
     onSettings: () => void;

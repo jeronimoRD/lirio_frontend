@@ -1,11 +1,12 @@
 import type { ReactNode, RefObject } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View, type ViewInstance } from 'react-native';
 import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { ArrowLeft } from 'lucide-react-native';
 
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
+import { glass } from '@/constants/theme';
 
 interface Props {
   title: string;
@@ -16,7 +17,7 @@ interface Props {
   /** Header fijo arriba con fondo difuminado */
   sticky?: boolean;
   /** Ref del BlurTargetView que envuelve el contenido (obligatorio en Android) */
-  blurTarget?: RefObject<View | null>;
+  blurTarget?: RefObject<ViewInstance | null>;
   /** Altura real del header, para el paddingTop del scroll */
   onHeightChange?: (height: number) => void;
 }
@@ -60,12 +61,12 @@ export default function ScreenHeader({
           {/* Velo crema para que el texto siempre se lea */}
           <View
             pointerEvents="none"
-            style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(252, 250, 248, 0.6)' }]}
+            style={[StyleSheet.absoluteFill, { backgroundColor: glass.header }]}
           />
           {/* Línea fina inferior */}
           <View
             pointerEvents="none"
-            className="absolute bottom-0 left-0 right-0 h-px bg-[#DCC7A8]/40"
+            className="absolute bottom-0 left-0 right-0 h-px bg-beige/40"
           />
         </>
       )}
@@ -77,14 +78,14 @@ export default function ScreenHeader({
             <Animated.View entering={FadeIn.duration(300)}>
               <GlassSurface
                 intensity={25}
-                tintColor="rgba(168, 18, 69, 0.10)"
+                tintColor={glass.brandFill}
                 style={{
                   width: SIDE,
                   height: SIDE,
                   borderRadius: 999,
                   overflow: 'hidden',
                   borderWidth: 1,
-                  borderColor: 'rgba(168, 18, 69, 0.18)',
+                  borderColor: glass.brandEdge,
                 }}>
                 <Pressable
                   onPress={onBack}
@@ -103,13 +104,13 @@ export default function ScreenHeader({
         <Animated.View entering={FadeInDown.duration(420)} className="flex-1 items-center px-2">
           <Text
             numberOfLines={1}
-            className="font-['Lora-Italic'] text-[26px] leading-[34px] text-[#A81245]">
+            className="font-['Lora-Italic'] text-[26px] leading-[34px] text-brand">
             {title}
           </Text>
           {!!subtitle && (
             <Text
               numberOfLines={1}
-              className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#A09B95]">
+              className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-muted">
               {subtitle}
             </Text>
           )}
@@ -125,15 +126,15 @@ export default function ScreenHeader({
       <View className="mt-2 flex-row items-center justify-center gap-2">
         <Animated.View
           entering={FadeIn.delay(180).duration(500)}
-          className="h-px w-10 bg-[#DCC7A8]"
+          className="h-px w-10 bg-beige"
         />
         <Animated.View
           entering={ZoomIn.delay(260).duration(350)}
-          className="h-[7px] w-[7px] rotate-45 bg-[#A81245]"
+          className="h-[7px] w-[7px] rotate-45 bg-brand"
         />
         <Animated.View
           entering={FadeIn.delay(180).duration(500)}
-          className="h-px w-10 bg-[#DCC7A8]"
+          className="h-px w-10 bg-beige"
         />
       </View>
     </View>

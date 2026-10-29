@@ -25,10 +25,10 @@ export default function Button({
   const colorClasses = className
     ? ''
     : secondary
-      ? 'border border-[#EAE6E1] bg-white'
+      ? 'border border-line bg-white'
       : danger
         ? 'bg-red-600'
-        : 'bg-[#A81245]';
+        : 'bg-brand';
 
   return (
     <Pressable
@@ -39,7 +39,7 @@ export default function Button({
       <Text
         className={
           textClassName ??
-          `text-base font-semibold ${secondary ? 'text-[#292724]' : 'text-white'}`
+          `text-base font-semibold ${secondary ? 'text-ink' : 'text-white'}`
         }
       >
         {text}

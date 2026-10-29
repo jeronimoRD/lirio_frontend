@@ -32,7 +32,7 @@ export default function FeedCard({ post, swatchColor, showMenu, onEdit, onDelete
           </Pressable>
 
           {openMenu && (
-            <View className="absolute right-2 top-11 w-28 overflow-hidden rounded-xl border border-[#EAE6E1] bg-white">
+            <View className="absolute right-2 top-11 w-28 overflow-hidden rounded-xl border border-line bg-white">
               {onEdit && (
                 <Pressable
                   onPress={() => {
@@ -40,7 +40,7 @@ export default function FeedCard({ post, swatchColor, showMenu, onEdit, onDelete
                     onEdit();
                   }}
                   className="px-4 py-3">
-                  <Text className="text-sm text-[#292724]">Editar</Text>
+                  <Text className="text-sm text-ink">Editar</Text>
                 </Pressable>
               )}
 
@@ -50,7 +50,7 @@ export default function FeedCard({ post, swatchColor, showMenu, onEdit, onDelete
                     closeMenu();
                     onDelete();
                   }}
-                  className="border-t border-[#EAE6E1] px-4 py-3">
+                  className="border-t border-line px-4 py-3">
                   <Text className="text-sm text-red-600">Eliminar</Text>
                 </Pressable>
               )}
