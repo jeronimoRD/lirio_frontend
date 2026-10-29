@@ -56,11 +56,8 @@ export function useHome() {
         : (categories.find((c) => c.name === activeFilter)?.id ?? null);
 
     const displayedPosts = activeCategoryId
-        ? posts.filter((post) => post.categoryId === activeCategoryId)
+        ? posts.filter((post) => post.categoryIds.includes(activeCategoryId))
     : posts;
-
-    const leftColumn = displayedPosts.filter((_, i) => i % 2 === 0);
-    const rightColumn = displayedPosts.filter((_, i) => i % 2 === 1);
 
     const showSpinner = loading && posts.length === 0;
 
@@ -74,7 +71,5 @@ export function useHome() {
     activeCategoryId,
     displayedPosts,
     featuredPost: displayedPosts[0],
-    leftColumn,
-    rightColumn,
     };
 }

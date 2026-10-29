@@ -2,7 +2,8 @@ import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 
-import { getPosts, deletePost } from '../../api/posts';
+import { deletePost } from '../../api/posts';
+import { useMyContent } from '../../content/context';
 import { useSession } from '../../session/context';
 import type { Post } from '../../types';
 
@@ -11,41 +12,15 @@ export type GalleryTab = 'outfits' | 'saved';
 export function useProfile(active = true) {
     const { user, signOut } = useSession();
     const router = useRouter();
+    const { myPosts, outfits, loaded, error, refresh, setMyPosts } = useMyContent();
 
-    const [posts, setPosts] = useState<Post[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<GalleryTab>('outfits');
     const [deleteTarget, setDeleteTarget] = useState<Post | null>(null);
     const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
-    if (!active || !user) return;
-
-    let cancelled = false;
-
-    const load = async () => {
-        setLoading(true);
-        setError(null);
-
-        try {
-            const all = await getPosts();
-            if (cancelled) return;
-            setPosts(all.filter((post) => post.userId === user.id));
-        } catch (err) {
-            if (cancelled) return;
-            setError(err instanceof Error ? err.message : 'No se pudieron cargar tus publicaciones');
-        } finally {
-            if (!cancelled) setLoading(false);
-        }
-    };
-
-    load();
-
-    return () => {
-        cancelled = true;
-        };
-    }, [active, user]);
+    if (active) refresh();
+    }, [active, refresh]);
 
     const onDeleteConfirmed = async () => {
     if (!deleteTarget || deleting) return;
@@ -57,7 +32,7 @@ export function useProfile(active = true) {
     try {
         await deletePost(id);
         setDeleteTarget(null);
-        setPosts((currentPosts) => currentPosts.filter((post) => post.id !== id));
+        setMyPosts((currentPosts) => currentPosts.filter((post) => post.id !== id));
         } catch (err) {
         Alert.alert(
             'Error',
@@ -77,18 +52,14 @@ export function useProfile(active = true) {
         params: { id: post.id },
     } as any);
 
-    const leftColumn = posts.filter((_, i) => i % 2 === 0);
-    const rightColumn = posts.filter((_, i) => i % 2 === 1);
-
-    const showSpinner = loading && posts.length === 0;
+    const showSpinner = !loaded && myPosts.length === 0;
 
   return {
     user,
     signOut,
 
-    posts,
-    leftColumn,
-    rightColumn,
+    posts: myPosts,
+    outfitCount: outfits.length,
     error,
     showSpinner,
 

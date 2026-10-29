@@ -41,13 +41,13 @@ export default function ConfirmModal({
       statusBarTranslucent={Platform.OS === 'android'}
       onRequestClose={onCancel}>
       <Pressable
-        className="flex-1 items-center justify-center bg-[#292724]/45 px-8"
+        className="flex-1 items-center justify-center bg-ink/45 px-8"
         onPress={onCancel}>
         <Pressable className="w-full max-w-sm rounded-2xl bg-white p-6" style={cardShadow}>
-          <Text className="text-center text-lg font-bold text-[#292724]">{title}</Text>
+          <Text className="text-center text-lg font-bold text-ink">{title}</Text>
 
           {!!message && (
-            <Text className="mt-2 text-center text-sm leading-5 text-[#6E6B68]">{message}</Text>
+            <Text className="mt-2 text-center text-sm leading-5 text-ink-secondary">{message}</Text>
           )}
 
           <View className="mt-6 flex-row gap-3">
@@ -67,7 +67,7 @@ export default function ConfirmModal({
                 danger={danger}
                 onPress={onConfirm}
                 disabled={loading}
-                className={danger ? 'bg-red-600' : loading ? 'bg-[#A81245]' : 'bg-[#A81245]'}
+                className={danger ? 'bg-red-600' : loading ? 'bg-brand' : 'bg-brand'}
               />
             </View>
           </View>

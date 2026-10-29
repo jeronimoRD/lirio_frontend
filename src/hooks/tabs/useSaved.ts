@@ -1,37 +1,40 @@
 import { useEffect, useState } from 'react';
 
-import { getPosts } from '../../api/posts';
-import { useFavorites } from '../../favorites/context';
+import { getLikedPosts } from '../../api/posts';
+import { useMyContent } from '../../content/context';
 import type { Post } from '../../types';
 
 export function useSaved() {
-    const { favoriteIds } = useFavorites();
-    const [allPosts, setAllPosts] = useState<Post[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+  const { savedPosts, loaded, error } = useMyContent();
 
-    useEffect(() => {
+  return { savedPosts, loading: !loaded, error };
+}
+
+export function useLikedPosts() {
+  const [likedPosts, setLikedPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
     let active = true;
 
-    getPosts()
-        .then((all) => {
-            if (active) setAllPosts(all);
-        })
-        .catch((err) => {
-            if (active) {
-            setError(err instanceof Error ? err.message : 'No se pudo cargar tus guardados');
-            }
-        })
-        .finally(() => {
-            if (active) setLoading(false);
-        });
+    getLikedPosts()
+      .then((posts) => {
+        if (active) setLikedPosts(posts);
+      })
+      .catch((err) => {
+        if (active) {
+          setError(err instanceof Error ? err.message : 'No se pudo cargar los posts que te han gustado');
+        }
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
 
     return () => {
-        active = false;
-        };
-    }, []);
+      active = false;
+    };
+  }, []);
 
-  const savedPosts = allPosts.filter((post) => favoriteIds.has(post.id));
-
-    return { savedPosts, loading, error };
+  return { likedPosts, loading, error };
 }
