@@ -9,7 +9,7 @@ import ConfirmModal from '../ConfirmModal';
 import Field from '../Field';
 import type { Role } from '../../types';
 import { ROLES } from '../../types';
-import { cardShadow } from '../../constants/theme';
+import { adminColors, cardShadow } from '../../constants/theme';
 import { initialsOf } from '../../utils/strings';
 import { useAdminUsers } from '../../hooks/admin/useAdminUsers';
 
@@ -18,7 +18,7 @@ const ROLE_STYLE: Record<Role, { label: string; className: string }> = {
   ADMIN: { label: 'Admin', className: 'bg-admin-brown/10 text-admin-brown' },
 };
 
-export default function AdminUsers() {
+export default function AdminUsers({ showHeader = true }: { showHeader?: boolean }) {
   const insets = useSafeAreaInsets();
   const [searchFocused, setSearchFocused] = useState(false);
   const {
@@ -49,7 +49,7 @@ export default function AdminUsers() {
 
   const emptyContent = loading ? (
     <View className="items-center py-10">
-      <ActivityIndicator color="#4A3728" />
+      <ActivityIndicator color={adminColors.brown} />
     </View>
   ) : !error && users.length === 0 ? (
     <View className="mt-4 rounded-2xl bg-white p-6" style={cardShadow}>
@@ -65,13 +65,13 @@ export default function AdminUsers() {
 
   return (
     <View className="flex-1 bg-screen">
-      <AdminBrandHeader />
+      {showHeader && <AdminBrandHeader title="Usuarios" />}
       <FlatList
         data={loading ? [] : filteredUsers}
         keyExtractor={(user) => user.id}
         className="flex-1"
         contentContainerClassName="px-5 pb-8"
-        contentContainerStyle={{ paddingTop: 24, paddingBottom: 32 + insets.bottom }}
+        contentContainerStyle={{ paddingTop: 24, paddingBottom: 94 + insets.bottom }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         ListHeaderComponent={
@@ -99,22 +99,22 @@ export default function AdminUsers() {
             {!showCreate && (
               <View
                 className="mt-4 h-12 flex-row items-center gap-2 rounded-full border border-line bg-white px-4"
-                style={searchFocused ? { borderColor: '#A81245' } : undefined}>
-                <Search size={18} color="#A09B95" />
+                style={searchFocused ? { borderColor: adminColors.brand } : undefined}>
+                <Search size={18} color={adminColors.faint} />
                 <TextInput
                   value={query}
                   onChangeText={setQuery}
                   onFocus={() => setSearchFocused(true)}
                   onBlur={() => setSearchFocused(false)}
                   placeholder="Buscar usuario por nombre o correo..."
-                  placeholderTextColor="#A09B95"
+                  placeholderTextColor={adminColors.faint}
                   className="flex-1 text-sm text-ink"
                   autoCapitalize="none"
                   returnKeyType="search"
                 />
                 {query.length > 0 && (
                   <Pressable onPress={() => setQuery('')} hitSlop={8}>
-                    <X size={16} color="#A09B95" />
+                    <X size={16} color={adminColors.faint} />
                   </Pressable>
                 )}
               </View>

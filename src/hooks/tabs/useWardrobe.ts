@@ -4,7 +4,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 
 import { deleteOutfit } from '../../api/outfits';
 import { useMyContent } from '../../content/context';
-import type { GarmentType, Outfit, Post } from '../../types';
+import type { Outfit, Post } from '../../types';
 
 export function useWardrobe() {
   const router = useRouter();
@@ -13,7 +13,7 @@ export function useWardrobe() {
 
   const [deleteTarget, setDeleteTarget] = useState<Outfit | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const [garmentType, setGarmentType] = useState<GarmentType | null>(null);
+  const [garmentTypeId, setGarmentTypeId] = useState<string | null>(null);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
 
@@ -30,12 +30,12 @@ export function useWardrobe() {
       byId.set(post.id, post);
     }
 
-    return [...byId.values()].filter((post) => !!post.garmentType);
+    return [...byId.values()].filter((post) => !!post.garmentTypeId);
   }, [myPosts, savedPosts]);
 
   const piecesOfType = useMemo(
-    () => (garmentType ? pieces.filter((post) => post.garmentType === garmentType) : []),
-    [pieces, garmentType],
+    () => (garmentTypeId ? pieces.filter((post) => post.garmentTypeId === garmentTypeId) : []),
+    [pieces, garmentTypeId],
   );
 
   const visibleOutfits = useMemo(() => {
@@ -48,9 +48,9 @@ export function useWardrobe() {
     );
   }, [outfits, selectedPostId, query]);
 
-  const selectGarmentType = (type: GarmentType) => {
+  const selectGarmentType = (typeId: string) => {
     setSelectedPostId(null);
-    setGarmentType((current) => (current === type ? null : type));
+    setGarmentTypeId((current) => (current === typeId ? null : typeId));
   };
 
   const togglePiece = (post: Post) => {
@@ -89,7 +89,7 @@ export function useWardrobe() {
     totalOutfits: outfits.length,
     loading: !loaded,
     error,
-    garmentType,
+    garmentTypeId,
     selectGarmentType,
     piecesOfType,
     selectedPostId,

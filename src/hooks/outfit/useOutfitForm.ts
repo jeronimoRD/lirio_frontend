@@ -5,12 +5,8 @@ import { useForm } from 'react-hook-form';
 import { createOutfit, getOutfit, updateOutfit } from '../../api/outfits';
 import { getMyPosts, getSavedPosts } from '../../api/posts';
 import { useSession } from '../../session/context';
-import {
-  GARMENT_TYPES,
-  type GarmentType,
-  type OutfitItem,
-  type Post,
-} from '../../types';
+import { useGarmentTypes } from '../../garment-types/context';
+import type { OutfitItem, Post } from '../../types';
 
 type OutfitFormValues = {
   name: string;
@@ -18,7 +14,7 @@ type OutfitFormValues = {
 
 export type OutfitSection = 'name' | 'pieces';
 
-export type PieceSelection = Partial<Record<GarmentType, string>>;
+export type PieceSelection = Partial<Record<string, string>>;
 
 const PIECES_MIN_MESSAGE = 'Elige al menos 2 prendas de tipos distintos.';
 
@@ -32,6 +28,7 @@ export function useOutfitForm({
 
   const router = useRouter();
   const { user } = useSession();
+  const { types } = useGarmentTypes();
 
   const { control, handleSubmit, reset } = useForm<OutfitFormValues>({
     defaultValues: { name: '' },
@@ -68,7 +65,7 @@ export function useOutfitForm({
           byId.set(post.id, post);
         }
 
-        setOptions([...byId.values()].filter((post) => !!post.garmentType));
+        setOptions([...byId.values()].filter((post) => !!post.garmentTypeId));
 
         if (outfit) {
           reset({ name: outfit.name });
@@ -77,7 +74,7 @@ export function useOutfitForm({
             outfit.items
               .filter((item: OutfitItem) => item.isAvailable)
               .reduce<PieceSelection>(
-                (acc, item) => ({ ...acc, [item.garmentType]: item.postId }),
+                (acc, item) => ({ ...acc, [item.garmentTypeId]: item.postId }),
                 {},
               ),
           );
@@ -108,17 +105,17 @@ export function useOutfitForm({
   }, [options]);
 
   const togglePiece = (post: Post) => {
-    const type = post.garmentType;
+    const typeId = post.garmentTypeId;
 
-    if (!type) return;
+    if (!typeId) return;
 
     setSelected((current) => {
       const next = { ...current };
 
-      if (next[type] === post.id) {
-        delete next[type];
+      if (next[typeId] === post.id) {
+        delete next[typeId];
       } else {
-        next[type] = post.id;
+        next[typeId] = post.id;
       }
 
       return next;
@@ -127,15 +124,15 @@ export function useOutfitForm({
     setPiecesError(null);
   };
 
-  const previewItems: OutfitItem[] = GARMENT_TYPES.flatMap((type) => {
-    const post = selected[type] ? optionsById.get(selected[type]!) : undefined;
+  const previewItems: OutfitItem[] = types.flatMap((type) => {
+    const post = selected[type.id] ? optionsById.get(selected[type.id]!) : undefined;
 
     if (!post) return [];
 
     return [
       {
         postId: post.id,
-        garmentType: type,
+        garmentTypeId: type.id,
         title: post.title,
         image: post.image,
         isAvailable: true,
@@ -144,7 +141,7 @@ export function useOutfitForm({
   });
 
   const selectedPostIds = () =>
-    GARMENT_TYPES.map((type) => selected[type]).filter(
+    types.map((type) => selected[type.id]).filter(
       (postId): postId is string => !!postId,
     );
 

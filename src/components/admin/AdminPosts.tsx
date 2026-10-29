@@ -3,10 +3,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AdminBrandHeader from './AdminBrandHeader';
 import ConfirmModal from '../ConfirmModal';
-import { cardShadow } from '../../constants/theme';
+import { adminColors, cardShadow } from '../../constants/theme';
 import { useAdminPosts } from '../../hooks/admin/useAdminPosts';
 
-export default function AdminPosts() {
+export default function AdminPosts({ showHeader = true }: { showHeader?: boolean }) {
   const insets = useSafeAreaInsets();
   const {
     posts,
@@ -23,14 +23,14 @@ export default function AdminPosts() {
 
   return (
     <View className="flex-1 bg-admin-screen">
-      <AdminBrandHeader />
+      {showHeader && <AdminBrandHeader title="Post" />}
       <FlatList
         data={loading ? [] : posts}
         keyExtractor={(post) => post.id}
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerClassName="px-5"
-        contentContainerStyle={{ paddingTop: 24, paddingBottom: 24 + insets.bottom }}
+        contentContainerStyle={{ paddingTop: 24, paddingBottom: 94 + insets.bottom }}
         ListHeaderComponent={
           <View className="mx-auto w-full max-w-md">
             <View className="mb-6">
@@ -45,7 +45,7 @@ export default function AdminPosts() {
 
             {loading && (
               <View className="items-center py-10">
-                <ActivityIndicator color="#A91243" />
+                <ActivityIndicator color={adminColors.brand} />
               </View>
             )}
 

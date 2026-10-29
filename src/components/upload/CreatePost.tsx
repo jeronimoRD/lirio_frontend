@@ -121,7 +121,7 @@ export default function CreatePost() {
     categoryIds,
     categoryError,
     toggleCategory,
-    garmentType,
+    garmentTypeId,
     garmentError,
     selectGarment,
     loading,
@@ -371,7 +371,7 @@ export default function CreatePost() {
             />
 
             <GarmentPicker
-              value={garmentType}
+              value={garmentTypeId}
               onChange={selectGarment}
               error={garmentError}
             />

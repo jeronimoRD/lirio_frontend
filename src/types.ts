@@ -28,9 +28,11 @@ export interface User {
   lastLogin?: string;
 }
 
-/** Tipos de prenda del post. Los valores coinciden con el enum del backend. */
-export const GARMENT_TYPES = ['SHIRT', 'PANTS', 'SHOES'] as const;
-export type GarmentType = (typeof GARMENT_TYPES)[number];
+/** Tipo de prenda (Camiseta, Pantalón, Abrigo...). Lo gestiona el admin. */
+export interface GarmentType {
+  id: string;
+  name: string;
+}
 
 /** Una publicación creada por un usuario. */
 export interface Post {
@@ -52,14 +54,14 @@ export interface Post {
   isSavedByMe?: boolean;
   /** Lista de usuarios que han guardado el post (opcional) */
   savedBy?: string[];
-  /** Tipo de prenda principal del post */
-  garmentType?: GarmentType;
+  /** ID del tipo de prenda del post */
+  garmentTypeId?: string;
 }
 
 /** Pieza de un outfit: un post elegido para un tipo de prenda. */
 export interface OutfitItem {
   postId: string;
-  garmentType: GarmentType;
+  garmentTypeId: string;
   /** Null si el post ya no existe. */
   title: string | null;
   /** Null si el post ya no existe. */

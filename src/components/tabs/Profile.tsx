@@ -1,6 +1,6 @@
 
 import { Redirect, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -9,16 +9,19 @@ import {
   ScrollView,
   Text,
   View,
+  type ViewInstance,
 } from 'react-native';
+import { BlurTargetView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTabBarClearance } from '../LiquidGlass/TabBarClearance';
 import { Bookmark, Shirt, Settings2, LogOut, Sparkles } from 'lucide-react-native';
 
 import ConfirmModal from '../ConfirmModal';
 import FeedCard from '../FeedCard';
+import GlassBadge from '../LiquidGlass/GlassBadge';
 import ProfileCover from '@/components/LiquidGlass/ProfileCover';
-import { garmentLabel } from '../upload/GarmentPicker';
-import { GARMENT_TYPES, type GarmentType, type Post, type Role } from '../../types';
+import { useGarmentTypes } from '../../garment-types/context';
+import type { Post, Role } from '../../types';
 import { cardShadowLg } from '../../constants/theme';
 import { initialsOf } from '../../utils/strings';
 import { useProfile } from '../../hooks/tabs/useProfile';
@@ -66,7 +69,8 @@ export default function Profile({ active = true }: { active?: boolean }) {
   } = useProfile(active);
 
   const { savedPosts, loading: savedLoading, error: savedError } = useSaved();
-  const [garmentType, setGarmentType] = useState<GarmentType | null>(null);
+  const { types, labelOf } = useGarmentTypes();
+  const [garmentTypeId, setGarmentTypeId] = useState<string | null>(null);
 
   if (!user) {
     return active ? <Redirect href="/(login)/login" /> : null;
@@ -75,12 +79,13 @@ export default function Profile({ active = true }: { active?: boolean }) {
   const isOutfits = activeTab === 'outfits';
 
   const currentPosts = isOutfits ? posts : savedPosts;
-  const availableTypes = GARMENT_TYPES.filter((type) =>
-    currentPosts.some((post) => post.garmentType === type)
+  const availableTypes = types.filter((type) =>
+    currentPosts.some((post) => post.garmentTypeId === type.id)
   );
-  const activeType = garmentType && availableTypes.includes(garmentType) ? garmentType : null;
+  const activeTypeId =
+    garmentTypeId && availableTypes.some((type) => type.id === garmentTypeId) ? garmentTypeId : null;
   const filterPosts = (items: Post[]) =>
-    activeType ? items.filter((post) => post.garmentType === activeType) : items;
+    activeTypeId ? items.filter((post) => post.garmentTypeId === activeTypeId) : items;
 
   const showTypeFilter = !error && !showSpinner && !savedLoading && !savedError && availableTypes.length > 0;
 
@@ -163,6 +168,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
               <SavedCard
                 post={item}
                 index={index}
+                garmentTypeLabel={labelOf(item.garmentTypeId)}
                 onPress={() => goToPost(item.id)}
               />
             </View>
@@ -311,15 +317,15 @@ export default function Profile({ active = true }: { active?: boolean }) {
                 contentContainerStyle={{ gap: 8, paddingHorizontal: 20, paddingTop: 16 }}
                 accessibilityRole="radiogroup">
                 {availableTypes.map((type) => {
-                  const selected = activeType === type;
+                  const selected = activeTypeId === type.id;
 
                   return (
                     <Pressable
-                      key={type}
-                      onPress={() => setGarmentType(selected ? null : type)}
+                      key={type.id}
+                      onPress={() => setGarmentTypeId(selected ? null : type.id)}
                       accessibilityRole="radio"
                       accessibilityState={{ selected }}
-                      accessibilityLabel={garmentLabel(type)}
+                      accessibilityLabel={type.name}
                       className={`h-10 justify-center rounded-full border px-4 ${
                         selected ? 'border-brand bg-brand/10' : 'border-line bg-white'
                       }`}>
@@ -327,7 +333,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
                         className={`text-[12px] font-semibold ${
                           selected ? 'text-brand' : 'text-ink-secondary'
                         }`}>
-                        {garmentLabel(type)}
+                        {type.name}
                       </Text>
                     </Pressable>
                   );
@@ -461,12 +467,16 @@ function GalleryTab({
 function SavedCard({
   post,
   index,
+  garmentTypeLabel,
   onPress,
 }: {
   post: Post;
   index: number;
+  garmentTypeLabel: string;
   onPress: () => void;
 }) {
+  const imageRef = useRef<ViewInstance | null>(null);
+
   return (
     <Pressable
       onPress={onPress}
@@ -475,11 +485,15 @@ function SavedCard({
       className="overflow-hidden rounded-row border border-line bg-white"
       style={cardShadowLg}
     >
-      <Image
-        source={{ uri: post.image }}
-        className="aspect-[3/4] w-full"
-        resizeMode="cover"
-      />
+      <BlurTargetView ref={imageRef} style={{ aspectRatio: 3 / 4, width: '100%' }}>
+        <Image source={{ uri: post.image }} className="h-full w-full" resizeMode="cover" />
+      </BlurTargetView>
+
+      {!!garmentTypeLabel && (
+        <View className="absolute left-2 top-2">
+          <GlassBadge label={garmentTypeLabel} variant="garment" blurTarget={imageRef} />
+        </View>
+      )}
 
       <View className="absolute right-2 top-2 h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-black/25">
         <Bookmark size={14} color="#FFFFFF" fill="#FFFFFF" />

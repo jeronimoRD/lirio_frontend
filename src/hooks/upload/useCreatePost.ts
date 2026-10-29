@@ -7,7 +7,7 @@ import { useRouter } from 'expo-router';
 
 import { createPost } from '../../api/posts';
 import { getCategories } from '../../api/categories';
-import type { Category, GarmentType } from '../../types';
+import type { Category } from '../../types';
 
 export type CreatePostForm = {
   title: string;
@@ -34,7 +34,7 @@ export function useCreatePost({
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
-  const [garmentType, setGarmentType] = useState<GarmentType | null>(null);
+  const [garmentTypeId, setGarmentTypeId] = useState<string | null>(null);
   const [confirm, setConfirm] = useState(false);
 
   const [categoryError, setCategoryError] = useState<string | null>(null);
@@ -113,14 +113,14 @@ export function useCreatePost({
     }
   };
 
-  const selectGarment = (type: GarmentType) => {
-    setGarmentType(type);
+  const selectGarment = (typeId: string) => {
+    setGarmentTypeId(typeId);
     setGarmentError(null);
   };
 
   const validateAll = (formErrors: FieldErrors<CreatePostForm>): CreateSection | null => {
     const imageMissing = !image;
-    const garmentMissing = !garmentType;
+    const garmentMissing = !garmentTypeId;
     const categoriesMissing = categoryIds.length === 0;
 
     setImageError(imageMissing ? 'Selecciona una imagen.' : null);
@@ -157,7 +157,7 @@ export function useCreatePost({
   );
 
   const onConfirmCreate = async () => {
-    if (loading || categoryIds.length === 0 || !garmentType || !image) {
+    if (loading || categoryIds.length === 0 || !garmentTypeId || !image) {
       return;
     }
 
@@ -171,7 +171,7 @@ export function useCreatePost({
         description,
         image,
         categoryIds,
-        garmentType,
+        garmentTypeId,
       );
 
       setConfirm(false);
@@ -201,7 +201,7 @@ export function useCreatePost({
     categoryError,
     toggleCategory,
 
-    garmentType,
+    garmentTypeId,
     garmentError,
     selectGarment,
 

@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -34,7 +35,7 @@ export default function Favorites() {
     totalOutfits,
     loading,
     error,
-    garmentType,
+    garmentTypeId,
     selectGarmentType,
     piecesOfType,
     selectedPostId,
@@ -56,8 +57,11 @@ export default function Favorites() {
     router.replace('/(tabs)/explore');
   };
 
+  const [focused, setFocused] = useState(false);
+
   const showSpinner = loading && totalOutfits === 0;
-  const filtering = !!garmentType || query.trim().length > 0;
+  const filtering = !!garmentTypeId || query.trim().length > 0;
+  const showGarmentFilter = focused || query.length > 0 || !!garmentTypeId;
 
   return (
     <View className="flex-1 bg-screen">
@@ -67,6 +71,7 @@ export default function Favorites() {
         keyExtractor={(outfit) => outfit.id}
         columnWrapperStyle={{ gap: 16 }}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
           paddingHorizontal: 18,
           paddingBottom: clearance,
@@ -139,20 +144,16 @@ export default function Favorites() {
             </View>
 
             <View className="mt-5 gap-4">
-              <GarmentFilter
-                value={garmentType}
-                onChange={selectGarmentType}
-                pieces={piecesOfType}
-                selectedPostId={selectedPostId}
-                onSelectPiece={togglePiece}
-              />
-
-              <View className="h-[50px] flex-row items-center gap-2 rounded-full border border-line bg-white px-4">
+              <View
+                className="h-[50px] flex-row items-center gap-2 rounded-full border border-line bg-white px-4"
+                style={focused ? { borderColor: COLORS.burgundy } : undefined}>
                 <Search size={18} color="#A09B95" />
 
                 <TextInput
                   value={query}
                   onChangeText={setQuery}
+                  onFocus={() => setFocused(true)}
+                  onBlur={() => setFocused(false)}
                   placeholder="Buscar outfits por nombre..."
                   placeholderTextColor="#A09B95"
                   className="flex-1 text-sm text-ink"
@@ -170,6 +171,16 @@ export default function Favorites() {
                   </Pressable>
                 )}
               </View>
+
+              {showGarmentFilter && (
+                <GarmentFilter
+                  value={garmentTypeId}
+                  onChange={selectGarmentType}
+                  pieces={piecesOfType}
+                  selectedPostId={selectedPostId}
+                  onSelectPiece={togglePiece}
+                />
+              )}
             </View>
 
             {!!error && (
