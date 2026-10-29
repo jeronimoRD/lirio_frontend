@@ -7,10 +7,7 @@ import {
   ScrollView,
   Text,
   View,
-  type ViewInstance,
 } from 'react-native';
-import { useRef } from 'react';
-import { BlurTargetView } from 'expo-blur';
 import { Heart, Sparkles } from 'lucide-react-native';
 
 import ScreenHeader from '../ScreenHeader';
@@ -22,6 +19,7 @@ import GlassBadge from '@/components/LiquidGlass/GlassBadge';
 import PressableCard from '@/components/PressableCard';
 import { useTabBarClearance } from '@/components/LiquidGlass/TabBarClearance';
 import { useGarmentTypes } from '../../garment-types/context';
+import { cloudinaryImageUrl } from '../../utils/cloudinaryImage';
 import { formatLikeCount } from '../../utils/format';
 
 const COLORS = {
@@ -125,6 +123,10 @@ export default function Home() {
         className="flex-1"
         data={showFeed ? displayedPosts : []}
         numColumns={2}
+        initialNumToRender={6}
+        maxToRenderPerBatch={4}
+        updateCellsBatchingPeriod={50}
+        windowSize={7}
         keyExtractor={(post) => post.id}
         columnWrapperStyle={{ gap: 13, paddingHorizontal: 18 }}
         showsVerticalScrollIndicator={false}
@@ -267,8 +269,8 @@ function FeedCard({
 }) {
   const { openPost, liked, likesCount, toggleLike } = usePostCard(post);
   const { labelOf } = useGarmentTypes();
-  const imageRef = useRef<ViewInstance | null>(null);
   const garmentType = labelOf(post.garmentTypeId);
+  const image = cloudinaryImageUrl(post.image, 600);
 
   return (
     <PressableCard
@@ -287,20 +289,17 @@ function FeedCard({
           elevation: 3,
         }}
       >
-        <BlurTargetView ref={imageRef} style={{ height: 220, width: '100%' }}>
-          <Image
-            source={{ uri: post.image }}
-            className="h-full w-full"
-            resizeMode="cover"
-          />
-        </BlurTargetView>
+        <Image
+          source={{ uri: image }}
+          className="h-[220px] w-full"
+          resizeMode="cover"
+        />
 
         {!!garmentType && (
           <View className="absolute left-2.5 top-2.5">
             <GlassBadge
               label={garmentType}
               variant="garment"
-              blurTarget={imageRef}
             />
           </View>
         )}
@@ -394,8 +393,8 @@ function FeedCard({
 function EditorialSpread({ post }: { post: Post }) {
   const { openPost } = usePostCard(post);
   const { labelOf } = useGarmentTypes();
-  const imageRef = useRef<ViewInstance | null>(null);
   const garmentType = labelOf(post.garmentTypeId);
+  const image = cloudinaryImageUrl(post.image, 1200);
 
   return (
     <View>
@@ -422,13 +421,11 @@ function EditorialSpread({ post }: { post: Post }) {
           elevation: 4,
         }}
       >
-        <BlurTargetView ref={imageRef} style={{ height: 280, width: '100%' }}>
-          <Image
-            source={{ uri: post.image }}
-            className="h-full w-full"
-            resizeMode="cover"
-          />
-        </BlurTargetView>
+        <Image
+          source={{ uri: image }}
+          className="h-[280px] w-full"
+          resizeMode="cover"
+        />
 
         <View className="absolute inset-0 bg-black/20" />
 
@@ -437,7 +434,6 @@ function EditorialSpread({ post }: { post: Post }) {
             <GlassBadge
               label={garmentType}
               variant="garment"
-              blurTarget={imageRef}
             />
           </View>
         )}

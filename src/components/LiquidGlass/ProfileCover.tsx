@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Settings } from 'lucide-react-native';
 
 import GlassIconButton from '@/components/LiquidGlass/GlassIconButton';
+import { cloudinaryImageUrl } from '../../utils/cloudinaryImage';
 
 // Se utiliza para crear una portada de perfil con un efecto de vidrio líquido en la interfaz de usuario,
 //  compatible con iOS y Android. Que se ve en la parte superior de la pantalla y contiene una imagen de fondo y un botón de configuración.
@@ -20,7 +21,7 @@ export default function ProfileCover({ imageUri, onSettings }: Props) {
     <View style={{ height: 170 + insets.top, backgroundColor: '#A81245' }}>
         {!!imageUri && (
         <Image
-            source={{ uri: imageUri }}
+            source={{ uri: cloudinaryImageUrl(imageUri, 900) }}
             blurRadius={18}
             style={StyleSheet.absoluteFill}
             resizeMode="cover"

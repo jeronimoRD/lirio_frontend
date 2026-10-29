@@ -1,6 +1,5 @@
 import { Sparkles } from 'lucide-react-native';
-import type { RefObject } from 'react';
-import { Text, View, type ViewInstance } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { glass } from '../../constants/theme';
 import GlassSurface from './GlassSurface';
@@ -8,16 +7,14 @@ import GlassSurface from './GlassSurface';
 type GlassBadgeProps = {
   label: string;
   variant: 'garment' | 'outfit';
-  blurTarget?: RefObject<ViewInstance | null>;
 };
 
-export default function GlassBadge({ label, variant, blurTarget }: GlassBadgeProps) {
+export default function GlassBadge({ label, variant }: GlassBadgeProps) {
   const isOutfit = variant === 'outfit';
 
   return (
     <View pointerEvents="none">
       <GlassSurface
-        blurTarget={blurTarget}
         intensity={40}
         tintColor={isOutfit ? glass.outfitFill : glass.garmentFill}
         style={{

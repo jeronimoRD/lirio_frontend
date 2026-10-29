@@ -3,6 +3,7 @@ import { Check } from 'lucide-react-native';
 
 import { useGarmentTypes } from '../../garment-types/context';
 import type { Post } from '../../types';
+import { cloudinaryImageUrl } from '../../utils/cloudinaryImage';
 
 export default function GarmentFilter({
   value,
@@ -71,7 +72,11 @@ export default function GarmentFilter({
                     className={`w-[64px] overflow-hidden rounded-[12px] border-2 bg-white ${
                       selected ? 'border-brand' : 'border-transparent'
                     }`}>
-                    <Image source={{ uri: item.image }} resizeMode="cover" className="h-[80px] w-full" />
+                    <Image
+                      source={{ uri: cloudinaryImageUrl(item.image, 240) }}
+                      resizeMode="cover"
+                      className="h-[80px] w-full"
+                    />
 
                     <View className="items-center justify-center px-1 py-1">
                       {selected ? (

@@ -1,7 +1,5 @@
-import { useRef } from 'react';
 import { router } from 'expo-router';
-import { Image, Pressable, Text, View, type ViewInstance } from 'react-native';
-import { BlurTargetView } from 'expo-blur';
+import { Image, Pressable, Text, View } from 'react-native';
 import { MoreVertical } from 'lucide-react-native';
 import type { Post } from '@/types';
 
@@ -9,6 +7,7 @@ import { useFeedCard } from '@/hooks/general/useFeedCard';
 import PressableCard from '@/components/PressableCard';
 import GlassBadge from '@/components/LiquidGlass/GlassBadge';
 import { useGarmentTypes } from '../garment-types/context';
+import { cloudinaryImageUrl } from '../utils/cloudinaryImage';
 
 type FeedCardProps = {
   post: Post;
@@ -21,20 +20,18 @@ type FeedCardProps = {
 export default function FeedCard({ post, swatchColor, showMenu, onEdit, onDelete }: FeedCardProps) {
   const { openMenu, toggleMenu, closeMenu } = useFeedCard();
   const { labelOf } = useGarmentTypes();
-  const imageRef = useRef<ViewInstance | null>(null);
   const garmentType = labelOf(post.garmentTypeId);
+  const image = cloudinaryImageUrl(post.image, 600);
 
   return (
     <PressableCard
       onPress={() => router.push(`/${post.id}`)}
       className="overflow-hidden rounded-[14px]">
-      <BlurTargetView ref={imageRef} style={{ height: 200, width: '100%' }}>
-        <Image source={{ uri: post.image }} className="h-full w-full" resizeMode="cover" />
-      </BlurTargetView>
+      <Image source={{ uri: image }} className="h-[200px] w-full" resizeMode="cover" />
 
       {!!garmentType && (
         <View className="absolute left-2 top-2">
-          <GlassBadge label={garmentType} variant="garment" blurTarget={imageRef} />
+          <GlassBadge label={garmentType} variant="garment" />
         </View>
       )}
 

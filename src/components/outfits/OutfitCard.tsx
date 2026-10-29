@@ -1,7 +1,6 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { router } from 'expo-router';
-import { Pressable, Text, View, type ViewInstance } from 'react-native';
-import { BlurTargetView } from 'expo-blur';
+import { Pressable, Text, View } from 'react-native';
 import { AlertTriangle, MoreVertical } from 'lucide-react-native';
 
 import type { Outfit } from '../../types';
@@ -18,7 +17,6 @@ type OutfitCardProps = {
 
 export default function OutfitCard({ outfit, onEdit, onDelete }: OutfitCardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const imageRef = useRef<ViewInstance | null>(null);
 
   const openOutfit = () =>
     router.push({
@@ -35,9 +33,7 @@ export default function OutfitCard({ outfit, onEdit, onDelete }: OutfitCardProps
       accessibilityLabel={`Abrir outfit ${outfit.name}`}
       className="aspect-[3/5] overflow-hidden rounded-card border border-brand/25 bg-white"
       style={cardShadowLg}>
-      <BlurTargetView ref={imageRef} style={{ flex: 1 }}>
-        <OutfitCollage items={outfit.items} />
-      </BlurTargetView>
+      <OutfitCollage items={outfit.items} imageWidth={400} />
 
       {!outfit.isAvailable && (
         <View
@@ -53,7 +49,7 @@ export default function OutfitCard({ outfit, onEdit, onDelete }: OutfitCardProps
       )}
 
       <View className="absolute left-2.5 top-2.5">
-        <GlassBadge label="Outfit" variant="outfit" blurTarget={imageRef} />
+        <GlassBadge label="Outfit" variant="outfit" />
       </View>
 
       {hasMenu && (
