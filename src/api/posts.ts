@@ -15,6 +15,21 @@ interface PostResponse {
   saved_by?: string[];
   garment_type_id?: string;
 }
+interface CommentResponse {
+  _id: string;
+  user_id: string;
+  content: string;
+  post_id: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PostComment {
+  id: string;
+  userId: string;
+  content: string;
+  createdAt?: string;
+}
 
 function toPost(data: PostResponse): Post {
   const likedBy = data.liked_by ?? [];
@@ -148,4 +163,67 @@ export async function deletePost(id: string): Promise<void> {
   } catch (error) {
     throw error;
   }
+}
+
+// Obtener comentarios de una publicación
+export async function getComments(
+  postId: string,
+): Promise<PostComment[]> {
+  const data = await request<CommentResponse[]>(
+    `/posts/${postId}/comments`,
+  );
+
+  return data.map((comment) => ({
+    id: comment._id,
+    userId: comment.user_id,
+    content: comment.content,
+    createdAt: comment.createdAt,
+  }));
+}
+
+// Agregar un comentario
+export async function addComment(
+  postId: string,
+  content: string,
+): Promise<PostComment> {
+  const data = await request<{
+    message: string;
+    comment: CommentResponse;
+  }>(
+    `/posts/${postId}/comments`,
+    { content },
+    'POST',
+  );
+
+  return {
+    id: data.comment._id,
+    userId: data.comment.user_id,
+    content: data.comment.content,
+    createdAt: data.comment.createdAt,
+  };
+}
+
+// Actualizar un comentario
+export async function updateComment(
+  postId: string,
+  commentId: string,
+  content: string,
+): Promise<{ message: string }> {
+  return request<{ message: string }>(
+    `/posts/${postId}/comments/${commentId}`,
+    { content },
+    'PATCH',
+  );
+}
+
+// Eliminar un comentario
+export async function deleteComment(
+  postId: string,
+  commentId: string,
+): Promise<{ message: string }> {
+  return request<{ message: string }>(
+    `/posts/${postId}/comments/${commentId}`,
+    undefined,
+    'DELETE',
+  );
 }
