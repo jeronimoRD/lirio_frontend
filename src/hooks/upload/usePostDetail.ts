@@ -23,7 +23,6 @@ export function usePostDetail() {
   const [likesCount, setLikesCount] = useState(cached?.likesCount ?? 0);
   const [reportVisible, setReportVisible] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
-
   useEffect(() => {
     getCategories()
       .then(setCategories)
