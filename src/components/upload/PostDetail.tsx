@@ -6,6 +6,7 @@ import {
   ScrollView,
   Text,
   View,
+  TextInput,
 } from 'react-native';
 import Animated, {
   FadeInDown,
@@ -19,7 +20,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Bookmark, Flag, Heart, Sparkles } from 'lucide-react-native';
-
 import ReportModal from '../ReportModal';
 import GlassIconButton from '@/components/LiquidGlass/GlassIconButton';
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
@@ -30,6 +30,8 @@ import { usePostDetail } from '../../hooks/upload/usePostDetail';
 import { toggleSave as toggleSaveApi } from '../../api/posts';
 import { useGarmentTypes } from '../../garment-types/context';
 import { useSession } from '../../session/context';
+import { usePostComments } from '../../hooks/upload/usePostComments';
+
 
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#3D6B52'];
 const DOUBLE_TAP_MS = 300;
@@ -92,7 +94,17 @@ export default function PostDetail() {
   } = usePostDetail();
   const { user: me } = useSession();
   const insets = useSafeAreaInsets();
-
+  
+  const {
+  comments,
+  loading: commentsLoading,
+  sending,
+  error: commentsError,
+  createComment,
+  editComment,
+  removeComment,
+} = usePostComments(post?.id ?? '');
+const [commentText, setCommentText] = useState('');
 
   const serverSaved = !!(
     post?.isSavedByMe ??
@@ -460,6 +472,77 @@ export default function PostDetail() {
                 {formatLikeCount(likesCount)}
               </Text>
             </Pressable>
+          </View>    
+
+          {/* Comentarios */}
+          <View className="mt-9 px-6">
+            <View className="flex-row items-center justify-between">
+              <View className="gap-1">
+                <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-ink-secondary">
+                  Comunidad
+                </Text>
+                <Text className="font-['Lora-Italic'] text-[21px] text-ink">
+                  Comentarios ({comments.length})
+                </Text>
+              </View>
+            </View>
+
+            {/* Campo para escribir */}
+            <View className="mt-5 flex-row items-center gap-2 rounded-2xl border border-line bg-white px-3 py-2">
+              <TextInput
+                value={commentText}
+                onChangeText={setCommentText}
+                placeholder="Escribe un comentario..."
+                placeholderTextColor="#99938E"
+                multiline
+                maxLength={500}
+                editable={!sending}
+                className="min-h-10 flex-1 py-2 text-[13px] text-ink"
+              />
+
+              <Pressable
+                disabled={!commentText.trim() || sending}
+                onPress={async () => {
+                  const success = await createComment(commentText);
+                  if (success) setCommentText('');
+                }}
+                className={`rounded-full px-4 py-2 ${
+                  commentText.trim() && !sending
+                    ? 'bg-brand'
+                    : 'bg-beige'
+                }`}
+              >
+                <Text className="text-[12px] font-semibold text-white">
+                  {sending ? '...' : 'Publicar'}
+                </Text>
+              </Pressable>
+            </View>
+
+            {/* Lista de comentarios */}
+            <View className="mt-5 gap-4">
+              {commentsLoading ? (
+                <ActivityIndicator color="#A81245" />
+              ) : commentsError ? (
+                <Text className="text-[12px] text-ink-secondary">
+                  {commentsError}
+                </Text>
+              ) : comments.length === 0 ? (
+                <Text className="py-3 text-center text-[13px] text-ink-secondary">
+                  Todavía no hay comentarios. ¡Sé la primera en comentar!
+                </Text>
+              ) : (
+                comments.map((comment) => (
+                  <View
+                    key={comment.id}
+                    className="rounded-xl bg-white/70 p-4"
+                  >
+                    <Text className="text-[13px] leading-6 text-ink">
+                      {comment.content}
+                    </Text>
+                  </View>
+                ))
+              )}
+            </View>
           </View>
 
           {/* Paleta editorial */}
