@@ -7,6 +7,8 @@ interface UserResponse {
   user_name: string;
   role: Role;
   bio?: string;
+  avatar_url?: string;
+  banner_url?: string;
   preferred_categories?: string[];
   createdAt?: string;
   last_login?: string;
@@ -23,6 +25,8 @@ function toUser(data: UserResponse): User {
     email: data.email,
     role: data.role,
     bio: data.bio ?? '',
+    avatarUrl: data.avatar_url ?? '',
+    bannerUrl: data.banner_url ?? '',
     preferredCategories: data.preferred_categories ?? [],
     createdAt: data.createdAt,
     lastLogin: data.last_login,

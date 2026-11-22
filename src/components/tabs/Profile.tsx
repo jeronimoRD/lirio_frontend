@@ -17,11 +17,11 @@ import { Bookmark, Shirt, Settings2, LogOut, Sparkles } from 'lucide-react-nativ
 import ConfirmModal from '../ConfirmModal';
 import FeedCard from '../FeedCard';
 import GlassBadge from '../LiquidGlass/GlassBadge';
+import Avatar from '../Avatar';
 import ProfileCover from '@/components/LiquidGlass/ProfileCover';
 import { useGarmentTypes } from '../../garment-types/context';
 import type { Post, Role } from '../../types';
 import { cardShadowLg } from '../../constants/theme';
-import { initialsOf } from '../../utils/strings';
 import { cloudinaryImageUrl } from '../../utils/cloudinaryImage';
 import { useProfile } from '../../hooks/tabs/useProfile';
 import { useSaved } from '../../hooks/tabs/useSaved';
@@ -182,7 +182,8 @@ export default function Profile({ active = true }: { active?: boolean }) {
             {/* Portada editorial */}
             <View>
               <ProfileCover
-                imageUri={posts[0]?.image}
+                bannerUri={user.bannerUrl}
+                fallbackUri={posts[0]?.image}
                 onSettings={goToSettings}
               />
 
@@ -201,9 +202,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
                 className="-mt-12 h-24 w-24 items-center justify-center rounded-full border-[4px] border-screen bg-beige"
                 style={cardShadowLg}
               >
-                <Text className="text-[26px] font-bold text-white">
-                  {initialsOf(user.name)}
-                </Text>
+                <Avatar name={user.name} uri={user.avatarUrl} size={88} />
               </View>
 
               <View className="mt-3 w-full items-center">

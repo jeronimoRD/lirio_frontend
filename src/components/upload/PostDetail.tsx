@@ -23,8 +23,8 @@ import { ArrowLeft, Bookmark, Flag, Heart, Sparkles } from 'lucide-react-native'
 import ReportModal from '../ReportModal';
 import GlassIconButton from '@/components/LiquidGlass/GlassIconButton';
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
-import { glass } from '@/constants/theme';
-import { initialsOf } from '../../utils/strings';
+import Avatar from '../Avatar';
+import { colors, glass } from '@/constants/theme';
 import { formatLikeCount } from '../../utils/format';
 import { usePostDetail } from '../../hooks/upload/usePostDetail';
 import { toggleSave as toggleSaveApi } from '../../api/posts';
@@ -395,11 +395,20 @@ const [commentText, setCommentText] = useState('');
           {/* Autor y acción para reportar */}
           <View className="mt-7 flex-row items-center gap-3 px-6">
             <View className="h-[50px] w-[50px] items-center justify-center rounded-full border border-beige bg-white p-1">
-              <View className="h-full w-full items-center justify-center rounded-full bg-brand">
-                <Text className="text-xs font-bold tracking-[0.08em] text-white">
-                  {author ? initialsOf(author.name) : '??'}
-                </Text>
-              </View>
+              {author ? (
+                <Avatar
+                  name={author.name}
+                  uri={author.avatarUrl}
+                  size={40}
+                  backgroundColor={colors.primary}
+                />
+              ) : (
+                <View className="h-full w-full items-center justify-center rounded-full bg-brand">
+                  <Text className="text-xs font-bold tracking-[0.08em] text-white">
+                    ??
+                  </Text>
+                </View>
+              )}
             </View>
 
             <View className="min-w-0 flex-1">

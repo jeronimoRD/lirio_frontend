@@ -4,13 +4,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Search, X } from 'lucide-react-native';
 
 import AdminBrandHeader from './AdminBrandHeader';
+import Avatar from '../Avatar';
 import Button from '../Button';
 import ConfirmModal from '../ConfirmModal';
 import Field from '../Field';
 import type { Role } from '../../types';
 import { ROLES } from '../../types';
 import { adminColors, cardShadow } from '../../constants/theme';
-import { initialsOf } from '../../utils/strings';
 import { useAdminUsers } from '../../hooks/admin/useAdminUsers';
 
 const ROLE_STYLE: Record<Role, { label: string; className: string }> = {
@@ -217,9 +217,12 @@ export default function AdminUsers({ showHeader = true }: { showHeader?: boolean
             <View className="mx-auto w-full max-w-md">
               <View className="mt-4 rounded-2xl bg-white p-5" style={cardShadow}>
                 <View className="flex-row items-center gap-3">
-                  <View className="h-11 w-11 items-center justify-center rounded-full bg-admin-brown">
-                    <Text className="text-sm font-bold text-white">{initialsOf(user.name)}</Text>
-                  </View>
+                  <Avatar
+                    name={user.name}
+                    uri={user.avatarUrl}
+                    size={44}
+                    backgroundColor={adminColors.brown}
+                  />
 
                   <View className="flex-1">
                     <View className="flex-row items-center gap-2">

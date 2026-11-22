@@ -1,5 +1,6 @@
 import type { Role, User } from '../types';
 import { request } from './client';
+import { File } from 'expo-file-system';
 
 interface UserResponse {
   _id: string;
@@ -7,6 +8,8 @@ interface UserResponse {
   user_name: string;
   role: Role;
   bio?: string;
+  avatar_url?: string;
+  banner_url?: string;
   preferred_categories?: string[];
 }
 
@@ -21,6 +24,8 @@ function toUser(data: UserResponse): User {
     email: data.email,
     role: data.role,
     bio: data.bio ?? '',
+    avatarUrl: data.avatar_url ?? '',
+    bannerUrl: data.banner_url ?? '',
     preferredCategories: data.preferred_categories ?? [],
   };
 }
@@ -73,6 +78,45 @@ export async function updateProfile(
       'PATCH',
     ),
   );
+}
+
+function imageForm(uri: string): FormData {
+  const formData = new FormData();
+  formData.append('image', new File(uri) as any);
+
+  return formData;
+}
+
+/** Sube la foto de perfil y devuelve el usuario actualizado. */
+export async function uploadAvatar(uri: string): Promise<User> {
+  return toUser(
+    await request<UserResponse>(
+      '/users/me/avatar',
+      imageForm(uri),
+      'PATCH',
+    ),
+  );
+}
+
+/** Quita la foto de perfil y vuelve a las iniciales. */
+export async function removeAvatar(): Promise<void> {
+  await request<MessageResponse>('/users/me/avatar', undefined, 'DELETE');
+}
+
+/** Sube la foto de portada y devuelve el usuario actualizado. */
+export async function uploadBanner(uri: string): Promise<User> {
+  return toUser(
+    await request<UserResponse>(
+      '/users/me/banner',
+      imageForm(uri),
+      'PATCH',
+    ),
+  );
+}
+
+/** Quita la portada propia y vuelve a la imagen de la última publicación. */
+export async function removeBanner(): Promise<void> {
+  await request<MessageResponse>('/users/me/banner', undefined, 'DELETE');
 }
 
 export async function updatePassword(newPassword: string): Promise<void> {

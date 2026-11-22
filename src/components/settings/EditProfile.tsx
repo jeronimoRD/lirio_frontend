@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Redirect } from 'expo-router';
 import {
   ActivityIndicator,
+  Image,
   Pressable,
   ScrollView,
   Text,
@@ -10,8 +11,10 @@ import {
   View,
 } from 'react-native';
 import {
+  Camera,
   Check,
   ChevronRight,
+  ImagePlus,
   Sparkles,
   UserRound,
 } from 'lucide-react-native';
@@ -19,12 +22,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import ScreenHeader from '../ScreenHeader';
 import Field from '../Field';
+import Avatar from '../Avatar';
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
 import {
   SectionCard,
   SectionHeaderRow,
   SectionLabel,
 } from '../SettingsSections';
+import { cloudinaryImageUrl } from '../../utils/cloudinaryImage';
+import { cardShadow } from '../../constants/theme';
 import { useEditProfile } from '../../hooks/settings/useEditProfile';
 
 const COLORS = {
@@ -60,8 +66,14 @@ export default function EditProfile() {
     bio,
     setBio,
     saving,
+    uploadingAvatar,
+    uploadingBanner,
     message,
     submit,
+    changeAvatar,
+    clearAvatar,
+    changeBanner,
+    clearBanner,
     goBack,
   } = useEditProfile();
 
@@ -125,15 +137,92 @@ export default function EditProfile() {
           <SectionLabel text="TU IDENTIDAD" />
 
           <View className="mt-2 overflow-hidden rounded-[22px] border border-line bg-white">
-            <View className="h-[70px] bg-brand" />
+            <Pressable
+              onPress={() => changeBanner()}
+              disabled={uploadingBanner}
+              accessibilityRole="button"
+              accessibilityLabel={
+                user.bannerUrl ? 'Cambiar foto de portada' : 'Añadir foto de portada'
+              }
+              className="h-[96px] bg-brand active:opacity-90">
+              {!!user.bannerUrl && (
+                <Image
+                  source={{ uri: cloudinaryImageUrl(user.bannerUrl, 900) }}
+                  className="h-full w-full"
+                  resizeMode="cover"
+                />
+              )}
+
+              <View className="absolute inset-0 bg-black/20" />
+
+              <View className="absolute bottom-2 right-2 flex-row items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5">
+                {uploadingBanner ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <ImagePlus size={13} color="#FFFFFF" />
+                )}
+
+                <Text className="text-[10px] font-semibold text-white">
+                  {user.bannerUrl ? 'Cambiar portada' : 'Añadir portada'}
+                </Text>
+              </View>
+
+              {!!user.bannerUrl && (
+                <Pressable
+                  onPress={() => clearBanner()}
+                  disabled={uploadingBanner}
+                  hitSlop={6}
+                  accessibilityRole="button"
+                  accessibilityLabel="Quitar foto de portada"
+                  className="absolute bottom-2 left-2 rounded-full bg-black/40 px-3 py-1.5">
+                  <Text className="text-[10px] font-semibold text-white">
+                    Quitar
+                  </Text>
+                </Pressable>
+              )}
+            </Pressable>
 
             <View className="px-4 pb-5">
-              <View className="-mt-8 mb-3 h-[66px] w-[66px] items-center justify-center rounded-full border-[3px] border-white bg-screen">
-                <UserRound
-                  size={30}
-                  color={COLORS.burgundy}
-                  strokeWidth={1.25}
-                />
+              <View className="-mt-9 mb-3 flex-row items-end gap-3">
+                <Pressable
+                  onPress={() => changeAvatar()}
+                  disabled={uploadingAvatar}
+                  accessibilityRole="button"
+                  accessibilityLabel={
+                    user.avatarUrl
+                      ? 'Cambiar foto de perfil'
+                      : 'Añadir foto de perfil'
+                  }
+                  className="h-[74px] w-[74px] items-center justify-center rounded-full border-[3px] border-white bg-screen active:opacity-90"
+                  style={cardShadow}>
+                  {uploadingAvatar ? (
+                    <ActivityIndicator color={COLORS.burgundy} />
+                  ) : (
+                    <Avatar
+                      name={user.name}
+                      uri={user.avatarUrl}
+                      size={68}
+                      backgroundColor={COLORS.burgundy}
+                    />
+                  )}
+
+                  <View className="absolute bottom-0 right-0 h-6 w-6 items-center justify-center rounded-full bg-brand">
+                    <Camera size={12} color="#FFFFFF" />
+                  </View>
+                </Pressable>
+
+                {!!user.avatarUrl && (
+                  <Pressable
+                    onPress={() => clearAvatar()}
+                    disabled={uploadingAvatar}
+                    accessibilityRole="button"
+                    accessibilityLabel="Quitar foto de perfil"
+                    className="mb-1 rounded-full border border-line bg-screen px-3 py-1.5 active:opacity-70">
+                    <Text className="text-[10px] font-semibold text-ink-secondary">
+                      Quitar foto
+                    </Text>
+                  </Pressable>
+                )}
               </View>
 
               <Text className="font-['Lora-Italic'] text-[23px] text-ink">
@@ -159,6 +248,10 @@ export default function EditProfile() {
               </View>
             </View>
           </View>
+
+          <Text className="mt-2 text-center text-[10px] text-ink-muted">
+            Portada y foto de perfil: JPG, PNG o WebP · hasta 5 MB
+          </Text>
         </View>
 
         {/* Formulario */}
