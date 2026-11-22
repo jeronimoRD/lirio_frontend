@@ -27,10 +27,27 @@ export function useEditProfile() {
 
     const [bio, setBio] = useState(user?.bio ?? '');
     const [saving, setSaving] = useState(false);
-    const [uploadingAvatar, setUploadingAvatar] = useState(false);
-    const [uploadingBanner, setUploadingBanner] = useState(false);
     const [message, setMessage] = useState<ResultMessage | null>(null);
 
+    // Nada se envía al servidor hasta pulsar "Guardar cambios".
+    const [pendingAvatarUri, setPendingAvatarUri] = useState<string | null>(null);
+    const [pendingBannerUri, setPendingBannerUri] = useState<string | null>(null);
+    const [pendingBannerColor, setPendingBannerColor] = useState<string | null>(null);
+    const [discardOpen, setDiscardOpen] = useState(false);
+
+    const hasPendingChanges =
+        pendingAvatarUri !== null ||
+        pendingBannerUri !== null ||
+        pendingBannerColor !== null ||
+        bio !== (user?.bio ?? '') ||
+        profileForm.formState.isDirty;
+
+    /**
+     * Aplica todo lo pendiente y lleva al perfil. Va en orden y se detiene en
+     * el primer error: lo ya subido queda aplicado y el aviso es el del
+     * servidor. La validación del nombre corre antes de subir nada, porque
+     * pasa por handleSubmit.
+     */
     const saveProfile = async (data: ProfileForm) => {
     if (!user) return;
 
@@ -38,9 +55,19 @@ export function useEditProfile() {
     setSaving(true);
 
     try {
+        if (pendingAvatarUri) {
+            await uploadAvatar(pendingAvatarUri);
+        }
+
+        if (pendingBannerUri) {
+            await uploadBanner(pendingBannerUri);
+        } else if (pendingBannerColor) {
+            await setBannerColor(pendingBannerColor);
+        }
+
         await updateProfile(data.name.trim(), user.email.trim().toLowerCase(), bio.trim());
         await refreshUser();
-        setMessage({ kind: 'ok', text: 'Datos actualizados correctamente' });
+        router.replace('/profile');
         } catch (err) {
         setMessage({ kind: 'error', text: messageOf(err) });
         } finally {
@@ -77,71 +104,60 @@ export function useEditProfile() {
         return result.assets[0].uri;
     };
 
+    /** Elige la foto de perfil. Aún no se sube: solo queda pendiente. */
     const changeAvatar = async () => {
         setMessage(null);
 
-        try {
-            const uri = await pickImage([1, 1]);
+        const uri = await pickImage([1, 1]);
 
-            if (!uri) return;
+        if (!uri) return;
 
-            setUploadingAvatar(true);
-            await uploadAvatar(uri);
-            await refreshUser();
-            setMessage({ kind: 'ok', text: 'Foto de perfil actualizada' });
-        } catch (err) {
-            setMessage({ kind: 'error', text: messageOf(err) });
-        } finally {
-            setUploadingAvatar(false);
-        }
+        setPendingAvatarUri(uri);
     };
 
+    /** Elige la foto de portada. Aún no se sube: solo queda pendiente. */
     const changeBanner = async () => {
         setMessage(null);
 
-        try {
-            const uri = await pickImage([2, 1]);
+        const uri = await pickImage([2, 1]);
 
-            if (!uri) return;
+        if (!uri) return;
 
-            setUploadingBanner(true);
-            await uploadBanner(uri);
-            await refreshUser();
-            setMessage({ kind: 'ok', text: 'Foto de portada actualizada' });
-        } catch (err) {
-            setMessage({ kind: 'error', text: messageOf(err) });
-        } finally {
-            setUploadingBanner(false);
-        }
+        setPendingBannerUri(uri);
+        setPendingBannerColor(null);
     };
 
     /**
-     * Fija un color de portada. El servidor borra la foto que tuviera:
-     * elegir un color la sustituye.
+     * Marca un color de portada pendiente. Foto y color se excluyen, aquí y en
+     * el servidor: gana el último que se elija.
      */
-    const chooseBannerColor = async (color: string) => {
+    const chooseBannerColor = (color: string) => {
         setMessage(null);
-        setUploadingBanner(true);
-
-        try {
-            await setBannerColor(color);
-            await refreshUser();
-            setMessage({ kind: 'ok', text: 'Color de portada aplicado' });
-        } catch (err) {
-            setMessage({ kind: 'error', text: messageOf(err) });
-        } finally {
-            setUploadingBanner(false);
-        }
+        setPendingBannerColor(color);
+        setPendingBannerUri(null);
     };
 
     /**
      * Vuelve siempre a la pestaña de perfil. El back normal no sirve: la barra
      * de tabs no navega, así que la ruta previa sigue siendo la de origen
-     * (casi siempre /home) y aterrizaría en el Home.
+     * (casi siempre /home) y aterrizaría en el Home. Si hay cambios sin
+     * guardar, pregunta antes de descartarlos.
      */
     const goBack = () => {
+        if (hasPendingChanges) {
+            setDiscardOpen(true);
+            return;
+        }
+
         router.replace('/profile');
     };
+
+    const confirmDiscard = () => {
+        setDiscardOpen(false);
+        router.replace('/profile');
+    };
+
+    const cancelDiscard = () => setDiscardOpen(false);
 
     return {
         user,
@@ -149,13 +165,18 @@ export function useEditProfile() {
         bio,
         setBio,
         saving,
-        uploadingAvatar,
-        uploadingBanner,
         message,
+        hasPendingChanges,
+        discardOpen,
+        pendingAvatarUri,
+        pendingBannerUri,
+        pendingBannerColor,
         submit: profileForm.handleSubmit(saveProfile),
         changeAvatar,
         changeBanner,
         chooseBannerColor,
+        confirmDiscard,
+        cancelDiscard,
         goBack,
     };
 }
