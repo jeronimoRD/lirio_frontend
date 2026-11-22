@@ -165,7 +165,6 @@ export async function deletePost(id: string): Promise<void> {
   }
 }
 
-// Obtener comentarios de una publicación
 export async function getComments(
   postId: string,
 ): Promise<PostComment[]> {
@@ -181,7 +180,6 @@ export async function getComments(
   }));
 }
 
-// Agregar un comentario
 export async function addComment(
   postId: string,
   content: string,
@@ -203,7 +201,6 @@ export async function addComment(
   };
 }
 
-// Actualizar un comentario
 export async function updateComment(
   postId: string,
   commentId: string,
@@ -216,7 +213,6 @@ export async function updateComment(
   );
 }
 
-// Eliminar un comentario
 export async function deleteComment(
   postId: string,
   commentId: string,

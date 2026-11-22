@@ -7,6 +7,7 @@ import {
   Text,
   View,
   TextInput,
+  Modal,
 } from 'react-native';
 import Animated, {
   FadeInDown,
@@ -105,7 +106,40 @@ export default function PostDetail() {
   removeComment,
 } = usePostComments(post?.id ?? '');
 const [commentText, setCommentText] = useState('');
+const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+const [editingText, setEditingText] = useState('');
+const [savingEdit, setSavingEdit] = useState(false);
+const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
+const [deleting, setDeleting] = useState(false);
 
+const handleEditComment = async () => {
+  if (!editingCommentId || !editingText.trim() || savingEdit) return;
+
+  setSavingEdit(true);
+
+  const success = await editComment(editingCommentId, editingText);
+
+  if (success) {
+    setEditingCommentId(null);
+    setEditingText('');
+  }
+
+  setSavingEdit(false);
+};
+
+const handleDeleteComment = async () => {
+  if (!deletingCommentId || deleting) return;
+
+  setDeleting(true);
+
+  const success = await removeComment(deletingCommentId);
+
+  if (success) {
+    setDeletingCommentId(null);
+  }
+
+  setDeleting(false);
+};
   const serverSaved = !!(
     post?.isSavedByMe ??
     (post?.savedBy && me ? post.savedBy.includes(me.id) : false)
@@ -531,16 +565,94 @@ const [commentText, setCommentText] = useState('');
                   Todavía no hay comentarios. ¡Sé la primera en comentar!
                 </Text>
               ) : (
-                comments.map((comment) => (
-                  <View
-                    key={comment.id}
-                    className="rounded-xl bg-white/70 p-4"
-                  >
-                    <Text className="text-[13px] leading-6 text-ink">
-                      {comment.content}
-                    </Text>
-                  </View>
-                ))
+                comments.map((comment) => {
+                  const isMyComment = comment.userId === me?.id;
+                  const isEditing = editingCommentId === comment.id;
+
+                  return (
+                    <View
+                      key={comment.id}
+                      className="rounded-xl bg-white/70 p-4"
+                    >
+                      {isEditing ? (
+                        <>
+                          <TextInput
+                            value={editingText}
+                            onChangeText={setEditingText}
+                            multiline
+                            maxLength={500}
+                            autoFocus
+                            className="min-h-16 rounded-xl border border-line bg-white p-3 text-[13px] text-ink"
+                            placeholder="Edita tu comentario..."
+                            placeholderTextColor="#99938E"
+                          />
+
+                          <View className="mt-3 flex-row justify-end gap-2">
+                            <Pressable
+                              onPress={() => {
+                                setEditingCommentId(null);
+                                setEditingText('');
+                              }}
+                              disabled={savingEdit}
+                              className="rounded-full border border-line px-4 py-2"
+                            >
+                              <Text className="text-[12px] font-semibold text-ink-secondary">
+                                Cancelar
+                              </Text>
+                            </Pressable>
+
+                            <Pressable
+                              onPress={handleEditComment}
+                              disabled={!editingText.trim() || savingEdit}
+                              className={`rounded-full px-4 py-2 ${
+                                editingText.trim() && !savingEdit
+                                  ? 'bg-brand'
+                                  : 'bg-beige'
+                              }`}
+                            >
+                              <Text className="text-[12px] font-semibold text-white">
+                                {savingEdit ? 'Guardando...' : 'Guardar'}
+                              </Text>
+                            </Pressable>
+                          </View>
+                        </>
+                      ) : (
+                        <>
+                          <Text className="text-[13px] leading-6 text-ink">
+                            {comment.content}
+                          </Text>
+
+                          {isMyComment && (
+                            <View className="mt-3 flex-row justify-end gap-4">
+                              <Pressable
+                                onPress={() => {
+                                  setEditingCommentId(comment.id);
+                                  setEditingText(comment.content);
+                                }}
+                                accessibilityRole="button"
+                                className="active:opacity-60"
+                              >
+                                <Text className="text-[12px] font-semibold text-brand">
+                                  Editar
+                                </Text>
+                              </Pressable>
+
+                              <Pressable
+                                onPress={() => setDeletingCommentId(comment.id)}
+                                accessibilityRole="button"
+                                className="active:opacity-60"
+                              >
+                                <Text className="text-[12px] font-semibold text-red-500">
+                                  Eliminar
+                                </Text>
+                              </Pressable>
+                            </View>
+                          )}
+                        </>
+                      )}
+                    </View>
+                  );
+                })
               )}
             </View>
           </View>
@@ -648,6 +760,50 @@ const [commentText, setCommentText] = useState('');
         targetId={post.id}
         onClose={closeReport}
       />
+    
+      <Modal
+        visible={!!deletingCommentId}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          if (!deleting) setDeletingCommentId(null);
+        }}
+      >
+        <View className="flex-1 items-center justify-center bg-black/40 px-7">
+          <View className="w-full rounded-3xl bg-white p-6">
+            <Text className="font-['Lora-Italic'] text-[21px] text-ink">
+              ¿Eliminar comentario?
+            </Text>
+
+            <Text className="mt-3 text-[13px] leading-6 text-ink-secondary">
+              Esta acción no se puede deshacer. ¿Estás seguro de que deseas eliminar este comentario?
+            </Text>
+
+            <View className="mt-6 flex-row justify-end gap-3">
+              <Pressable
+                onPress={() => setDeletingCommentId(null)}
+                disabled={deleting}
+                className="rounded-full border border-line px-5 py-3"
+              >
+                <Text className="text-[12px] font-semibold text-ink-secondary">
+                  Cancelar
+                </Text>
+              </Pressable>
+
+              <Pressable
+                onPress={handleDeleteComment}
+                disabled={deleting}
+                className="rounded-full bg-red-500 px-5 py-3"
+              >
+                <Text className="text-[12px] font-semibold text-white">
+                  {deleting ? 'Eliminando...' : 'Eliminar'}
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 }
