@@ -20,7 +20,7 @@ import GlassBadge from '../LiquidGlass/GlassBadge';
 import Avatar from '../Avatar';
 import ProfileCover from '@/components/LiquidGlass/ProfileCover';
 import { useGarmentTypes } from '../../garment-types/context';
-import type { Post, Role } from '../../types';
+import type { Post } from '../../types';
 import { cardShadowLg } from '../../constants/theme';
 import { cloudinaryImageUrl } from '../../utils/cloudinaryImage';
 import { useProfile } from '../../hooks/tabs/useProfile';
@@ -36,11 +36,6 @@ const COLORS = {
   champagne: '#DCC7A8',
   soft: '#F4EEE7',
   white: '#FFFFFF',
-};
-
-const ROLE_LABEL: Record<Role, string> = {
-  USER: 'Usuario',
-  ADMIN: 'Administrador',
 };
 
 export default function Profile({ active = true }: { active?: boolean }) {
@@ -199,7 +194,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
             {/* Identidad */}
             <View className="items-center px-5">
               <View
-                className="-mt-12 h-24 w-24 items-center justify-center rounded-full border-[4px] border-screen bg-beige"
+                className="-mt-[48px] h-[96px] w-[96px] items-center justify-center rounded-full border-[4px] border-white bg-beige"
                 style={cardShadowLg}
               >
                 <Avatar name={user.name} uri={user.avatarUrl} size={88} />
@@ -211,7 +206,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
                 </Text>
 
                 <Text className="mt-1 text-center text-[11px] text-ink-muted">
-                  {ROLE_LABEL[user.role]} · {user.email}
+                  {user.email}
                 </Text>
 
                 {!!user.bio && (
