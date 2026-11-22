@@ -1,6 +1,6 @@
 import type { ViewStyle } from 'react-native';
 
-import { colors as palette, glass as glassTokens } from './tokens';
+import { colors as palette, glass as glassTokens, bannerPalette as bannerPaletteTokens } from './tokens';
 
 export const colors = {
   background: palette.screen,
@@ -24,6 +24,9 @@ export const adminColors = {
 } as const;
 
 export const glass = glassTokens;
+
+/** Colores sólidos de portada elegibles en Editar perfil. */
+export const bannerPalette = bannerPaletteTokens;
 
 export const cardShadow: ViewStyle = {
   shadowColor: 'rgba(92, 75, 54, 0.10)',

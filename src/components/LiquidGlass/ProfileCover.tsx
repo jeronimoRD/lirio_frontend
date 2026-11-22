@@ -12,6 +12,8 @@ import { cloudinaryImageUrl } from '../../utils/cloudinaryImage';
 interface Props {
     /** Portada elegida por el usuario. */
     bannerUri?: string;
+    /** Color sólido elegido en Editar perfil. Vacío si no eligió ninguno. */
+    bannerColor?: string;
     /** Respaldo mientras no haya portada: la última publicación, difuminada. */
     fallbackUri?: string;
     onSettings: () => void;
@@ -19,14 +21,17 @@ interface Props {
 
 export default function ProfileCover({
     bannerUri,
+    bannerColor,
     fallbackUri,
     onSettings,
 }: Props) {
     const insets = useSafeAreaInsets();
-    const imageUri = bannerUri || fallbackUri;
+    // Precedencia: foto > color sólido > última publicación difuminada.
+    const solidColor = !bannerUri && bannerColor ? bannerColor : undefined;
+    const imageUri = bannerUri || (solidColor ? undefined : fallbackUri);
 
     return (
-    <View style={{ height: 170 + insets.top, backgroundColor: '#A81245' }}>
+    <View style={{ height: 170 + insets.top, backgroundColor: solidColor ?? '#A81245' }}>
         {!!imageUri && (
         <Image
             source={{ uri: cloudinaryImageUrl(imageUri, 1200) }}
@@ -37,7 +42,7 @@ export default function ProfileCover({
         )}
         <LinearGradient
         colors={
-            bannerUri
+            bannerUri || solidColor
             ? ['rgba(41,39,36,0.35)', 'rgba(41,39,36,0.05)']
             : ['rgba(168,18,69,0.55)', 'rgba(168,18,69,0.15)']
         }

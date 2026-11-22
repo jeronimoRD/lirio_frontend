@@ -5,8 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Alert } from 'react-native';
 
 import {
-    removeAvatar,
-    removeBanner,
+    setBannerColor,
     updateProfile,
     uploadAvatar,
     uploadBanner,
@@ -97,21 +96,6 @@ export function useEditProfile() {
         }
     };
 
-    const clearAvatar = async () => {
-        setMessage(null);
-        setUploadingAvatar(true);
-
-        try {
-            await removeAvatar();
-            await refreshUser();
-            setMessage({ kind: 'ok', text: 'Foto de perfil eliminada' });
-        } catch (err) {
-            setMessage({ kind: 'error', text: messageOf(err) });
-        } finally {
-            setUploadingAvatar(false);
-        }
-    };
-
     const changeBanner = async () => {
         setMessage(null);
 
@@ -131,14 +115,18 @@ export function useEditProfile() {
         }
     };
 
-    const clearBanner = async () => {
+    /**
+     * Fija un color de portada. El servidor borra la foto que tuviera:
+     * elegir un color la sustituye.
+     */
+    const chooseBannerColor = async (color: string) => {
         setMessage(null);
         setUploadingBanner(true);
 
         try {
-            await removeBanner();
+            await setBannerColor(color);
             await refreshUser();
-            setMessage({ kind: 'ok', text: 'Foto de portada eliminada' });
+            setMessage({ kind: 'ok', text: 'Color de portada aplicado' });
         } catch (err) {
             setMessage({ kind: 'error', text: messageOf(err) });
         } finally {
@@ -146,12 +134,13 @@ export function useEditProfile() {
         }
     };
 
+    /**
+     * Vuelve siempre a la pestaña de perfil. El back normal no sirve: la barra
+     * de tabs no navega, así que la ruta previa sigue siendo la de origen
+     * (casi siempre /home) y aterrizaría en el Home.
+     */
     const goBack = () => {
-        if (router.canGoBack()) {
-        router.back();
-        } else {
-        router.replace('/home');
-        }
+        router.replace('/profile');
     };
 
     return {
@@ -165,9 +154,8 @@ export function useEditProfile() {
         message,
         submit: profileForm.handleSubmit(saveProfile),
         changeAvatar,
-        clearAvatar,
         changeBanner,
-        clearBanner,
+        chooseBannerColor,
         goBack,
     };
 }

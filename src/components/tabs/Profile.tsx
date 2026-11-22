@@ -178,6 +178,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
             <View>
               <ProfileCover
                 bannerUri={user.bannerUrl}
+                bannerColor={user.bannerColor}
                 fallbackUri={posts[0]?.image}
                 onSettings={goToSettings}
               />
@@ -194,10 +195,10 @@ export default function Profile({ active = true }: { active?: boolean }) {
             {/* Identidad */}
             <View className="items-center px-5">
               <View
-                className="-mt-[48px] h-[96px] w-[96px] items-center justify-center rounded-full border-[4px] border-white bg-beige"
+                className="-mt-[56px] h-[112px] w-[112px] items-center justify-center rounded-full border-[4px] border-white bg-beige"
                 style={cardShadowLg}
               >
-                <Avatar name={user.name} uri={user.avatarUrl} size={88} />
+                <Avatar name={user.name} uri={user.avatarUrl} size={104} />
               </View>
 
               <View className="mt-3 w-full items-center">
@@ -214,6 +215,21 @@ export default function Profile({ active = true }: { active?: boolean }) {
                     {user.bio}
                   </Text>
                 )}
+              </View>
+
+              {/* Acciones principales */}
+              <View className="mt-4 w-full max-w-[390px] flex-row justify-center gap-3">
+                <Pressable
+                  onPress={goToEditProfile}
+                  accessibilityRole="button"
+                  className="h-[49px] flex-row items-center justify-center gap-2 rounded-full bg-brand px-7"
+                  style={cardShadowLg}
+                >
+                  <Settings2 size={16} color="#FFFFFF" />
+                  <Text className="text-[13px] font-semibold text-white">
+                    Editar perfil
+                  </Text>
+                </Pressable>
               </View>
 
               {/* Estadística */}
@@ -255,21 +271,6 @@ export default function Profile({ active = true }: { active?: boolean }) {
                     </Text>
                   </View>
                 </View>
-              </View>
-
-              {/* Acciones principales */}
-              <View className="mt-4 w-full max-w-[390px] flex-row gap-3">
-                <Pressable
-                  onPress={goToEditProfile}
-                  accessibilityRole="button"
-                  className="h-[49px] flex-1 flex-row items-center justify-center gap-2 rounded-full bg-brand"
-                  style={cardShadowLg}
-                >
-                  <Settings2 size={16} color="#FFFFFF" />
-                  <Text className="text-[13px] font-semibold text-white">
-                    Editar perfil
-                  </Text>
-                </Pressable>
               </View>
             </View>
 

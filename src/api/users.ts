@@ -10,6 +10,7 @@ interface UserResponse {
   bio?: string;
   avatar_url?: string;
   banner_url?: string;
+  banner_color?: string;
   preferred_categories?: string[];
 }
 
@@ -26,6 +27,7 @@ function toUser(data: UserResponse): User {
     bio: data.bio ?? '',
     avatarUrl: data.avatar_url ?? '',
     bannerUrl: data.banner_url ?? '',
+    bannerColor: data.banner_color ?? '',
     preferredCategories: data.preferred_categories ?? [],
   };
 }
@@ -98,11 +100,6 @@ export async function uploadAvatar(uri: string): Promise<User> {
   );
 }
 
-/** Quita la foto de perfil y vuelve a las iniciales. */
-export async function removeAvatar(): Promise<void> {
-  await request<MessageResponse>('/users/me/avatar', undefined, 'DELETE');
-}
-
 /** Sube la foto de portada y devuelve el usuario actualizado. */
 export async function uploadBanner(uri: string): Promise<User> {
   return toUser(
@@ -114,9 +111,18 @@ export async function uploadBanner(uri: string): Promise<User> {
   );
 }
 
-/** Quita la portada propia y vuelve a la imagen de la última publicación. */
-export async function removeBanner(): Promise<void> {
-  await request<MessageResponse>('/users/me/banner', undefined, 'DELETE');
+/**
+ * Fija un color sólido de portada. El servidor borra la foto de portada que
+ * tuviera: elegir un color la sustituye.
+ */
+export async function setBannerColor(color: string): Promise<User> {
+  return toUser(
+    await request<UserResponse>(
+      '/users/me',
+      { banner_color: color },
+      'PATCH',
+    ),
+  );
 }
 
 export async function updatePassword(newPassword: string): Promise<void> {

@@ -15,6 +15,7 @@ import {
   Check,
   ChevronRight,
   ImagePlus,
+  Palette,
   Sparkles,
   UserRound,
 } from 'lucide-react-native';
@@ -30,7 +31,7 @@ import {
   SectionLabel,
 } from '../SettingsSections';
 import { cloudinaryImageUrl } from '../../utils/cloudinaryImage';
-import { cardShadow } from '../../constants/theme';
+import { bannerPalette, cardShadow } from '../../constants/theme';
 import { useEditProfile } from '../../hooks/settings/useEditProfile';
 
 const COLORS = {
@@ -59,6 +60,7 @@ function EditorialMark() {
 export default function EditProfile() {
   const insets = useSafeAreaInsets();
   const [bioFocused, setBioFocused] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
 
   const {
     user,
@@ -71,9 +73,8 @@ export default function EditProfile() {
     message,
     submit,
     changeAvatar,
-    clearAvatar,
     changeBanner,
-    clearBanner,
+    chooseBannerColor,
     goBack,
   } = useEditProfile();
 
@@ -144,7 +145,8 @@ export default function EditProfile() {
               accessibilityLabel={
                 user.bannerUrl ? 'Cambiar foto de portada' : 'Añadir foto de portada'
               }
-              className="h-[96px] bg-brand active:opacity-90">
+              className="h-[96px] active:opacity-90"
+              style={{ backgroundColor: user.bannerColor || COLORS.burgundy }}>
               {!!user.bannerUrl && (
                 <Image
                   source={{ uri: cloudinaryImageUrl(user.bannerUrl, 900) }}
@@ -163,27 +165,35 @@ export default function EditProfile() {
                 )}
 
                 <Text className="text-[10px] font-semibold text-white">
-                  {user.bannerUrl ? 'Cambiar portada' : 'Añadir portada'}
+                  Imagen
                 </Text>
               </View>
 
-              {!!user.bannerUrl && (
-                <Pressable
-                  onPress={() => clearBanner()}
-                  disabled={uploadingBanner}
-                  hitSlop={6}
-                  accessibilityRole="button"
-                  accessibilityLabel="Quitar foto de portada"
-                  className="absolute bottom-2 left-2 rounded-full bg-black/40 px-3 py-1.5">
-                  <Text className="text-[10px] font-semibold text-white">
-                    Quitar
-                  </Text>
-                </Pressable>
-              )}
+              <Pressable
+                onPress={() => setPaletteOpen((open) => !open)}
+                disabled={uploadingBanner}
+                hitSlop={6}
+                accessibilityRole="button"
+                accessibilityLabel="Elegir color de portada"
+                accessibilityState={{ expanded: paletteOpen }}
+                className="absolute bottom-2 left-2 flex-row items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5">
+                <Palette size={12} color="#FFFFFF" />
+
+                {!!user.bannerColor && (
+                  <View
+                    className="h-2 w-2 rounded-full border border-white"
+                    style={{ backgroundColor: user.bannerColor }}
+                  />
+                )}
+
+                <Text className="text-[10px] font-semibold text-white">
+                  Color
+                </Text>
+              </Pressable>
             </Pressable>
 
             <View className="px-4 pb-5">
-              <View className="-mt-9 mb-3 flex-row items-end gap-3">
+              <View className="-mt-9 mb-3 items-center">
                 <Pressable
                   onPress={() => changeAvatar()}
                   disabled={uploadingAvatar}
@@ -211,18 +221,6 @@ export default function EditProfile() {
                   </View>
                 </Pressable>
 
-                {!!user.avatarUrl && (
-                  <Pressable
-                    onPress={() => clearAvatar()}
-                    disabled={uploadingAvatar}
-                    accessibilityRole="button"
-                    accessibilityLabel="Quitar foto de perfil"
-                    className="mb-1 rounded-full border border-line bg-screen px-3 py-1.5 active:opacity-70">
-                    <Text className="text-[10px] font-semibold text-ink-secondary">
-                      Quitar foto
-                    </Text>
-                  </Pressable>
-                )}
               </View>
 
               <Text className="font-['Lora-Italic'] text-[23px] text-ink">
@@ -247,6 +245,52 @@ export default function EditProfile() {
                 </Text>
               </View>
             </View>
+
+            {paletteOpen && (
+              <View className="border-t border-line px-4 py-4">
+                <Text className="text-[10px] font-bold uppercase tracking-[0.15em] text-ink-secondary">
+                  Color de portada
+                </Text>
+
+                <View className="mt-4 gap-4">
+                  {[bannerPalette.slice(0, 4), bannerPalette.slice(4)].map(
+                    (swatchRow, rowIndex) => (
+                      <View
+                        key={rowIndex}
+                        className="flex-row justify-center gap-4">
+                        {swatchRow.map((option) => {
+                          const selected = user.bannerColor === option.hex;
+
+                          return (
+                            <Pressable
+                              key={option.hex}
+                              onPress={() => chooseBannerColor(option.hex)}
+                              disabled={uploadingBanner}
+                              accessibilityRole="radio"
+                              accessibilityLabel={`Color de portada ${option.name}`}
+                              accessibilityState={{
+                                selected,
+                                disabled: uploadingBanner,
+                              }}
+                              className="h-[64px] w-[64px] items-center justify-center rounded-full border-[3px] active:opacity-70"
+                              style={{
+                                backgroundColor: option.hex,
+                                borderColor: selected ? COLORS.text : 'transparent',
+                              }}>
+                              {selected && (
+                                <View className="h-7 w-7 items-center justify-center rounded-full bg-black/45">
+                                  <Check size={16} color="#FFFFFF" />
+                                </View>
+                              )}
+                            </Pressable>
+                          );
+                        })}
+                      </View>
+                    ),
+                  )}
+                </View>
+              </View>
+            )}
           </View>
 
           <Text className="mt-2 text-center text-[10px] text-ink-muted">
