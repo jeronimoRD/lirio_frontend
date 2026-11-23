@@ -6,6 +6,8 @@ import {
   ScrollView,
   Text,
   View,
+  TextInput,
+  Modal,
 } from 'react-native';
 import Animated, {
   FadeInDown,
@@ -19,17 +21,19 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Bookmark, Flag, Heart, Sparkles } from 'lucide-react-native';
-
 import ReportModal from '../ReportModal';
+import FollowButton from '../follow/FollowButton';
 import GlassIconButton from '@/components/LiquidGlass/GlassIconButton';
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
-import { glass } from '@/constants/theme';
-import { initialsOf } from '../../utils/strings';
+import Avatar from '../Avatar';
+import { colors, glass } from '@/constants/theme';
 import { formatLikeCount } from '../../utils/format';
 import { usePostDetail } from '../../hooks/upload/usePostDetail';
 import { toggleSave as toggleSaveApi } from '../../api/posts';
 import { useGarmentTypes } from '../../garment-types/context';
 import { useSession } from '../../session/context';
+import { usePostComments } from '../../hooks/upload/usePostComments';
+
 
 const SWATCH_COLORS = ['#DCC7A8', '#A81245', '#3D6B52'];
 const DOUBLE_TAP_MS = 300;
@@ -86,14 +90,58 @@ export default function PostDetail() {
     likesCount,
     toggleLike,
     canReport,
+    canFollow,
     reportVisible,
     openReport,
     closeReport,
   } = usePostDetail();
   const { user: me } = useSession();
   const insets = useSafeAreaInsets();
+  
+  const {
+  comments,
+  loading: commentsLoading,
+  sending,
+  error: commentsError,
+  createComment,
+  editComment,
+  removeComment,
+} = usePostComments(post?.id ?? '');
+const [commentText, setCommentText] = useState('');
+const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+const [editingText, setEditingText] = useState('');
+const [savingEdit, setSavingEdit] = useState(false);
+const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
+const [deleting, setDeleting] = useState(false);
 
+const handleEditComment = async () => {
+  if (!editingCommentId || !editingText.trim() || savingEdit) return;
 
+  setSavingEdit(true);
+
+  const success = await editComment(editingCommentId, editingText);
+
+  if (success) {
+    setEditingCommentId(null);
+    setEditingText('');
+  }
+
+  setSavingEdit(false);
+};
+
+const handleDeleteComment = async () => {
+  if (!deletingCommentId || deleting) return;
+
+  setDeleting(true);
+
+  const success = await removeComment(deletingCommentId);
+
+  if (success) {
+    setDeletingCommentId(null);
+  }
+
+  setDeleting(false);
+};
   const serverSaved = !!(
     post?.isSavedByMe ??
     (post?.savedBy && me ? post.savedBy.includes(me.id) : false)
@@ -380,14 +428,23 @@ export default function PostDetail() {
             </View>
           </View>
 
-          {/* Autor y acción para reportar */}
+          {/* Autor, seguir y reportar */}
           <View className="mt-7 flex-row items-center gap-3 px-6">
             <View className="h-[50px] w-[50px] items-center justify-center rounded-full border border-beige bg-white p-1">
-              <View className="h-full w-full items-center justify-center rounded-full bg-brand">
-                <Text className="text-xs font-bold tracking-[0.08em] text-white">
-                  {author ? initialsOf(author.name) : '??'}
-                </Text>
-              </View>
+              {author ? (
+                <Avatar
+                  name={author.name}
+                  uri={author.avatarUrl}
+                  size={40}
+                  backgroundColor={colors.primary}
+                />
+              ) : (
+                <View className="h-full w-full items-center justify-center rounded-full bg-brand">
+                  <Text className="text-xs font-bold tracking-[0.08em] text-white">
+                    ??
+                  </Text>
+                </View>
+              )}
             </View>
 
             <View className="min-w-0 flex-1">
@@ -399,15 +456,16 @@ export default function PostDetail() {
               </Text>
             </View>
 
+            {canFollow && <FollowButton userId={post.userId} />}
+
             {canReport && (
               <Pressable
                 onPress={openReport}
                 hitSlop={10}
                 accessibilityRole="button"
                 accessibilityLabel="Reportar publicación"
-                className="min-h-10 flex-row items-center gap-1.5 rounded-full border border-line bg-white px-3 active:opacity-60">
-                <Flag size={13} color="#6E6B68" strokeWidth={1.8} />
-                <Text className="text-[11px] font-medium text-ink-secondary">Reportar</Text>
+                className="h-10 w-10 items-center justify-center rounded-full border border-line bg-white active:opacity-60">
+                <Flag size={15} color="#6E6B68" strokeWidth={1.8} />
               </Pressable>
             )}
           </View>
@@ -460,6 +518,159 @@ export default function PostDetail() {
                 {formatLikeCount(likesCount)}
               </Text>
             </Pressable>
+          </View>    
+
+          {/* Comentarios */}
+          <View className="mt-9 px-6">
+            <View className="flex-row items-center justify-between">
+              <View className="gap-1">
+                <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-ink-secondary">
+                  Comunidad
+                </Text>
+                <Text className="font-['Lora-Italic'] text-[21px] text-ink">
+                  Comentarios ({comments.length})
+                </Text>
+              </View>
+            </View>
+
+            {/* Campo para escribir */}
+            <View className="mt-5 flex-row items-center gap-2 rounded-2xl border border-line bg-white px-3 py-2">
+              <TextInput
+                value={commentText}
+                onChangeText={setCommentText}
+                placeholder="Escribe un comentario..."
+                placeholderTextColor="#99938E"
+                multiline
+                maxLength={500}
+                editable={!sending}
+                className="min-h-10 flex-1 py-2 text-[13px] text-ink"
+              />
+
+              <Pressable
+                disabled={!commentText.trim() || sending}
+                onPress={async () => {
+                  const success = await createComment(commentText);
+                  if (success) setCommentText('');
+                }}
+                className={`rounded-full px-4 py-2 ${
+                  commentText.trim() && !sending
+                    ? 'bg-brand'
+                    : 'bg-beige'
+                }`}
+              >
+                <Text className="text-[12px] font-semibold text-white">
+                  {sending ? '...' : 'Publicar'}
+                </Text>
+              </Pressable>
+            </View>
+
+            {/* Lista de comentarios */}
+            <View className="mt-5 gap-4">
+              {commentsLoading ? (
+                <ActivityIndicator color="#A81245" />
+              ) : commentsError ? (
+                <Text className="text-[12px] text-ink-secondary">
+                  {commentsError}
+                </Text>
+              ) : comments.length === 0 ? (
+                <Text className="py-3 text-center text-[13px] text-ink-secondary">
+                  Todavía no hay comentarios. ¡Sé la primera en comentar!
+                </Text>
+              ) : (
+                comments.map((comment) => {
+                  const isMyComment = comment.userId === me?.id;
+                  const isEditing = editingCommentId === comment.id;
+
+                  return (
+                    <View
+                      key={comment.id}
+                      className="rounded-xl bg-white/70 p-4"
+                    >
+                      {isEditing ? (
+                        <>
+                          <TextInput
+                            value={editingText}
+                            onChangeText={setEditingText}
+                            multiline
+                            maxLength={500}
+                            autoFocus
+                            className="min-h-16 rounded-xl border border-line bg-white p-3 text-[13px] text-ink"
+                            placeholder="Edita tu comentario..."
+                            placeholderTextColor="#99938E"
+                          />
+
+                          <View className="mt-3 flex-row justify-end gap-2">
+                            <Pressable
+                              onPress={() => {
+                                setEditingCommentId(null);
+                                setEditingText('');
+                              }}
+                              disabled={savingEdit}
+                              className="rounded-full border border-line px-4 py-2"
+                            >
+                              <Text className="text-[12px] font-semibold text-ink-secondary">
+                                Cancelar
+                              </Text>
+                            </Pressable>
+
+                            <Pressable
+                              onPress={handleEditComment}
+                              disabled={!editingText.trim() || savingEdit}
+                              className={`rounded-full px-4 py-2 ${
+                                editingText.trim() && !savingEdit
+                                  ? 'bg-brand'
+                                  : 'bg-beige'
+                              }`}
+                            >
+                              <Text className="text-[12px] font-semibold text-white">
+                                {savingEdit ? 'Guardando...' : 'Guardar'}
+                              </Text>
+                            </Pressable>
+                          </View>
+                        </>
+                      ) : (
+                        <>
+                          <Text className="mb-1 text-[13px] font-semibold text-ink">
+                            {comment.user_name ?? 'Usuario'}
+                          </Text>
+
+                          <Text className="text-[13px] leading-6 text-ink-secondary">
+                            {comment.content}
+                          </Text>
+
+                          {isMyComment && (
+                            <View className="mt-3 flex-row justify-end gap-4">
+                              <Pressable
+                                onPress={() => {
+                                  setEditingCommentId(comment.id);
+                                  setEditingText(comment.content);
+                                }}
+                                accessibilityRole="button"
+                                className="active:opacity-60"
+                              >
+                                <Text className="text-[12px] font-semibold text-brand">
+                                  Editar
+                                </Text>
+                              </Pressable>
+
+                              <Pressable
+                                onPress={() => setDeletingCommentId(comment.id)}
+                                accessibilityRole="button"
+                                className="active:opacity-60"
+                              >
+                                <Text className="text-[12px] font-semibold text-red-500">
+                                  Eliminar
+                                </Text>
+                              </Pressable>
+                            </View>
+                          )}
+                        </>
+                      )}
+                    </View>
+                  );
+                })
+              )}
+            </View>
           </View>
 
           {/* Paleta editorial */}
@@ -565,6 +776,50 @@ export default function PostDetail() {
         targetId={post.id}
         onClose={closeReport}
       />
+    
+      <Modal
+        visible={!!deletingCommentId}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          if (!deleting) setDeletingCommentId(null);
+        }}
+      >
+        <View className="flex-1 items-center justify-center bg-black/40 px-7">
+          <View className="w-full rounded-3xl bg-white p-6">
+            <Text className="font-['Lora-Italic'] text-[21px] text-ink">
+              ¿Eliminar comentario?
+            </Text>
+
+            <Text className="mt-3 text-[13px] leading-6 text-ink-secondary">
+              Esta acción no se puede deshacer. ¿Estás seguro de que deseas eliminar este comentario?
+            </Text>
+
+            <View className="mt-6 flex-row justify-end gap-3">
+              <Pressable
+                onPress={() => setDeletingCommentId(null)}
+                disabled={deleting}
+                className="rounded-full border border-line px-5 py-3"
+              >
+                <Text className="text-[12px] font-semibold text-ink-secondary">
+                  Cancelar
+                </Text>
+              </Pressable>
+
+              <Pressable
+                onPress={handleDeleteComment}
+                disabled={deleting}
+                className="rounded-full bg-red-500 px-5 py-3"
+              >
+                <Text className="text-[12px] font-semibold text-white">
+                  {deleting ? 'Eliminando...' : 'Eliminar'}
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 }

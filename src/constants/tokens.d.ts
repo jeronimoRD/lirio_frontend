@@ -32,6 +32,11 @@ export declare const radius: {
   readonly hero: string;
 };
 
+export declare const bannerPalette: readonly {
+  readonly name: string;
+  readonly hex: string;
+}[];
+
 export declare const glass: {
   readonly fill: string;
   readonly header: string;

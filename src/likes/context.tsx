@@ -15,7 +15,7 @@ interface LikesContextValue {
   get: (postId: string) => LikeState | undefined;
   setState: (postId: string, state: LikeState) => void;
   update: (postId: string, partial: Partial<LikeState>) => void;
-  subscribe: (postId: string, listener: () => void) => () => void;
+  subscribe: (postId: string, alistener: () => void) => () => void;
 }
 
 const LikesContext = createContext<LikesContextValue | null>(null);

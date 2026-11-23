@@ -91,12 +91,13 @@ export function useSettings() {
         }
     };
 
+    /**
+     * Vuelve siempre a la pestaña de perfil. El back normal no sirve: la barra
+     * de tabs no navega, así que la ruta previa sigue siendo la de origen
+     * (casi siempre /home) y aterrizaría en el Home.
+     */
     const goBack = () => {
-        if (router.canGoBack()) {
-        router.back();
-        } else {
-        router.replace('/home');
-        }
+        router.replace('/profile');
     };
 
     const validateConfirm = (value: string) => value === newPassword || 'Las contraseñas no coinciden';
