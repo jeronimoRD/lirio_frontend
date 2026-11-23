@@ -15,6 +15,27 @@ interface PostResponse {
   saved_by?: string[];
   garment_type_id?: string;
 }
+interface CommentResponse {
+  _id: string;
+  user_id: string;
+  content: string;
+  post_id: string;
+  createdAt: string;
+  updatedAt: string;
+  user_name?: string;
+  avatar_url?: string;
+
+}
+
+export interface PostComment {
+  id: string;
+  userId: string;
+  content: string;
+  createdAt?: string;
+  user_name?: string;
+  avatar_url?: string;
+  updatedAt?: string;
+}
 
 function toPost(data: PostResponse): Post {
   const likedBy = data.liked_by ?? [];
@@ -148,4 +169,68 @@ export async function deletePost(id: string): Promise<void> {
   } catch (error) {
     throw error;
   }
+}
+
+export async function getComments(
+  postId: string,
+): Promise<PostComment[]> {
+  const data = await request<CommentResponse[]>(
+    `/posts/${postId}/comments`,
+  );
+  return data.map((comment) => ({
+    id: comment._id,
+    userId: comment.user_id,
+    content: comment.content,
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+    user_name: comment.user_name,
+    avatar_url: comment.avatar_url,
+  }));
+}
+
+export async function addComment(
+  postId: string,
+  content: string,
+): Promise<PostComment> {
+  const data = await request<{
+    message: string;
+    comment: CommentResponse;
+  }>(
+    `/posts/${postId}/comments`,
+    { content },
+    'POST',
+  );
+
+  return {
+    id: data.comment._id,
+    userId: data.comment.user_id,
+    content: data.comment.content,
+    createdAt: data.comment.createdAt,
+    user_name: data.comment.user_name,
+    avatar_url: data.comment.avatar_url,
+    updatedAt: data.comment.updatedAt,
+  };
+}
+
+export async function updateComment(
+  postId: string,
+  commentId: string,
+  content: string,
+): Promise<{ message: string }> {
+  return request<{ message: string }>(
+    `/posts/${postId}/comments/${commentId}`,
+    { content },
+    'PATCH',
+  );
+}
+
+export async function deleteComment(
+  postId: string,
+  commentId: string,
+): Promise<{ message: string }> {
+  return request<{ message: string }>(
+    `/posts/${postId}/comments/${commentId}`,
+    undefined,
+    'DELETE',
+  );
 }

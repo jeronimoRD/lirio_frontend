@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Redirect } from 'expo-router';
 import {
   ActivityIndicator,
+  Image,
   Pressable,
   ScrollView,
   Text,
@@ -10,21 +11,28 @@ import {
   View,
 } from 'react-native';
 import {
+  Camera,
   Check,
   ChevronRight,
+  ImagePlus,
+  Palette,
   Sparkles,
   UserRound,
 } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import ScreenHeader from '../ScreenHeader';
+import ConfirmModal from '../ConfirmModal';
 import Field from '../Field';
+import Avatar from '../Avatar';
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
 import {
   SectionCard,
   SectionHeaderRow,
   SectionLabel,
 } from '../SettingsSections';
+import { cloudinaryImageUrl } from '../../utils/cloudinaryImage';
+import { bannerPalette, cardShadow } from '../../constants/theme';
 import { useEditProfile } from '../../hooks/settings/useEditProfile';
 
 const COLORS = {
@@ -53,6 +61,7 @@ function EditorialMark() {
 export default function EditProfile() {
   const insets = useSafeAreaInsets();
   const [bioFocused, setBioFocused] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
 
   const {
     user,
@@ -61,13 +70,27 @@ export default function EditProfile() {
     setBio,
     saving,
     message,
+    discardOpen,
+    pendingAvatarUri,
+    pendingBannerUri,
+    pendingBannerColor,
     submit,
+    changeAvatar,
+    changeBanner,
+    chooseBannerColor,
+    confirmDiscard,
+    cancelDiscard,
     goBack,
   } = useEditProfile();
 
   if (!user) {
     return <Redirect href="/(login)/login" />;
   }
+
+  // Lo que se verá al guardar: una foto de portada pendiente anula el color.
+  const effectiveBannerColor = pendingBannerUri
+    ? ''
+    : (pendingBannerColor ?? user.bannerColor);
 
   return (
     <ScrollView
@@ -120,20 +143,93 @@ export default function EditProfile() {
           </View>
         </View>
 
+        <ConfirmModal
+          visible={discardOpen}
+          title="¿Descartar los cambios?"
+          message="Tienes cambios sin guardar. Si sales ahora no se aplicarán."
+          confirmLabel="Descartar"
+          cancelLabel="Seguir editando"
+          danger
+          onConfirm={confirmDiscard}
+          onCancel={cancelDiscard}
+        />
+
         {/* Vista previa del perfil */}
         <View>
           <SectionLabel text="TU IDENTIDAD" />
 
           <View className="mt-2 overflow-hidden rounded-[22px] border border-line bg-white">
-            <View className="h-[70px] bg-brand" />
+            <Pressable
+              onPress={() => changeBanner()}
+              disabled={saving}
+              accessibilityRole="button"
+              accessibilityLabel="Elegir foto de portada"
+              className="h-[96px] active:opacity-90"
+              style={{ backgroundColor: effectiveBannerColor || COLORS.burgundy }}>
+              {!!(pendingBannerUri ?? user.bannerUrl) && (
+                <Image
+                  source={{
+                    uri: cloudinaryImageUrl(pendingBannerUri ?? user.bannerUrl, 900),
+                  }}
+                  className="h-full w-full"
+                  resizeMode="cover"
+                />
+              )}
+
+              <View className="absolute inset-0 bg-black/20" />
+
+              <View className="absolute bottom-2 right-2 flex-row items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5">
+                <ImagePlus size={13} color="#FFFFFF" />
+
+                <Text className="text-[10px] font-semibold text-white">
+                  Imagen
+                </Text>
+              </View>
+
+              <Pressable
+                onPress={() => setPaletteOpen((open) => !open)}
+                disabled={saving}
+                hitSlop={6}
+                accessibilityRole="button"
+                accessibilityLabel="Elegir color de portada"
+                accessibilityState={{ expanded: paletteOpen }}
+                className="absolute bottom-2 left-2 flex-row items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5">
+                <Palette size={12} color="#FFFFFF" />
+
+                {!!effectiveBannerColor && (
+                  <View
+                    className="h-2 w-2 rounded-full border border-white"
+                    style={{ backgroundColor: effectiveBannerColor }}
+                  />
+                )}
+
+                <Text className="text-[10px] font-semibold text-white">
+                  Color
+                </Text>
+              </Pressable>
+            </Pressable>
 
             <View className="px-4 pb-5">
-              <View className="-mt-8 mb-3 h-[66px] w-[66px] items-center justify-center rounded-full border-[3px] border-white bg-screen">
-                <UserRound
-                  size={30}
-                  color={COLORS.burgundy}
-                  strokeWidth={1.25}
-                />
+              <View className="-mt-9 mb-3 items-center">
+                <Pressable
+                  onPress={() => changeAvatar()}
+                  disabled={saving}
+                  accessibilityRole="button"
+                  accessibilityLabel="Elegir foto de perfil"
+                  className="h-[74px] w-[74px] items-center justify-center rounded-full border-[3px] border-white bg-screen active:opacity-90"
+                  style={cardShadow}>
+                  <Avatar
+                    name={user.name}
+                    uri={pendingAvatarUri ?? user.avatarUrl}
+                    size={68}
+                    backgroundColor={COLORS.burgundy}
+                  />
+
+                  <View className="absolute bottom-0 right-0 h-6 w-6 items-center justify-center rounded-full bg-brand">
+                    <Camera size={12} color="#FFFFFF" />
+                  </View>
+                </Pressable>
+
               </View>
 
               <Text className="font-['Lora-Italic'] text-[23px] text-ink">
@@ -158,7 +254,57 @@ export default function EditProfile() {
                 </Text>
               </View>
             </View>
+
+            {paletteOpen && (
+              <View className="border-t border-line px-4 py-4">
+                <Text className="text-[10px] font-bold uppercase tracking-[0.15em] text-ink-secondary">
+                  Color de portada
+                </Text>
+
+                <View className="mt-4 gap-4">
+                  {[bannerPalette.slice(0, 4), bannerPalette.slice(4)].map(
+                    (swatchRow, rowIndex) => (
+                      <View
+                        key={rowIndex}
+                        className="flex-row justify-center gap-4">
+                        {swatchRow.map((option) => {
+                          const selected = effectiveBannerColor === option.hex;
+
+                          return (
+                            <Pressable
+                              key={option.hex}
+                              onPress={() => chooseBannerColor(option.hex)}
+                              disabled={saving}
+                              accessibilityRole="radio"
+                              accessibilityLabel={`Color de portada ${option.name}`}
+                              accessibilityState={{
+                                selected,
+                                disabled: saving,
+                              }}
+                              className="h-[64px] w-[64px] items-center justify-center rounded-full border-[3px] active:opacity-70"
+                              style={{
+                                backgroundColor: option.hex,
+                                borderColor: selected ? COLORS.text : 'transparent',
+                              }}>
+                              {selected && (
+                                <View className="h-7 w-7 items-center justify-center rounded-full bg-black/45">
+                                  <Check size={16} color="#FFFFFF" />
+                                </View>
+                              )}
+                            </Pressable>
+                          );
+                        })}
+                      </View>
+                    ),
+                  )}
+                </View>
+              </View>
+            )}
           </View>
+
+          <Text className="mt-2 text-center text-[10px] text-ink-muted">
+            Portada y foto de perfil: JPG, PNG o WebP · hasta 5 MB
+          </Text>
         </View>
 
         {/* Formulario */}
@@ -240,29 +386,15 @@ export default function EditProfile() {
                 </View>
               </View>
 
-              {/* Mensaje de estado */}
+              {/* Aviso de error: el éxito navega al perfil, sin mensaje. */}
               {message && (
-                <View
-                  className={`overflow-hidden rounded-2xl ${
-                    message.kind === 'ok'
-                      ? 'border border-green-200 bg-green-50'
-                      : 'border border-red-200 bg-red-50'
-                  }`}>
+                <View className="overflow-hidden rounded-2xl border border-red-200 bg-red-50">
                   <View className="flex-row items-start gap-3 p-4">
                     <View className="mt-0.5">
-                      {message.kind === 'ok' ? (
-                        <Check size={17} color="#15803D" />
-                      ) : (
-                        <Sparkles size={17} color="#B91C1C" />
-                      )}
+                      <Sparkles size={17} color="#B91C1C" />
                     </View>
 
-                    <Text
-                      className={`flex-1 text-[12px] leading-5 ${
-                        message.kind === 'ok'
-                          ? 'text-green-700'
-                          : 'text-red-700'
-                      }`}>
+                    <Text className="flex-1 text-[12px] leading-5 text-red-700">
                       {message.text}
                     </Text>
                   </View>
@@ -285,7 +417,13 @@ export default function EditProfile() {
                 }}>
                 <View className="min-h-[50px] flex-row items-center justify-center gap-2 px-5">
                   {saving ? (
-                    <ActivityIndicator color="#FFFFFF" />
+                    <>
+                      <ActivityIndicator color="#FFFFFF" />
+
+                      <Text className="text-[12px] font-semibold tracking-[0.04em] text-white">
+                        Guardando…
+                      </Text>
+                    </>
                   ) : (
                     <>
                       <Check size={16} color="#FFFFFF" />

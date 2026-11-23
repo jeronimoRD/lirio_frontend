@@ -21,10 +21,10 @@ import {
 
 import ScreenHeader from '../ScreenHeader';
 import FeedCard from '../FeedCard';
+import Avatar from '../Avatar';
 import OutfitCard from '../outfits/OutfitCard';
 import type { Outfit, Post, User } from '../../types';
-import { cardShadowLg } from '../../constants/theme';
-import { initialsOf } from '../../utils/strings';
+import { cardShadowLg, colors } from '../../constants/theme';
 import { useExplore } from '../../hooks/tabs/useExplore';
 import { useTabBarClearance } from '../LiquidGlass/TabBarClearance';
 
@@ -568,10 +568,10 @@ function TabButton({
 }
 
 function AvatarRing({
-  initials,
+  user,
   size = 64,
 }: {
-  initials: string;
+  user: User;
   size?: number;
 }) {
   const ringSize = size + 8;
@@ -581,17 +581,12 @@ function AvatarRing({
       className="items-center justify-center rounded-full border-2 border-beige"
       style={{ width: ringSize, height: ringSize }}
     >
-      <View
-        className="items-center justify-center rounded-full bg-brand"
-        style={{ width: size, height: size }}
-      >
-        <Text
-          className="font-bold text-white"
-          style={{ fontSize: size * 0.32 }}
-        >
-          {initials}
-        </Text>
-      </View>
+      <Avatar
+        name={user.name}
+        uri={user.avatarUrl}
+        size={size}
+        backgroundColor={colors.primary}
+      />
     </View>
   );
 }
@@ -608,7 +603,7 @@ function SuggestionCard({
       className="w-[160px] items-center gap-3 rounded-[22px] border border-[#F0EBE5] bg-white px-4 pb-4 pt-5"
       style={cardShadowLg}
     >
-      <AvatarRing initials={initialsOf(user.name)} />
+      <AvatarRing user={user} />
 
       <View className="w-full items-center gap-1">
         <Text
@@ -649,7 +644,7 @@ function UserRow({
       className="mx-4 mb-3 flex-row items-center gap-3.5 rounded-card border border-[#F0EBE5] bg-white p-4"
       style={cardShadowLg}
     >
-      <AvatarRing initials={initialsOf(user.name)} size={52} />
+      <AvatarRing user={user} size={52} />
 
       <View className="flex-1 gap-[3px]">
         <Text

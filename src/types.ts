@@ -20,6 +20,12 @@ export interface User {
   email: string;
   role: Role;
   bio: string;
+  /** Foto de perfil en Cloudinary. Vacío si aún no ha subido una. */
+  avatarUrl: string;
+  /** Foto de portada en Cloudinary. Vacío si usa la de su última publicación. */
+  bannerUrl: string;
+  /** Color sólido de portada. Vacío si no eligió ninguno. */
+  bannerColor: string;
   /** IDs de las categorías de estilos que el usuario eligió al registrarse. */
   preferredCategories: string[];
   /** Solo lo incluye la lista de admin (login/registro no). */
