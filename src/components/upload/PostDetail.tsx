@@ -22,6 +22,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Bookmark, Flag, Heart, Sparkles } from 'lucide-react-native';
 import ReportModal from '../ReportModal';
+import FollowButton from '../follow/FollowButton';
 import GlassIconButton from '@/components/LiquidGlass/GlassIconButton';
 import GlassSurface from '@/components/LiquidGlass/GlassSurface';
 import Avatar from '../Avatar';
@@ -89,6 +90,7 @@ export default function PostDetail() {
     likesCount,
     toggleLike,
     canReport,
+    canFollow,
     reportVisible,
     openReport,
     closeReport,
@@ -426,7 +428,7 @@ const handleDeleteComment = async () => {
             </View>
           </View>
 
-          {/* Autor y acción para reportar */}
+          {/* Autor, seguir y reportar */}
           <View className="mt-7 flex-row items-center gap-3 px-6">
             <View className="h-[50px] w-[50px] items-center justify-center rounded-full border border-beige bg-white p-1">
               {author ? (
@@ -454,15 +456,16 @@ const handleDeleteComment = async () => {
               </Text>
             </View>
 
+            {canFollow && <FollowButton userId={post.userId} />}
+
             {canReport && (
               <Pressable
                 onPress={openReport}
                 hitSlop={10}
                 accessibilityRole="button"
                 accessibilityLabel="Reportar publicación"
-                className="min-h-10 flex-row items-center gap-1.5 rounded-full border border-line bg-white px-3 active:opacity-60">
-                <Flag size={13} color="#6E6B68" strokeWidth={1.8} />
-                <Text className="text-[11px] font-medium text-ink-secondary">Reportar</Text>
+                className="h-10 w-10 items-center justify-center rounded-full border border-line bg-white active:opacity-60">
+                <Flag size={15} color="#6E6B68" strokeWidth={1.8} />
               </Pressable>
             )}
           </View>
