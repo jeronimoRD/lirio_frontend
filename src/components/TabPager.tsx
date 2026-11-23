@@ -21,6 +21,8 @@ const TabPager = forwardRef<TabPagerHandle, TabPagerProps>(
         style={{ flex: 1, backgroundColor: '#FCFAF8' }}
         initialPage={index}
         offscreenPageLimit={1}
+        overScrollMode="never"
+        overdrag={false}
         onPageSelected={onPageSelected}
         onPageScroll={onPageScroll}>
         {children}

@@ -1,5 +1,6 @@
 import type { Role, User } from '../types';
 import { request } from './client';
+import { File } from 'expo-file-system';
 
 interface UserResponse {
   _id: string;
@@ -7,6 +8,9 @@ interface UserResponse {
   user_name: string;
   role: Role;
   bio?: string;
+  avatar_url?: string;
+  banner_url?: string;
+  banner_color?: string;
   preferred_categories?: string[];
 }
 
@@ -21,6 +25,9 @@ function toUser(data: UserResponse): User {
     email: data.email,
     role: data.role,
     bio: data.bio ?? '',
+    avatarUrl: data.avatar_url ?? '',
+    bannerUrl: data.banner_url ?? '',
+    bannerColor: data.banner_color ?? '',
     preferredCategories: data.preferred_categories ?? [],
   };
 }
@@ -70,6 +77,49 @@ export async function updateProfile(
         email,
         ...(bio !== undefined ? { bio } : {}),
       },
+      'PATCH',
+    ),
+  );
+}
+
+function imageForm(uri: string): FormData {
+  const formData = new FormData();
+  formData.append('image', new File(uri) as any);
+
+  return formData;
+}
+
+/** Sube la foto de perfil y devuelve el usuario actualizado. */
+export async function uploadAvatar(uri: string): Promise<User> {
+  return toUser(
+    await request<UserResponse>(
+      '/users/me/avatar',
+      imageForm(uri),
+      'PATCH',
+    ),
+  );
+}
+
+/** Sube la foto de portada y devuelve el usuario actualizado. */
+export async function uploadBanner(uri: string): Promise<User> {
+  return toUser(
+    await request<UserResponse>(
+      '/users/me/banner',
+      imageForm(uri),
+      'PATCH',
+    ),
+  );
+}
+
+/**
+ * Fija un color sólido de portada. El servidor borra la foto de portada que
+ * tuviera: elegir un color la sustituye.
+ */
+export async function setBannerColor(color: string): Promise<User> {
+  return toUser(
+    await request<UserResponse>(
+      '/users/me',
+      { banner_color: color },
       'PATCH',
     ),
   );

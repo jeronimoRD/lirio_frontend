@@ -33,6 +33,22 @@ const radius = {
   hero: '28px',
 };
 
+/**
+ * Colores sólidos de portada que el usuario puede elegir en Editar perfil.
+ * Deben coincidir con BANNER_PALETTE en backend/src/users/banner-palette.ts:
+ * el servidor valida el valor contra esa lista.
+ */
+const bannerPalette = [
+  { name: 'Vino', hex: '#A81245' },
+  { name: 'Rosa', hex: '#E8C9CE' },
+  { name: 'Champán', hex: '#DCC7A8' },
+  { name: 'Crema', hex: '#F4EEE7' },
+  { name: 'Tinta', hex: '#292724' },
+  { name: 'Piedra', hex: '#6E6B68' },
+  { name: 'Terracota', hex: '#B4654A' },
+  { name: 'Oliva', hex: '#7C7A54' },
+];
+
 const glass = {
   fill: 'rgba(252, 250, 248, 0.55)',
   header: 'rgba(252, 250, 248, 0.6)',
@@ -44,4 +60,4 @@ const glass = {
   toast: 'rgba(41, 39, 36, 0.88)',
 };
 
-module.exports = { colors, radius, glass };
+module.exports = { colors, radius, glass, bannerPalette };

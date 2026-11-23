@@ -1,6 +1,6 @@
 
 import { Redirect, useRouter } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -9,9 +9,7 @@ import {
   ScrollView,
   Text,
   View,
-  type ViewInstance,
 } from 'react-native';
-import { BlurTargetView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTabBarClearance } from '../LiquidGlass/TabBarClearance';
 import { Bookmark, Shirt, Settings2, LogOut, Sparkles } from 'lucide-react-native';
@@ -19,11 +17,12 @@ import { Bookmark, Shirt, Settings2, LogOut, Sparkles } from 'lucide-react-nativ
 import ConfirmModal from '../ConfirmModal';
 import FeedCard from '../FeedCard';
 import GlassBadge from '../LiquidGlass/GlassBadge';
+import Avatar from '../Avatar';
 import ProfileCover from '@/components/LiquidGlass/ProfileCover';
 import { useGarmentTypes } from '../../garment-types/context';
-import type { Post, Role } from '../../types';
+import type { Post } from '../../types';
 import { cardShadowLg } from '../../constants/theme';
-import { initialsOf } from '../../utils/strings';
+import { cloudinaryImageUrl } from '../../utils/cloudinaryImage';
 import { useProfile } from '../../hooks/tabs/useProfile';
 import { useSaved } from '../../hooks/tabs/useSaved';
 
@@ -37,11 +36,6 @@ const COLORS = {
   champagne: '#DCC7A8',
   soft: '#F4EEE7',
   white: '#FFFFFF',
-};
-
-const ROLE_LABEL: Record<Role, string> = {
-  USER: 'Usuario',
-  ADMIN: 'Administrador',
 };
 
 export default function Profile({ active = true }: { active?: boolean }) {
@@ -149,6 +143,10 @@ export default function Profile({ active = true }: { active?: boolean }) {
         className="flex-1 bg-screen"
         data={listData}
         numColumns={2}
+        initialNumToRender={6}
+        maxToRenderPerBatch={4}
+        updateCellsBatchingPeriod={50}
+        windowSize={7}
         keyExtractor={(post) => post.id}
         columnWrapperStyle={{ gap: 12, paddingHorizontal: 20 }}
         showsVerticalScrollIndicator={false}
@@ -179,7 +177,9 @@ export default function Profile({ active = true }: { active?: boolean }) {
             {/* Portada editorial */}
             <View>
               <ProfileCover
-                imageUri={posts[0]?.image}
+                bannerUri={user.bannerUrl}
+                bannerColor={user.bannerColor}
+                fallbackUri={posts[0]?.image}
                 onSettings={goToSettings}
               />
 
@@ -195,12 +195,10 @@ export default function Profile({ active = true }: { active?: boolean }) {
             {/* Identidad */}
             <View className="items-center px-5">
               <View
-                className="-mt-12 h-24 w-24 items-center justify-center rounded-full border-[4px] border-screen bg-beige"
+                className="-mt-[56px] h-[112px] w-[112px] items-center justify-center rounded-full border-[4px] border-white bg-beige"
                 style={cardShadowLg}
               >
-                <Text className="text-[26px] font-bold text-white">
-                  {initialsOf(user.name)}
-                </Text>
+                <Avatar name={user.name} uri={user.avatarUrl} size={104} />
               </View>
 
               <View className="mt-3 w-full items-center">
@@ -209,7 +207,7 @@ export default function Profile({ active = true }: { active?: boolean }) {
                 </Text>
 
                 <Text className="mt-1 text-center text-[11px] text-ink-muted">
-                  {ROLE_LABEL[user.role]} · {user.email}
+                  {user.email}
                 </Text>
 
                 {!!user.bio && (
@@ -217,6 +215,21 @@ export default function Profile({ active = true }: { active?: boolean }) {
                     {user.bio}
                   </Text>
                 )}
+              </View>
+
+              {/* Acciones principales */}
+              <View className="mt-4 w-full max-w-[390px] flex-row justify-center gap-3">
+                <Pressable
+                  onPress={goToEditProfile}
+                  accessibilityRole="button"
+                  className="h-[49px] flex-row items-center justify-center gap-2 rounded-full bg-brand px-7"
+                  style={cardShadowLg}
+                >
+                  <Settings2 size={16} color="#FFFFFF" />
+                  <Text className="text-[13px] font-semibold text-white">
+                    Editar perfil
+                  </Text>
+                </Pressable>
               </View>
 
               {/* Estadística */}
@@ -258,21 +271,6 @@ export default function Profile({ active = true }: { active?: boolean }) {
                     </Text>
                   </View>
                 </View>
-              </View>
-
-              {/* Acciones principales */}
-              <View className="mt-4 w-full max-w-[390px] flex-row gap-3">
-                <Pressable
-                  onPress={goToEditProfile}
-                  accessibilityRole="button"
-                  className="h-[49px] flex-1 flex-row items-center justify-center gap-2 rounded-full bg-brand"
-                  style={cardShadowLg}
-                >
-                  <Settings2 size={16} color="#FFFFFF" />
-                  <Text className="text-[13px] font-semibold text-white">
-                    Editar perfil
-                  </Text>
-                </Pressable>
               </View>
             </View>
 
@@ -475,8 +473,6 @@ function SavedCard({
   garmentTypeLabel: string;
   onPress: () => void;
 }) {
-  const imageRef = useRef<ViewInstance | null>(null);
-
   return (
     <Pressable
       onPress={onPress}
@@ -485,13 +481,15 @@ function SavedCard({
       className="overflow-hidden rounded-row border border-line bg-white"
       style={cardShadowLg}
     >
-      <BlurTargetView ref={imageRef} style={{ aspectRatio: 3 / 4, width: '100%' }}>
-        <Image source={{ uri: post.image }} className="h-full w-full" resizeMode="cover" />
-      </BlurTargetView>
+      <Image
+        source={{ uri: cloudinaryImageUrl(post.image, 600) }}
+        className="aspect-[3/4] w-full"
+        resizeMode="cover"
+      />
 
       {!!garmentTypeLabel && (
         <View className="absolute left-2 top-2">
-          <GlassBadge label={garmentTypeLabel} variant="garment" blurTarget={imageRef} />
+          <GlassBadge label={garmentTypeLabel} variant="garment" />
         </View>
       )}
 

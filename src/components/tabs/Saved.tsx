@@ -68,6 +68,10 @@ export default function Favorites() {
       <FlatList
         data={outfits}
         numColumns={2}
+        initialNumToRender={6}
+        maxToRenderPerBatch={4}
+        updateCellsBatchingPeriod={50}
+        windowSize={7}
         keyExtractor={(outfit) => outfit.id}
         columnWrapperStyle={{ gap: 16 }}
         showsVerticalScrollIndicator={false}
