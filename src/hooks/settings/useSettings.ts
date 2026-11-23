@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { deleteAccount, updatePassword, updateProfile } from '../../api/users';
+import { registerThisDevice, unregisterThisDevice } from '../general/usePushNotifications';
 import { useSession } from '../../session/context';
 import { messageOf, type ResultMessage } from '../../utils/resultMessage';
 
@@ -42,6 +43,8 @@ export function useSettings() {
     const [deleteMessage, setDeleteMessage] = useState<ResultMessage | null>(null);
 
     const [pushEnabled, setPushEnabled] = useState(true);
+    const [savingPush, setSavingPush] = useState(false);
+    const [pushMessage, setPushMessage] = useState<ResultMessage | null>(null);
     const [emailEnabled, setEmailEnabled] = useState(false);
 
     const saveProfile = async (data: ProfileForm) => {
@@ -92,6 +95,37 @@ export function useSettings() {
     };
 
     /**
+     * Activar pide permiso y registra el teléfono; desactivar lo da de baja en
+     * el servidor. Si algo falla, el interruptor vuelve a su estado anterior.
+     */
+    const togglePush = async (enabled: boolean) => {
+        setPushMessage(null);
+        setPushEnabled(enabled);
+        setSavingPush(true);
+
+        try {
+            if (enabled) {
+                const registered = await registerThisDevice();
+
+                if (!registered) {
+                    setPushEnabled(false);
+                    setPushMessage({
+                        kind: 'error',
+                        text: 'No se pudo activar el push en este dispositivo. Revisa el permiso de notificaciones.',
+                    });
+                }
+            } else {
+                await unregisterThisDevice();
+            }
+        } catch (err) {
+            setPushEnabled(!enabled);
+            setPushMessage({ kind: 'error', text: messageOf(err) });
+        } finally {
+            setSavingPush(false);
+        }
+    };
+
+    /**
      * Vuelve siempre a la pestaña de perfil. El back normal no sirve: la barra
      * de tabs no navega, así que la ruta previa sigue siendo la de origen
      * (casi siempre /home) y aterrizaría en el Home.
@@ -119,7 +153,9 @@ export function useSettings() {
     passwordMessage,
 
     pushEnabled,
-    setPushEnabled,
+    togglePush,
+    savingPush,
+    pushMessage,
     emailEnabled,
     setEmailEnabled,
 

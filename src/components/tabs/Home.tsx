@@ -11,6 +11,7 @@ import {
 import { Heart, Sparkles } from 'lucide-react-native';
 
 import ScreenHeader from '../ScreenHeader';
+import NotificationBell from '../notifications/NotificationBell';
 import type { Post } from '../../types';
 import { useHome } from '../../hooks/tabs/useHome';
 import { usePostCard } from '../../hooks/tabs/usePostCard';
@@ -143,7 +144,7 @@ export default function Home() {
           <View>
             {/* Encabezado editorial */}
             <View className="px-[18px] pt-2">
-              <ScreenHeader title="Hibirio" />
+              <ScreenHeader title="Hibirio" right={<NotificationBell />} />
 
               <View className="mb-5 mt-3">
                 <View className="flex-row items-start justify-between">

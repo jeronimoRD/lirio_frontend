@@ -1,6 +1,7 @@
 import { createContext, use, useState, type PropsWithChildren } from 'react';
 import * as api from '../api/auth';
 import { getMe } from '../api/users';
+import { savePushToken } from '../api/notifications';
 import { setToken } from '../api/client';
 import type { User } from '../types';
 
@@ -62,6 +63,9 @@ export function SessionProvider({ children }: PropsWithChildren) {
           await signIn(email, password);
         },
         signOut: () => {
+          // Este teléfono deja de recibir avisos de esta cuenta. La petición
+          // usa el token actual, así que se lanza antes de soltarlo.
+          void savePushToken(null).catch(() => {});
           setToken(null);
           setUser(null);
         },

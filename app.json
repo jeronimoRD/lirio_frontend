@@ -20,7 +20,14 @@
       ],
       "expo-status-bar",
       "expo-router",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "color": "#A81245",
+          "defaultChannel": "default"
+        }
+      ]
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -36,7 +43,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FCFAF8"
       },
-      "package": "com.hibirio.app"
+      "package": "com.hibirio.app",
+      "googleServicesFile": "./google-services.json"
     },
     "extra": {
       "router": {},

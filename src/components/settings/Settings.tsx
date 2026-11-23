@@ -164,7 +164,9 @@ export default function Settings() {
     savingPassword,
     passwordMessage,
     pushEnabled,
-    setPushEnabled,
+    togglePush,
+    savingPush,
+    pushMessage,
     emailEnabled,
     setEmailEnabled,
     deleting,
@@ -451,8 +453,18 @@ export default function Settings() {
                       label="Notificaciones push"
                       description="Avisos y novedades en tu dispositivo."
                       value={pushEnabled}
-                      onChange={setPushEnabled}
+                      onChange={togglePush}
                     />
+
+                    {pushMessage ? (
+                      <View className="mt-3">
+                        <ResultBanner message={pushMessage} />
+                      </View>
+                    ) : null}
+
+                    {savingPush ? (
+                      <Text className="mt-2 text-xs text-ink-muted">Actualizando avisos…</Text>
+                    ) : null}
 
                     <View className="my-3 h-px bg-line" />
 

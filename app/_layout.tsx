@@ -8,6 +8,7 @@ import { LikesProvider } from '../src/likes/context';
 import { MyContentProvider } from '../src/content/context';
 import { GarmentTypesProvider } from '../src/garment-types/context';
 import { FollowsProvider } from '@/follows/context';
+import { PushBridge } from '../src/components/notifications/PushBridge';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,6 +35,7 @@ export default function RootLayout() {
         <FollowsProvider>
           <MyContentProvider>
             <GarmentTypesProvider>
+              <PushBridge />
               <Stack screenOptions={{ headerShown: false }} />
             </GarmentTypesProvider>
           </MyContentProvider>

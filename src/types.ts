@@ -167,3 +167,27 @@ export interface NewReport {
 
 /** Acciones que el admin puede aplicar al resolver un reporte. */
 export type ReportAction = 'DELETE_POST' | 'DELETE_USER';
+
+// --- Notificaciones --------------------------------------------------------
+
+/** Eventos que generan un aviso in-app. */
+export type NotificationType = 'LIKE' | 'FOLLOW' | 'COMMENT';
+
+/** Quién provocó la notificación, resuelto por el servidor al leerla. */
+export interface NotificationSender {
+  name: string;
+  avatarUrl: string;
+}
+
+/** Aviso de actividad para el usuario actual. */
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  /** Texto del evento, ej. "le gustó tu publicación". */
+  message: string;
+  /** Publicación relacionada (like o comentario). */
+  postId?: string;
+  isRead: boolean;
+  createdAt: string;
+  sender: NotificationSender;
+}
