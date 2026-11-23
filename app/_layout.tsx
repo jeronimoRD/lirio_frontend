@@ -7,6 +7,7 @@ import { SessionProvider } from '../src/session/context';
 import { LikesProvider } from '../src/likes/context';
 import { MyContentProvider } from '../src/content/context';
 import { GarmentTypesProvider } from '../src/garment-types/context';
+import { FollowsProvider } from '@/follows/context';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -30,11 +31,13 @@ export default function RootLayout() {
   return (
     <SessionProvider>
       <LikesProvider>
-        <MyContentProvider>
-          <GarmentTypesProvider>
-            <Stack screenOptions={{ headerShown: false }} />
-          </GarmentTypesProvider>
-        </MyContentProvider>
+        <FollowsProvider>
+          <MyContentProvider>
+            <GarmentTypesProvider>
+              <Stack screenOptions={{ headerShown: false }} />
+            </GarmentTypesProvider>
+          </MyContentProvider>
+        </FollowsProvider>
       </LikesProvider>
     </SessionProvider>
   );

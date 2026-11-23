@@ -6,6 +6,7 @@ import { deletePost } from '../../api/posts';
 import { useMyContent } from '../../content/context';
 import { useSession } from '../../session/context';
 import type { Post } from '../../types';
+import { useFollowStats } from '../follow/useFollowStats';
 
 export type GalleryTab = 'outfits' | 'saved';
 
@@ -13,7 +14,8 @@ export function useProfile(active = true) {
     const { user, signOut } = useSession();
     const router = useRouter();
     const { myPosts, outfits, loaded, error, refresh, setMyPosts } = useMyContent();
-
+    const { followersCount } = useFollowStats(user?.id, active);
+    const [followersVisible, setFollowersVisible] = useState(false);
     const [activeTab, setActiveTab] = useState<GalleryTab>('outfits');
     const [deleteTarget, setDeleteTarget] = useState<Post | null>(null);
     const [deleting, setDeleting] = useState(false);
@@ -69,6 +71,11 @@ export function useProfile(active = true) {
     goToSettings,
     goToEditProfile,
     editPost,
+
+    followersCount,
+    followersVisible,
+    openFollowers: () => setFollowersVisible(true),
+    closeFollowers: () => setFollowersVisible(false),
 
     deleteTarget,
     deleting,
