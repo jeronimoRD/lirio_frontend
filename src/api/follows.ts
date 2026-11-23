@@ -43,7 +43,7 @@ export function getFollowingIds(): Promise<string[]> {
 }
 
 export function followUser(userId: string): Promise<FollowActionResponse> {
-    return request<FollowActionResponse>(`/follows/${userId}`, undefined, 'PUT');
+    return request<FollowActionResponse>(`/follows/${userId}`, undefined, 'POST');
 }
 
 export function unfollowUser(userId: string): Promise<FollowActionResponse> {

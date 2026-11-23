@@ -1,4 +1,3 @@
-
 import { Redirect, useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -14,9 +13,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTabBarClearance } from '../LiquidGlass/TabBarClearance';
 import { Bookmark, Shirt, Settings2, LogOut, Sparkles } from 'lucide-react-native';
 
-
 import ConfirmModal from '../ConfirmModal';
 import FeedCard from '../FeedCard';
+import FollowersModal from '../follow/FollowersModal';
 import GlassBadge from '../LiquidGlass/GlassBadge';
 import ProfileCover from '@/components/LiquidGlass/ProfileCover';
 import { useGarmentTypes } from '../../garment-types/context';
@@ -61,6 +60,10 @@ export default function Profile({ active = true }: { active?: boolean }) {
     goToSettings,
     goToEditProfile,
     editPost,
+    followersCount,
+    followersVisible,
+    openFollowers,
+    closeFollowers,
     deleteTarget,
     deleting,
     askDelete,
@@ -248,7 +251,10 @@ export default function Profile({ active = true }: { active?: boolean }) {
                     <Text className="text-[23px] font-semibold text-brand">
                       {posts.length}
                     </Text>
-                    <Text className="text-[9px] font-bold uppercase tracking-[1.5px] text-ink-secondary">
+                    <Text
+                      numberOfLines={1}
+                      className="text-[9px] font-bold uppercase tracking-[1.5px] text-ink-secondary"
+                    >
                       Publicaciones
                     </Text>
                   </View>
@@ -257,10 +263,31 @@ export default function Profile({ active = true }: { active?: boolean }) {
                     <Text className="text-[23px] font-semibold text-brand">
                       {outfitCount}
                     </Text>
-                    <Text className="text-[9px] font-bold uppercase tracking-[1.5px] text-ink-secondary">
+                    <Text
+                      numberOfLines={1}
+                      className="text-[9px] font-bold uppercase tracking-[1.5px] text-ink-secondary"
+                    >
                       Outfits
                     </Text>
                   </View>
+
+                  {/* Al tocar se abre la lista de seguidores */}
+                  <Pressable
+                    onPress={openFollowers}
+                    accessibilityRole="button"
+                    accessibilityLabel="Ver seguidores"
+                    className="flex-1 border-l border-line pl-4 active:opacity-70"
+                  >
+                    <Text className="text-[23px] font-semibold text-brand">
+                      {followersCount}
+                    </Text>
+                    <Text
+                      numberOfLines={1}
+                      className="text-[9px] font-bold uppercase tracking-[1.5px] text-ink-secondary"
+                    >
+                      Seguidores
+                    </Text>
+                  </Pressable>
                 </View>
               </View>
 
@@ -422,6 +449,13 @@ export default function Profile({ active = true }: { active?: boolean }) {
         loading={deleting}
         onConfirm={onDeleteConfirmed}
         onCancel={cancelDelete}
+      />
+
+      <FollowersModal
+        visible={followersVisible}
+        userId={user.id}
+        total={followersCount}
+        onClose={closeFollowers}
       />
     </>
   );

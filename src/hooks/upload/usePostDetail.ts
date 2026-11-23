@@ -99,8 +99,9 @@ export function usePostDetail() {
     likesCount,
     toggleLike,
     // Solo se puede reportar una publicación ajena.
-    canFollow: !!post && post.userId !== me?.id,
     canReport: !!post && post.userId !== me?.id,
+    // Solo se puede seguir al autor de una publicación ajena y con sesión iniciada.
+    canFollow: !!post && !!me && post.userId !== me.id,
     reportVisible,
     openReport: () => setReportVisible(true),
     closeReport: () => setReportVisible(false),
