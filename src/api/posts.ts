@@ -22,6 +22,9 @@ interface CommentResponse {
   post_id: string;
   createdAt: string;
   updatedAt: string;
+  user_name?: string;
+  avatar_url?: string;
+
 }
 
 export interface PostComment {
@@ -29,6 +32,9 @@ export interface PostComment {
   userId: string;
   content: string;
   createdAt?: string;
+  user_name?: string;
+  avatar_url?: string;
+  updatedAt?: string;
 }
 
 function toPost(data: PostResponse): Post {
@@ -171,12 +177,14 @@ export async function getComments(
   const data = await request<CommentResponse[]>(
     `/posts/${postId}/comments`,
   );
-
   return data.map((comment) => ({
     id: comment._id,
     userId: comment.user_id,
     content: comment.content,
     createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+    user_name: comment.user_name,
+    avatar_url: comment.avatar_url,
   }));
 }
 
@@ -198,6 +206,9 @@ export async function addComment(
     userId: data.comment.user_id,
     content: data.comment.content,
     createdAt: data.comment.createdAt,
+    user_name: data.comment.user_name,
+    avatar_url: data.comment.avatar_url,
+    updatedAt: data.comment.updatedAt,
   };
 }
 

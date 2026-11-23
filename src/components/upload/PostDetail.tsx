@@ -618,7 +618,11 @@ const handleDeleteComment = async () => {
                         </>
                       ) : (
                         <>
-                          <Text className="text-[13px] leading-6 text-ink">
+                          <Text className="mb-1 text-[13px] font-semibold text-ink">
+                            {comment.user_name ?? 'Usuario'}
+                          </Text>
+
+                          <Text className="text-[13px] leading-6 text-ink-secondary">
                             {comment.content}
                           </Text>
 
