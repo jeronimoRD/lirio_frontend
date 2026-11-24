@@ -1,3 +1,4 @@
+import { Alert } from 'react-native';
 import { useCallback, useRef, useState } from 'react';
 
 import { followUser, unfollowUser } from '../../api/follows';
@@ -25,8 +26,12 @@ export function useFollow(userId: string | undefined) {
     try {
         if (previous) await unfollowUser(userId);
         else await followUser(userId);
-    } catch {
+    } catch (error) {
         store.setFollowing(userId, previous);
+        Alert.alert(
+            'Error',
+            error instanceof Error ? error.message : 'No se pudo actualizar el seguimiento.',
+        );
     } finally {
         busyRef.current = false;
         setBusy(false);

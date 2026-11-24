@@ -10,7 +10,7 @@ export function setToken(value: string | null): void {
 export async function request<T>(
   path: string,
   body?: unknown,
-  method: 'GET' | 'POST' | 'PATCH' | 'DELETE' =
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' =
     body === undefined ? 'GET' : 'POST',
 ): Promise<T> {
   let response: Response;
