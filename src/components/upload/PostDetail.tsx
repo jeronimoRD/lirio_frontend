@@ -115,6 +115,11 @@ const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
 const [deleting, setDeleting] = useState(false);
 const [menuCommentId, setMenuCommentId] = useState<string | null>(null);
 
+const sortedComments = [
+  ...comments.filter((c) => c.userId === me?.id),
+  ...comments.filter((c) => c.userId !== me?.id),
+];
+
 const handleEditComment = async () => {
   if (!editingCommentId || !editingText.trim() || savingEdit) return;
 
@@ -578,7 +583,7 @@ const handleDeleteComment = async () => {
                   Todavía no hay comentarios. ¡Sé la primera en comentar!
                 </Text>
               ) : (
-                comments.map((comment) => {
+                sortedComments.map((comment) => {
                   const isMyComment = comment.userId === me?.id;
                   const isEditing = editingCommentId === comment.id;
                   const isMenuOpen = menuCommentId === comment.id;
@@ -587,6 +592,7 @@ const handleDeleteComment = async () => {
                     <View
                       key={comment.id}
                       className="relative rounded-xl bg-white/70 p-4"
+                      style={isMenuOpen ? { zIndex: 10 } : undefined}
                     >
                       {isEditing ? (
                         <>
