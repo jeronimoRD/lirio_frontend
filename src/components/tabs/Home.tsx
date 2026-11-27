@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { Heart, Sparkles } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import ScreenHeader from '../ScreenHeader';
 import NotificationBell from '../notifications/NotificationBell';
@@ -118,6 +119,11 @@ export default function Home() {
   } = useHome();
 
   const clearance = useTabBarClearance();
+  const insets = useSafeAreaInsets();
+
+  // El spinner nace por debajo del notch/cámara frontal, a la misma altura
+  // que en Explore (justo bajo el ScreenHeader).
+  const progressOffset = insets.top + 90;
 
   const showFeed = !loading && !error;
 
@@ -140,6 +146,7 @@ export default function Home() {
             onRefresh={refresh}
             tintColor={COLORS.burgundy}
             colors={[COLORS.burgundy]}
+            progressViewOffset={progressOffset}
           />
         }
         contentContainerStyle={{ paddingBottom: clearance }}

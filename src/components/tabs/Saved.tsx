@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   FlatList,
   Pressable,
-  RefreshControl,
   Text,
   TextInput,
   View,
@@ -35,8 +34,6 @@ export default function Favorites() {
     outfits,
     totalOutfits,
     loading,
-    refreshing,
-    refresh,
     error,
     garmentTypeId,
     selectGarmentType,
@@ -79,14 +76,6 @@ export default function Favorites() {
         columnWrapperStyle={{ gap: 16 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={refresh}
-            tintColor={COLORS.burgundy}
-            colors={[COLORS.burgundy]}
-          />
-        }
         contentContainerStyle={{
           paddingHorizontal: 18,
           paddingBottom: clearance,

@@ -4,6 +4,7 @@ import { useFocusEffect } from 'expo-router';
 import { getFeedPosts } from '../../api/posts';
 import { getCategories } from '../../api/categories';
 import { useMyContent } from '../../content/context';
+import { shuffle } from '../../utils/shuffle';
 import type { Post, Category } from '../../types';
 
 const ALL_FILTER = 'Ver todos';
@@ -60,6 +61,8 @@ export function useHome() {
     const refresh = useCallback(async () => {
         setRefreshing(true);
         await load();
+        // Recargar a mano baraja el feed para descubrir otros looks.
+        setPosts((current) => shuffle(current));
         setRefreshing(false);
     }, [load]);
 

@@ -6,6 +6,7 @@ import { getPublicOutfits } from '../../api/outfits';
 import { getCategories } from '../../api/categories';
 import { searchUsers, suggestUsers } from '../../api/users';
 import { useMyContent } from '../../content/context';
+import { shuffle } from '../../utils/shuffle';
 import type { Post, Outfit, Category, User } from '../../types';
 
 export type SearchTab = 'prendas' | 'outfits' | 'cuentas';
@@ -98,6 +99,9 @@ export function useExplore() {
     const refresh = useCallback(async () => {
         setRefreshing(true);
         await load();
+        // Recargar a mano baraja los resultados para descubrir otros looks.
+        setPosts((current) => shuffle(current));
+        setOutfits((current) => shuffle(current));
         setRefreshing(false);
     }, [load]);
 
