@@ -20,7 +20,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowLeft, Bookmark, Flag, Heart, Sparkles } from 'lucide-react-native';
+import { ArrowLeft, Bookmark, Flag, Heart, MoreVertical, Sparkles } from 'lucide-react-native';
 import ReportModal from '../ReportModal';
 import FollowButton from '../follow/FollowButton';
 import GlassIconButton from '@/components/LiquidGlass/GlassIconButton';
@@ -113,6 +113,7 @@ const [editingText, setEditingText] = useState('');
 const [savingEdit, setSavingEdit] = useState(false);
 const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
 const [deleting, setDeleting] = useState(false);
+const [menuCommentId, setMenuCommentId] = useState<string | null>(null);
 
 const handleEditComment = async () => {
   if (!editingCommentId || !editingText.trim() || savingEdit) return;
@@ -580,11 +581,12 @@ const handleDeleteComment = async () => {
                 comments.map((comment) => {
                   const isMyComment = comment.userId === me?.id;
                   const isEditing = editingCommentId === comment.id;
+                  const isMenuOpen = menuCommentId === comment.id;
 
                   return (
                     <View
                       key={comment.id}
-                      className="rounded-xl bg-white/70 p-4"
+                      className="relative rounded-xl bg-white/70 p-4"
                     >
                       {isEditing ? (
                         <>
@@ -630,37 +632,58 @@ const handleDeleteComment = async () => {
                         </>
                       ) : (
                         <>
-                          <Text className="mb-1 text-[13px] font-semibold text-ink">
-                            {comment.user_name ?? 'Usuario'}
-                          </Text>
+                          <View className="flex-row items-start gap-2">
+                            <Avatar
+                              name={comment.userName ?? 'Usuario'}
+                              uri={comment.avatarUrl}
+                              size={28}
+                              backgroundColor={colors.primary}
+                            />
+                            <View className="flex-1 min-w-0">
+                              <Text className="mb-1 text-[13px] font-semibold text-ink">
+                                {comment.userName ?? 'Usuario'}
+                              </Text>
 
-                          <Text className="text-[13px] leading-6 text-ink-secondary">
-                            {comment.content}
-                          </Text>
+                              <Text className="text-[13px] leading-6 text-ink-secondary">
+                                {comment.content}
+                              </Text>
+                            </View>
+                          </View>
 
-                          {isMyComment && (
-                            <View className="mt-3 flex-row justify-end gap-4">
+                          {isMyComment && !isEditing && (
+                            <Pressable
+                              onPress={() =>
+                                setMenuCommentId(isMenuOpen ? null : comment.id)
+                              }
+                              hitSlop={8}
+                              accessibilityRole="button"
+                              accessibilityLabel="Opciones de comentario"
+                              className="absolute right-2 top-2 h-7 w-7 items-center justify-center rounded-full bg-line/60"
+                            >
+                              <MoreVertical size={14} color="#6E6B68" strokeWidth={2} />
+                            </Pressable>
+                          )}
+
+                          {isMyComment && !isEditing && isMenuOpen && (
+                            <View className="absolute right-2 top-9 w-28 overflow-hidden rounded-xl border border-line bg-white">
                               <Pressable
                                 onPress={() => {
                                   setEditingCommentId(comment.id);
                                   setEditingText(comment.content);
+                                  setMenuCommentId(null);
                                 }}
-                                accessibilityRole="button"
-                                className="active:opacity-60"
+                                className="px-4 py-3"
                               >
-                                <Text className="text-[12px] font-semibold text-brand">
-                                  Editar
-                                </Text>
+                                <Text className="text-sm text-ink">Editar</Text>
                               </Pressable>
-
                               <Pressable
-                                onPress={() => setDeletingCommentId(comment.id)}
-                                accessibilityRole="button"
-                                className="active:opacity-60"
+                                onPress={() => {
+                                  setDeletingCommentId(comment.id);
+                                  setMenuCommentId(null);
+                                }}
+                                className="border-t border-line px-4 py-3"
                               >
-                                <Text className="text-[12px] font-semibold text-red-500">
-                                  Eliminar
-                                </Text>
+                                <Text className="text-sm text-red-600">Eliminar</Text>
                               </Pressable>
                             </View>
                           )}

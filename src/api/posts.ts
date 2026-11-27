@@ -32,8 +32,8 @@ export interface PostComment {
   userId: string;
   content: string;
   createdAt?: string;
-  user_name?: string;
-  avatar_url?: string;
+  userName?: string;
+  avatarUrl?: string;
   updatedAt?: string;
 }
 
@@ -183,8 +183,8 @@ export async function getComments(
     content: comment.content,
     createdAt: comment.createdAt,
     updatedAt: comment.updatedAt,
-    user_name: comment.user_name,
-    avatar_url: comment.avatar_url,
+    userName: comment.user_name,
+    avatarUrl: comment.avatar_url,
   }));
 }
 
@@ -206,8 +206,8 @@ export async function addComment(
     userId: data.comment.user_id,
     content: data.comment.content,
     createdAt: data.comment.createdAt,
-    user_name: data.comment.user_name,
-    avatar_url: data.comment.avatar_url,
+    userName: data.comment.user_name,
+    avatarUrl: data.comment.avatar_url,
     updatedAt: data.comment.updatedAt,
   };
 }
