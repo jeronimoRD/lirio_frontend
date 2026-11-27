@@ -4,6 +4,7 @@ import {
   FlatList,
   Image,
   Pressable,
+  RefreshControl,
   ScrollView,
   Text,
   View,
@@ -105,6 +106,8 @@ function EmptyState({
 export default function Home() {
   const {
     loading,
+    refreshing,
+    refresh,
     error,
     filters,
     activeFilter,
@@ -131,6 +134,14 @@ export default function Home() {
         keyExtractor={(post) => post.id}
         columnWrapperStyle={{ gap: 13, paddingHorizontal: 18 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={refresh}
+            tintColor={COLORS.burgundy}
+            colors={[COLORS.burgundy]}
+          />
+        }
         contentContainerStyle={{ paddingBottom: clearance }}
         renderItem={({ item, index }) => (
           <View className="flex-1 pb-5">
@@ -403,7 +414,7 @@ function EditorialSpread({ post }: { post: Post }) {
         <EditorialMark />
 
         <Text className="text-[9px] font-semibold uppercase tracking-[0.2em] text-ink-secondary">
-          HIBIRIO · EDITOR'S CHOICE
+          HIBIRIO · EDITOR&apos;S CHOICE
         </Text>
 
         <View className="h-px flex-1 bg-line" />

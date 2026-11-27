@@ -5,6 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { getPost, updatePost } from '../../api/posts';
 import { getCategories } from '../../api/categories';
+import { useMyContent } from '../../content/context';
 import type { Category } from '../../types';
 
 export type EditPostForm = {
@@ -15,6 +16,7 @@ export type EditPostForm = {
 export function useEditPost() {
     const router = useRouter();
     const { id } = useLocalSearchParams<{ id: string }>();
+    const { refresh: refreshContent, invalidate } = useMyContent();
 
     const { control, handleSubmit, reset } = useForm<EditPostForm>({
         defaultValues: { title: '', description: '' },
@@ -98,6 +100,8 @@ export function useEditPost() {
 
         await updatePost(id, title.trim(), description.trim(), categoryIds, garmentTypeId);
 
+        refreshContent();
+        invalidate();
         router.replace('/(tabs)/profile');
         } catch (error) {
         Alert.alert(

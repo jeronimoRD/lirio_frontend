@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 
 import { createPost } from '../../api/posts';
 import { getCategories } from '../../api/categories';
+import { useMyContent } from '../../content/context';
 import type { Category } from '../../types';
 
 export type CreatePostForm = {
@@ -22,6 +23,7 @@ export function useCreatePost({
   onFirstError: (section: CreateSection) => void;
 }) {
   const router = useRouter();
+  const { refresh: refreshContent, invalidate } = useMyContent();
 
   const { control, handleSubmit, getValues } = useForm<CreatePostForm>({
     defaultValues: {
@@ -174,6 +176,8 @@ export function useCreatePost({
         garmentTypeId,
       );
 
+      refreshContent();
+      invalidate();
       setConfirm(false);
       router.replace('/(tabs)/profile');
     } catch (error) {

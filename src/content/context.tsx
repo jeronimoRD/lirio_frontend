@@ -17,6 +17,12 @@ interface MyContent {
   error: string | null;
   /** Vuelve a pedir todo en segundo plano; lo que ya está en memoria se sigue mostrando. */
   refresh: () => Promise<void>;
+  /**
+   * Marca que el contenido cambió (post u outfit creado, editado o borrado).
+   * Las pantallas con datos propios (Home, Explore) lo usan para recargarse.
+   */
+  version: number;
+  invalidate: () => void;
   setMyPosts: (update: (posts: Post[]) => Post[]) => void;
   setOutfits: (update: (outfits: Outfit[]) => Outfit[]) => void;
 }
@@ -38,8 +44,11 @@ export function MyContentProvider({ children }: PropsWithChildren) {
   const [outfits, setOutfitsState] = useState<Outfit[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [version, setVersion] = useState(0);
 
   const currentUserRef = useRef<string | null>(userId);
+
+  const invalidate = useCallback(() => setVersion((current) => current + 1), []);
 
   const refresh = useCallback(async () => {
     if (!userId) return;
@@ -88,10 +97,12 @@ export function MyContentProvider({ children }: PropsWithChildren) {
       loaded,
       error,
       refresh,
+      version,
+      invalidate,
       setMyPosts: (update) => setMyPostsState((current) => update(current)),
       setOutfits: (update) => setOutfitsState((current) => update(current)),
     }),
-    [myPosts, savedPosts, outfits, loaded, error, refresh],
+    [myPosts, savedPosts, outfits, loaded, error, refresh, version, invalidate],
   );
 
   return <MyContentContext value={value}>{children}</MyContentContext>;

@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 
 import { createOutfit, getOutfit, updateOutfit } from '../../api/outfits';
 import { getMyPosts, getSavedPosts } from '../../api/posts';
+import { useMyContent } from '../../content/context';
 import { useSession } from '../../session/context';
 import { useGarmentTypes } from '../../garment-types/context';
 import type { OutfitItem, Post } from '../../types';
@@ -29,6 +30,7 @@ export function useOutfitForm({
   const router = useRouter();
   const { user } = useSession();
   const { types } = useGarmentTypes();
+  const { refresh: refreshContent, invalidate } = useMyContent();
 
   const { control, handleSubmit, reset } = useForm<OutfitFormValues>({
     defaultValues: { name: '' },
@@ -171,6 +173,8 @@ export function useOutfitForm({
           await createOutfit(input);
         }
 
+        refreshContent();
+        invalidate();
         router.back();
       } catch (err) {
         setSubmitError(err instanceof Error ? err.message : 'No se pudo guardar el outfit.');

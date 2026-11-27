@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 
 import { deleteOutfit, getOutfit } from '../../api/outfits';
+import { useMyContent } from '../../content/context';
 import { useSession } from '../../session/context';
 import type { Outfit } from '../../types';
 
@@ -10,6 +11,7 @@ export function useOutfitDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { user } = useSession();
+  const { setOutfits, invalidate } = useMyContent();
 
   const [outfit, setOutfit] = useState<Outfit | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,6 +52,8 @@ export function useOutfitDetail() {
 
     try {
       await deleteOutfit(outfit.id);
+      setOutfits((current) => current.filter((item) => item.id !== outfit.id));
+      invalidate();
       setConfirmVisible(false);
       router.back();
     } catch (err) {

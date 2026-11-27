@@ -9,19 +9,26 @@ import type { Outfit, Post } from '../../types';
 export function useWardrobe() {
   const router = useRouter();
 
-  const { myPosts, savedPosts, outfits, loaded, error, refresh, setOutfits } = useMyContent();
+  const { myPosts, savedPosts, outfits, loaded, error, refresh: refreshContent, setOutfits, invalidate } = useMyContent();
 
   const [deleteTarget, setDeleteTarget] = useState<Outfit | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [garmentTypeId, setGarmentTypeId] = useState<string | null>(null);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
 
   useFocusEffect(
     useCallback(() => {
-      refresh();
-    }, [refresh]),
+      refreshContent();
+    }, [refreshContent]),
   );
+
+  const refresh = useCallback(async () => {
+    setRefreshing(true);
+    await refreshContent();
+    setRefreshing(false);
+  }, [refreshContent]);
 
   const pieces = useMemo(() => {
     const byId = new Map<string, Post>();
@@ -68,6 +75,7 @@ export function useWardrobe() {
       await deleteOutfit(id);
       setDeleteTarget(null);
       setOutfits((current) => current.filter((outfit) => outfit.id !== id));
+      invalidate();
     } catch (err) {
       Alert.alert(
         'Error',
@@ -88,6 +96,8 @@ export function useWardrobe() {
     outfits: visibleOutfits,
     totalOutfits: outfits.length,
     loading: !loaded,
+    refreshing,
+    refresh,
     error,
     garmentTypeId,
     selectGarmentType,

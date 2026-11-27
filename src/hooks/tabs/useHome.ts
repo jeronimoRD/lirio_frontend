@@ -1,50 +1,67 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
 
 import { getFeedPosts } from '../../api/posts';
 import { getCategories } from '../../api/categories';
+import { useMyContent } from '../../content/context';
 import type { Post, Category } from '../../types';
 
 const ALL_FILTER = 'Ver todos';
 
 export function useHome() {
+    const { version } = useMyContent();
     const [posts, setPosts] = useState<Post[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [activeFilter, setActiveFilter] = useState(ALL_FILTER);
 
-    useEffect(() => {
-    let cancelled = false;
+    const loadedOnce = useRef(false);
 
-    const load = async () => {
-        setLoading(true);
+    const load = useCallback(async () => {
+        if (!loadedOnce.current) {
+            setLoading(true);
+        }
+
         setError(null);
 
         getCategories()
             .then((allCategories) => {
-            if (cancelled) return;
-            setCategories(allCategories);
-        })
-        .catch(() => {});
+                setCategories(allCategories);
+            })
+            .catch(() => {});
 
         try {
-            const allPosts = await getFeedPosts();
-            if (cancelled) return;
-            setPosts(allPosts);
+            setPosts(await getFeedPosts());
         } catch (err) {
-            if (cancelled) return;
             setError(err instanceof Error ? err.message : 'No se pudo cargar el feed');
         } finally {
-            if (!cancelled) setLoading(false);
+            loadedOnce.current = true;
+            setLoading(false);
         }
-    };
-
-    load();
-
-        return () => {
-        cancelled = true;
-        };
     }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            load();
+        }, [load]),
+    );
+
+    const lastVersion = useRef(version);
+
+    useEffect(() => {
+        if (lastVersion.current === version) return;
+
+        lastVersion.current = version;
+        load();
+    }, [version, load]);
+
+    const refresh = useCallback(async () => {
+        setRefreshing(true);
+        await load();
+        setRefreshing(false);
+    }, [load]);
 
     const filters = [ALL_FILTER, ...categories.map((category) => category.name)];
 
@@ -63,6 +80,8 @@ export function useHome() {
 
     return {
     loading,
+    refreshing,
+    refresh,
     error,
     showSpinner,
     filters,

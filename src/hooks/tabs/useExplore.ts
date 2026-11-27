@@ -1,18 +1,22 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
 
 import { getPosts } from '../../api/posts';
 import { getPublicOutfits } from '../../api/outfits';
 import { getCategories } from '../../api/categories';
 import { searchUsers, suggestUsers } from '../../api/users';
+import { useMyContent } from '../../content/context';
 import type { Post, Outfit, Category, User } from '../../types';
 
 export type SearchTab = 'prendas' | 'outfits' | 'cuentas';
 
 export function useExplore() {
+    const { version } = useMyContent();
     const [posts, setPosts] = useState<Post[]>([]);
     const [outfits, setOutfits] = useState<Outfit[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [query, setQuery] = useState('');
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
@@ -23,44 +27,79 @@ export function useExplore() {
     const [usersError, setUsersError] = useState<string | null>(null);
     const [focused, setFocused] = useState(false);
 
-    useEffect(() => {
-        let active = true;
+    const loadedOnce = useRef(false);
+    // Cada carga tiene un número; solo la más reciente puede escribir estado.
+    const genRef = useRef(0);
 
-        getCategories()
-        .then((all) => {
-            if (active) setCategories(all);
-        })
-        .catch(() => {});
+    const load = useCallback(async () => {
+        const gen = ++genRef.current;
 
-        getPosts()
-        .then((all) => {
-            if (active) setPosts(all);
-        })
-        .catch((err) => {
-            if (active) {
-            setError(err instanceof Error ? err.message : 'No se pudo cargar el contenido');
-            }
-        })
-        .finally(() => {
-            if (active) setLoading(false);
-        });
+        if (!loadedOnce.current) {
+            setLoading(true);
+        }
 
-        getPublicOutfits()
-        .then((all) => {
-            if (active) setOutfits(all);
-        })
-        .catch(() => {});
+        setError(null);
 
-        suggestUsers(10)
-        .then((all) => {
-            if (active) setSuggestions(all);
-        })
-        .catch(() => {});
+        // Todo se pide a la vez y se aplica junto: si una parte falla, el resto
+        // se actualiza igual y nunca queda una lista con datos viejos.
+        const [postsResult, outfitsResult, categoriesResult, suggestionsResult] =
+            await Promise.allSettled([
+                getPosts(),
+                getPublicOutfits(),
+                getCategories(),
+                suggestUsers(10),
+            ]);
 
-        return () => {
-        active = false;
-        };
+        // Llegó una carga más nueva mientras esta estaba en vuelo: se descarta
+        // para no pisar el estado con datos viejos.
+        if (gen !== genRef.current) return;
+
+        if (postsResult.status === 'fulfilled') {
+            setPosts(postsResult.value);
+        } else {
+            setError(
+                postsResult.reason instanceof Error
+                    ? postsResult.reason.message
+                    : 'No se pudo cargar el contenido',
+            );
+        }
+
+        if (outfitsResult.status === 'fulfilled') {
+            setOutfits(outfitsResult.value);
+        }
+
+        if (categoriesResult.status === 'fulfilled') {
+            setCategories(categoriesResult.value);
+        }
+
+        if (suggestionsResult.status === 'fulfilled') {
+            setSuggestions(suggestionsResult.value);
+        }
+
+        loadedOnce.current = true;
+        setLoading(false);
     }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            load();
+        }, [load]),
+    );
+
+    const lastVersion = useRef(version);
+
+    useEffect(() => {
+        if (lastVersion.current === version) return;
+
+        lastVersion.current = version;
+        load();
+    }, [version, load]);
+
+    const refresh = useCallback(async () => {
+        setRefreshing(true);
+        await load();
+        setRefreshing(false);
+    }, [load]);
 
   // Búsqueda de cuentas en el servidor, con un pequeño retardo.
     useEffect(() => {
@@ -183,9 +222,23 @@ export function useExplore() {
     const hasCategoryFilter = activeCategoryIds.length > 0;
     const filters = categories.map((category) => category.name);
 
+    // Al abrir la pestaña de outfits se recarga todo, para que uno recién
+    // creado aparezca aunque el foco de las tabs no cambie.
+    useEffect(() => {
+        if (!searchActive || activeTab !== 'outfits') return;
+
+        const timer = setTimeout(() => {
+            load();
+        }, 0);
+
+        return () => clearTimeout(timer);
+    }, [searchActive, activeTab, load]);
+
     return {
     // carga general
     loading,
+    refreshing,
+    refresh,
     error,
 
     // buscador

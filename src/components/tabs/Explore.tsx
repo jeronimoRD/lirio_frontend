@@ -5,6 +5,7 @@ import {
   FlatList,
   Modal,
   Pressable,
+  RefreshControl,
   ScrollView,
   Text,
   TextInput,
@@ -48,6 +49,8 @@ type ExploreItem =
 export default function Explore() {
   const {
     loading,
+    refreshing,
+    refresh,
     error,
     query,
     setQuery,
@@ -278,6 +281,14 @@ export default function Explore() {
         contentContainerStyle={{ paddingBottom: clearance }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={refresh}
+            tintColor={COLORS.burgundy}
+            colors={[COLORS.burgundy]}
+          />
+        }
         renderItem={({ item }) => {
           if (item.kind === 'user') {
             return (
